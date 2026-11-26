@@ -54,7 +54,8 @@ function changeSettings(patch) {
   applySettings();
   if ('lowercase' in patch) { if(!completed) roundPresentation='mixed';renderLetters(); renderModel(); }
   if ('adapt' in patch || 'minIndependentSessions' in patch) recommendation();
-  if(word) {renderRelated();renderAdvice();}
+  const affectsAdvice=['adapt','minIndependentSessions','categoryInterest','exploration','preferredActivity','reviewAfterDays','lowercase'].some(key=>key in patch);
+  if(word && affectsAdvice) {renderRelated();renderAdvice();}
   settingsQueue = settingsQueue.then(async () => {
     try {await store.settings(patch);}
     catch {storageOK = false;}

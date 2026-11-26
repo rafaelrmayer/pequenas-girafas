@@ -88,6 +88,9 @@ function renderRelated() {
     const reason = document.createElement('small'); reason.textContent = related.reason;
     content.append(title, reason); node.append(img, content); $('recommendations').append(node);
   }
+  const concepts=new Map((catalog.concepts || []).map(concept=>[concept.id,concept]));
+  $('semantic-note').textContent=catalog.relations.filter(edge=>edge.from===word.id && concepts.has(edge.to)).map(edge=>`${word.text}: ${edge.label} ${concepts.get(edge.to).label}.`).join(' ');
+
 }
 function renderEvidence() {
   if(!word) return;
@@ -98,7 +101,7 @@ function renderEvidence() {
     const li=document.createElement('li');li.dataset.activity=type;
     const label=facts.status==='no_evidence'?'Sem registro':facts.status==='observed_independent'?'Há conclusão sem pistas':'Explorada com apoio';
     li.textContent=`${ACTIVITIES[type]}: ${label}.`;
-    if(facts.completions) li.textContent+=` ${facts.completions} conclusões; ${facts.independent} sem pistas e ${facts.assisted} com apoio; ${facts.withHints} com pista solicitada${facts.unknownHints?`; ${facts.unknownHints} sem informação sobre pistas`:""}. ${facts.sessions} ${facts.sessions===1?'sessão':'sessões'}, ${facts.days.length} ${facts.days.length===1?'dia local':'dias locais'} com data, ${facts.presentations.length} ${facts.presentations.length===1?'apresentação registrada':'apresentações registradas'}.${facts.undated?` ${facts.undated} ${facts.undated===1?'registro':'registros'} sem data.`:''}`;
+    if(facts.completions) li.textContent+=` ${facts.completions} ${facts.completions===1?'conclusão':'conclusões'}; ${facts.independent} sem pistas e ${facts.assisted} com apoio; ${facts.withHints} com pista solicitada${facts.unknownHints?`; ${facts.unknownHints} sem informação sobre pistas`:""}. ${facts.sessions} ${facts.sessions===1?'sessão':'sessões'}, ${facts.days.length} ${facts.days.length===1?'dia local':'dias locais'} com data, ${facts.presentations.length} ${facts.presentations.length===1?'apresentação registrada':'apresentações registradas'}.${facts.undated?` ${facts.undated} ${facts.undated===1?'registro':'registros'} sem data.`:''}`;
     $('skill-evidence').append(li);
   }
 }

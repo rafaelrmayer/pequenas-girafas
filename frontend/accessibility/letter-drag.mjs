@@ -54,7 +54,9 @@ export function letterDrag(root, {canDrop, drop, announce}) {
       clear();if(position) drop(key,position.index);
     } else clear();
   });
-  root.addEventListener('pointercancel',clear);
+  // Native HTML dragging also emits pointercancel for the mouse stream.
+  // Only a pending touch/pen gesture should be canceled here.
+  root.addEventListener('pointercancel',event=>{if(pending && event.pointerId===pending.id) clear();});
   root.addEventListener('contextmenu',event=>{if(active) event.preventDefault();});
   root.addEventListener('click',event=>{
     if(suppress && performance.now()<suppress.until && (event.target===suppress.node || suppress.node.contains(event.target))) {

@@ -10,5 +10,6 @@
   "devDependencies": {
     "fake-indexeddb": "6.2.8",
     "playwright": "1.62.1"
-  }
+  },
+  "license": "PolyForm-Noncommercial-1.0.0"
 }

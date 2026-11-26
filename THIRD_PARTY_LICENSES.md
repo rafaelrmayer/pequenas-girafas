@@ -2,7 +2,7 @@
 
 ## Código próprio
 
-Interface, SVGs e motores desta V0.1 foram criados para o projeto. O mantenedor ainda deve definir a licença de distribuição do código próprio antes de torná-lo público. Ausência de LICENSE não concede licença de software livre. O mantenedor criou o repositório público. Não há produção; nenhuma licença de distribuição do código próprio foi concedida ainda.
+O código próprio, a interface e os SVGs originais são disponibilizados sob a PolyForm Noncommercial 1.0.0, conforme [LICENSE](LICENSE). Preservar o aviso de autoria em [NOTICE](NOTICE) ao redistribuir. A licença cobre somente os direitos do titular sobre esses materiais; não relicencia dependências, ferramentas, vozes ou outros componentes de terceiros.
 
 ## Referências GIRAF
 
@@ -24,7 +24,7 @@ As distribuições mantêm os avisos próprios; dependências transitivas e a im
 
 ## Áudio sintético do catálogo
 
-Os 33 MP3 foram gerados offline com eSpeak NG 1.52.0 (voz `pt-br`, velocidade 145) e codificados com FFmpeg/libmp3lame. Fonte do sintetizador: https://github.com/espeak-ng/espeak-ng (GPL-3.0-or-later); pacotes oficiais Debian 1.52.0+dfsg-5 usados apenas na geração. Código, bibliotecas e bases de voz do sintetizador não foram incorporados ao aplicativo. São distribuídas somente as gravações de palavras genéricas e nomes de letras, com transcrições e comandos em `scripts/generate_audio.py`. Não há clonagem de voz ou gravação de usuários. Revisão de pronúncia e licença própria do projeto continuam pendentes.
+Os 33 MP3 foram gerados offline com eSpeak NG 1.52.0 (voz `pt-br`, velocidade 145) e codificados com FFmpeg/libmp3lame. Fonte do sintetizador: https://github.com/espeak-ng/espeak-ng (GPL-3.0-or-later); pacotes oficiais Debian 1.52.0+dfsg-5 usados apenas na geração. Código, bibliotecas e bases de voz do sintetizador não foram incorporados ao aplicativo. São distribuídas somente as gravações de palavras genéricas e nomes de letras, com transcrições e comandos em `scripts/generate_audio.py`. Não há clonagem de voz ou gravação de usuários. Revisão de pronúncia continua pendente; a licença do código próprio está em LICENSE.
 
 ## Atualização do catálogo — Edge TTS
 
@@ -32,4 +32,4 @@ O catálogo atual substitui os áudios eSpeak por gravações geradas com `edge-
 
 O manifesto ao lado dos MP3 contém transcrições genéricas e hashes. A geração usa o serviço online uma vez por catálogo; o aplicativo distribuído toca somente os arquivos locais. O script eSpeak foi mantido como alternativa histórica, mas os MP3 atuais não foram produzidos por ele.
 
-As seis variações SVG de PEIXE, POLVO e ÁGUA da versão 0.1.6 foram desenhadas para este projeto com formas vetoriais originais. Não são fotos, pictogramas de bibliotecas externas nem assets GIRAF/ARASAAC. As imagens originais foram preservadas. Revisão pedagógica e licença geral de distribuição do projeto continuam pendentes.
+As seis variações SVG de PEIXE, POLVO e ÁGUA da versão 0.1.6 foram desenhadas para este projeto com formas vetoriais originais. Não são fotos, pictogramas de bibliotecas externas nem assets GIRAF/ARASAAC. As imagens originais foram preservadas. Revisão pedagógica continua pendente. Os SVGs originais estão cobertos pela licença do código próprio em LICENSE.

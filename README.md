@@ -72,7 +72,7 @@ O código público GIRAF-ai foi analisado em commit fixado, assim como a alterna
 - [Privacidade](PRIVACY.md), [segurança](SECURITY.md), [acessibilidade](ACCESSIBILITY.md).
 - [Diretrizes pedagógicas](PEDAGOGICAL_GUIDELINES.md) e [histórico](CHANGELOG.md).
 
-V0.2–V1.0 não estão implementadas: frases, desenho, histórias, relatórios avançados, restauração de backup, reconhecimento de escrita, embeddings, RAG e modelos treinados ficam fora desta entrega. A Jornada de Bia e as outras APIs não foram modificadas. A licença de distribuição do código próprio ainda deverá ser definida; a ausência de LICENSE não concede uma licença de software livre.
+V0.2–V1.0 não estão implementadas: frases, desenho, histórias, relatórios avançados, restauração de backup, reconhecimento de escrita, embeddings, RAG e modelos treinados ficam fora desta entrega. A Jornada de Bia e as outras APIs não foram modificadas.
 
 ## Ambientes separados
 
@@ -129,3 +129,14 @@ PEIXE, POLVO e ÁGUA agora têm três ilustrações cada: a original e duas nova
 A área de responsáveis mostra conclusões com cada imagem, rodadas com troca e registros sem identificação. Contextos antigos que registraram explicitamente `image-v1` continuam ligados à original; eventos sem imagem registrada permanecem desconhecidos. Isso descreve o material disponível durante as interações, não o que a pessoa olhou ou reconheceu.
 
 As seis ilustrações novas são SVGs locais originais e entram no cache offline. Não há serviço de visão, rastreamento ocular ou análise de imagem. Conclusões em imagens diferentes são observações, não prova de generalização. Exportação schemaVersion 4 inclui `visualIds`, preservando registros antigos.
+
+
+## Licença e reutilização
+
+O código próprio, a interface e os SVGs originais do Pequenas Girafas estão disponíveis sob a [PolyForm Noncommercial 1.0.0](LICENSE). É permitido usar, copiar, modificar e redistribuir para os fins permitidos nessa licença, preservando os termos e o aviso de autoria de [NOTICE](NOTICE).
+
+A licença permite fins não comerciais e contempla expressamente usos por instituições educacionais, beneficentes e outras organizações descritas no texto, independentemente da origem do financiamento. Não é uma proibição geral de qualquer uso por uma instituição que receba receitas. Usos comerciais fora dessas permissões exigem autorização específica do titular.
+
+Descrição pública: **código disponível para reutilização não comercial**. A restrição comercial impede apresentá-lo como software livre ou open source. Este resumo não substitui a licença integral.
+
+Dependências, ferramentas de geração e áudios de fornecedores têm condições próprias; esta licença não substitui nem amplia direitos sobre componentes de terceiros. Consulte [Componentes e licenças](THIRD_PARTY_LICENSES.md), especialmente os termos do serviço de voz. A demonstração atual permanece experimental, sem validação pedagógica.

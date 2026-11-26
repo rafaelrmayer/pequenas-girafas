@@ -55,8 +55,13 @@ test('keyboard and hint are sufficient; settings, accent and mobile layout', asy
     await page.locator('#check').focus(); await page.keyboard.press('Enter');
     await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/ÁGUA: 1 construções; 1 com apoio/);
-    await page.locator('#dark').check(); await page.locator('#reduced').check(); await page.locator('#lowercase').check();
+    for (const id of ['dark', 'reduced', 'lowercase']) {
+      const setting = page.locator(`#${id}`);
+      await setting.press('Space');
+      assert.equal(await setting.isChecked(), true);
+    }
     await page.waitForFunction(()=>document.body.classList.contains('dark')&&document.body.classList.contains('reduced'));
+    assert.equal(await page.locator('#slots').textContent(), 'água');
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     const contrast = await page.evaluate(() => {
       const luminance = color => {
@@ -88,6 +93,10 @@ test('independent evidence across sessions recommends optional memory mode, neve
     assert.equal(await page.locator('#recommendations button').count(),6);
     await page.locator('#adult-title').click(); await page.locator('#adapt').uncheck();
     await page.waitForFunction(()=>document.querySelector('#adapt-reason').textContent.includes('desligada'));
+    await page.waitForFunction(async () => {
+      const {load} = await import('/storage/store.mjs');
+      return (await load()).settings.adapt === false;
+    });
     await page.reload(); await page.locator('#experience').waitFor({state:'visible'});
     assert.equal(await page.locator('input[value="model"]').isChecked(),true);
     assert.deepEqual(failures,[]);

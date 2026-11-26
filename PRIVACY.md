@@ -23,3 +23,7 @@ O áudio principal usa 33 MP3 genéricos gerados offline, servidos pela própria
 ## Próximas versões
 
 Textos livres e histórias podem conter dados pessoais: não serão enviados automaticamente a provedores. Qualquer mudança de fluxo precisa de revisão prévia e documentação. Dados de crianças/familiares não serão usados para pesquisa ou treinamento. Questões devem ser encaminhadas ao mantenedor do repositório, sem incluir informações pessoais em issues ou capturas.
+
+## Geração do catálogo de áudio
+
+A ferramenta de desenvolvimento Edge TTS envia somente 33 palavras e nomes de letras genéricos fixos ao serviço Microsoft Edge. Isso ocorre na preparação do catálogo pelo mantenedor, não no dispositivo da criança, no servidor de produção ou nos testes comuns. Não aceita texto livre. O aplicativo recebe apenas os MP3 empacotados e não chama Microsoft para reproduzi-los; progresso, configurações e sessão local continuam fora da rede. A infraestrutura do serviço pode observar IP e metadados da máquina de geração; isso é diferente de processar dados da criança.

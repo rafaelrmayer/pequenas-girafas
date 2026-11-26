@@ -75,6 +75,7 @@ function chooseWord(id, options={}) {
   if (saving) { $('word').value = word.id; return; }
   stop(); drag?.cancel(); round=0; word = catalog.words.find(w => w.id === id) || catalog.words[0];
   $('word').value = word.id;
+  $('picture-options').open=false;
   currentImage=presentationsFor(word).find(image=>image.id===options.imageId) || presentationsFor(word)[0];renderPicture();
   const support=recommendation();mode = options.mode || support.mode;
   document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true;
@@ -104,6 +105,7 @@ function renderPicture() {
   }
   $('presentation-select').value=currentImage.id;$('presentation-select').disabled=images.length<2;
   $('next-image').disabled=images.length<2;
+  $('picture-options').hidden=images.length<2;
   $('image-status').textContent=`Imagem ${images.findIndex(image=>image.id===currentImage.id)+1} de ${images.length}.`;
 }
 function changeVisual(id) {
@@ -170,7 +172,7 @@ function reset() {
   bank=next.bank; selected=next.slots; locked=next.locked;
   $('repeat').hidden=true; $('check').disabled=false; $('hint').disabled=false;
   $('task-title').textContent = activity==='build' ? 'Vamos juntar as letras?' : activity==='missing' ? 'Qual letra está faltando?' : 'Qual palavra combina com a imagem?';
-  $('task-instructions').textContent = activity==='build' ? 'Clique nas letras ou arraste-as para os espaços. Para retirar uma, toque nela na palavra.' : activity==='missing' ? 'Escolha uma letra para completar o espaço. Você também pode arrastá-la.' : 'Observe a imagem e escolha uma palavra. Depois, clique em Conferir palavra.';
+  $('task-instructions').textContent = activity==='build' ? 'Toque ou arraste as letras. Para retirar uma, toque nela na palavra.' : activity==='missing' ? 'Toque em uma letra ou arraste-a até o espaço vazio.' : 'Observe a imagem e escolha uma palavra. Depois, clique em Conferir palavra.';
   $('support-controls').hidden=activity!=='build';
   $('word-audio-status').textContent='';
   renderModel();renderLetters();renderAdvice();renderEvidence();announce('Escolha quando quiser. Você pode pedir uma pista.');
@@ -179,15 +181,14 @@ function renderModel() {
   const visible=activity==='build' ? mode==='model' : showAnswer;
   $('word-model').classList.toggle('masked',!visible);
   $('word-model').textContent=visible ? text(word.text) : activity==='build' ? 'O modelo está guardado. Você pode pedir uma pista.' : 'Observe a imagem. Peça uma pista quando quiser.';
-  $('mode-description').textContent=activity==='build' ? (mode==='model' ? 'A palavra está disponível como modelo.' : 'Explorando sem modelo. As pistas continuam disponíveis.') : 'Você pode escolher livremente outra atividade ou pedir apoio.';
 }
-function putLetter(key,index,focus=true) {
+function putLetter(key,index,focus=true,preventScroll=false) {
   if(completed || saving || activity==='match') return;
   const next=placeLetter(selected,bank,key,index,locked);
   if(next===selected) return;
   roundStarted=true;selected=next;activeSlot=null;renderLetters();
   announce(`Letra ${text(selected[index].value)} na posição ${index+1}.`);
-  if(focus) ($('letter-bank').querySelector('button:not(:disabled)') || $('check')).focus();
+  if(focus) ($('letter-bank').querySelector('button:not(:disabled)') || $('check')).focus({preventScroll});
 }
 function renderLetters() {
   drag?.cancel();
@@ -205,24 +206,28 @@ function renderLetters() {
     }
     return;
   }
+  const nextSlot = activity === 'missing'
+    ? locked.findIndex(value => !value)
+    : activeSlot ?? selected.findIndex(entry => !entry);
   Array.from(word.text).forEach((_,index)=>{
     const entry=selected[index];
-    const node=button(entry?text(entry.value):'·',()=>{
+    const node=button(entry?text(entry.value):'·',event=>{
+      const preventScroll = event.detail > 0 || !event.isTrusted;
       if(completed || saving || locked[index]) return;
       roundStarted=true;
-      if(entry) {selected[index]=null;activeSlot=index;renderLetters();$('slots').children[index].focus();}
-      else {activeSlot=index;renderLetters();$('letter-bank').querySelector('button:not(:disabled)')?.focus();}
+      if(entry) {selected[index]=null;activeSlot=index;renderLetters();$('slots').children[index].focus({preventScroll});}
+      else {activeSlot=index;renderLetters();$('letter-bank').querySelector('button:not(:disabled)')?.focus({preventScroll});}
     },'slot');
     node.dataset.slot=String(index);
     node.setAttribute('aria-label',`Posição ${index+1}: ${entry?text(entry.value):'vazia'}. ${locked[index]?'Já preenchida':entry?'Retirar letra':'Escolher espaço'}`);
     node.disabled=completed || locked[index];node.classList.toggle('fixed',locked[index]);node.classList.toggle('chosen-slot',activeSlot===index);
+    node.classList.toggle('next-slot',!completed && !entry && nextSlot===index);
     if(entry && !node.disabled) {node.dataset.letterKey=entry.key;node.draggable=true;}
     $('slots').append(node);
   });
   bank.forEach(entry=>{
-    const node=button(text(entry.value),()=>{
-      const index=activity==='missing'?locked.findIndex(value=>!value):activeSlot!==null?activeSlot:selected.findIndex(item=>!item);
-      putLetter(entry.key,index);
+    const node=button(text(entry.value),event=>{
+      putLetter(entry.key,nextSlot,true,event.detail > 0 || !event.isTrusted);
     },'tile');
     node.dataset.tile=entry.key;node.dataset.letterKey=entry.key;node.setAttribute('aria-label',`Adicionar ${text(entry.value)}`);
     node.disabled=completed || selected.some(item=>item?.key===entry.key);node.draggable=!node.disabled;
@@ -307,7 +312,7 @@ async function boot() {
     });
     drag=letterDrag($('atividade'),{
       canDrop:index=>activity!=='match' && !completed && !saving && index>=0 && index<selected.length && !locked[index],
-      drop:(key,index)=>putLetter(key,index,false),announce
+      drop:(key,index)=>putLetter(key,index,false)
     });
     $('check').addEventListener('click', check); $('hint').addEventListener('click', hint);
     $('clear').addEventListener('click', () => {if (!saving) reset();}); $('repeat').addEventListener('click', () => {if (saving) return; round++; reset(); ($('letter-bank').querySelector('button:not(:disabled)') || $('match-options').querySelector('button'))?.focus();});

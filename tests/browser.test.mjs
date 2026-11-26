@@ -237,29 +237,66 @@ test('desktop drag places letters out of order, swaps occupied spaces and leaves
   } finally {await browser.close();}
 });
 
-test('touch hold, drop and cancellation preserve accented letters on mobile', async () => {
-  const {browser,page,failures} = await setup({viewport:{width:390,height:844}});
+test('touch adds and removes letters, and drag starts without waiting on mobile', async () => {
+  const {browser,context,page,failures} = await setup({viewport:{width:390,height:844}, hasTouch:true});
   try {
     await page.locator('#word').selectOption('agua');
-    const source=page.getByRole('button',{name:'Adicionar Á',exact:true});
-    await source.scrollIntoViewIfNeeded();
-    const start=await source.boundingBox();
-    await source.dispatchEvent('pointerdown',{pointerId:42,pointerType:'touch',clientX:start.x+10,clientY:start.y+10});
-    await page.waitForFunction(()=>document.querySelector('.letter-dragging'));
-    await source.dispatchEvent('pointercancel',{pointerId:42,pointerType:'touch'});
-    assert.equal(await source.isDisabled(),false);
-    await source.dispatchEvent('pointerdown',{pointerId:43,pointerType:'touch',clientX:start.x+10,clientY:start.y+10});
-    await page.waitForFunction(()=>document.querySelector('.letter-dragging'));
-    const target=page.locator('#slots [data-slot="0"]');await target.scrollIntoViewIfNeeded();
-    const box=await target.boundingBox();
-    await source.dispatchEvent('pointermove',{pointerId:43,pointerType:'touch',clientX:box.x+box.width/2,clientY:box.y+box.height/2});
-    await source.dispatchEvent('pointerup',{pointerId:43,pointerType:'touch',clientX:box.x+box.width/2,clientY:box.y+box.height/2});
+    const source = page.getByRole('button',{name:'Adicionar Á',exact:true});
+    const target = page.locator('#slots [data-slot="0"]');
+    await page.locator('#letter-play').evaluate(node => node.scrollIntoView({block:'center'}));
+    const scroll = await page.evaluate(() => scrollY);
+    await source.tap();
     assert.equal(await target.textContent(),'Á');
-    assert.equal(await page.getByRole('button',{name:'Adicionar Á',exact:true}).isDisabled(),true);
-    for(const letter of 'GUA') await page.getByRole('button',{name:`Adicionar ${letter}`,exact:true}).click();
-    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
-    await page.locator('input[name="activity"][value="missing"]').check();
-    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await target.tap();
+    assert.equal(await target.textContent(),'·');
+    assert.equal(await page.evaluate(() => scrollY),scroll);
+
+    if (browserEngine === chromium) {
+      const cdp = await context.newCDPSession(page);
+      const point = async locator => {
+        const {x,y,width,height} = await locator.boundingBox();
+        return {x:x+width/2, y:y+height/2};
+      };
+      const touch = (type,...touchPoints) => cdp.send('Input.dispatchTouchEvent',{type,touchPoints});
+      const start = await point(source);
+      const end = await point(target);
+      await touch('touchStart',start);
+      await touch('touchMove',end);
+      assert.equal(await page.locator('.letter-drag-preview').textContent(),'Á');
+      assert.equal(await target.evaluate(node => node.classList.contains('drop-target')),true);
+      await touch('touchCancel');
+      assert.equal(await target.textContent(),'·');
+      assert.equal(await page.locator('.letter-drag-preview').count(),0);
+
+      await touch('touchStart',start);
+      await touch('touchMove',{x:4,y:start.y});
+      await touch('touchEnd');
+      assert.equal(await target.textContent(),'·');
+
+      await touch('touchStart',start);
+      await touch('touchMove',end);
+      await touch('touchEnd');
+      await page.waitForFunction(() => document.querySelector('#slots [data-slot="0"]').textContent === 'Á');
+      assert.equal(await page.locator('.letter-drag-preview').count(),0);
+    } else {
+      await source.tap();
+    }
+    assert.equal(await source.isDisabled(),true);
+    for (const [index, letter] of [...'GUA'].entries()) {
+      await page.getByRole('button',{name:`Adicionar ${letter}`,exact:true}).tap();
+      await page.waitForFunction(([slot, value]) =>
+        document.querySelector(`#slots [data-slot="${slot}"]`).textContent === value,
+      [index + 1, letter], {timeout:2000});
+    }
+    await page.locator('#check').tap();
+    await page.locator('#repeat').waitFor({state:'visible'});
+    await page.locator('#word').selectOption('caranguejo');
+    await page.setViewportSize({width:320,height:700});
+    await page.locator('.activity-grid').scrollIntoViewIfNeeded();
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth));
+    assert.ok(await page.locator('#letter-play button').evaluateAll(buttons =>
+      buttons.every(button => button.getBoundingClientRect().width >= 44)
+    ));
     await page.screenshot({path:'test-results/activities-mobile.png',fullPage:true});
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
@@ -338,6 +375,12 @@ test('completed evidence records only day and presentation; revisits preserve le
   } finally {await browser.close();}
 });
 
+async function selectImage(page, id) {
+  const options = page.locator('#picture-options');
+  if (await options.getAttribute('open') === null) await options.locator('summary').click();
+  await page.locator('#presentation-select').selectOption(id);
+}
+
 test('visual choice preserves the word and in-progress letters, records mixed rounds and accepts optional image revisits', async () => {
   const {browser,page,failures} = await setup();
   try {
@@ -346,7 +389,7 @@ test('visual choice preserves the word and in-progress letters, records mixed ro
       HTMLMediaElement.prototype.play=function(){window.visualPlayCount++;return play.call(this);};
     });
     assert.match(await page.locator('#image-status').textContent(),/Imagem 1 de 3/);
-    await page.locator('#presentation-select').selectOption('image-v2');
+    await selectImage(page, 'image-v2');
     assert.equal(await page.locator('#word').inputValue(),'peixe');
     assert.match(await page.locator('#picture').getAttribute('src'),/peixe-azul/);
     assert.equal(await page.evaluate(()=>window.visualPlayCount),0);
@@ -359,9 +402,9 @@ test('visual choice preserves the word and in-progress letters, records mixed ro
     assert.equal(await page.locator('#word').inputValue(),'peixe');
     assert.equal(await page.locator('#presentation-select').inputValue(),image);
     assert.equal(await page.evaluate(()=>window.visualPlayCount),1);
-    await page.locator('#presentation-select').selectOption('image-v3');
+    await selectImage(page, 'image-v3');
     await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
-    await page.locator('#presentation-select').selectOption('image-v1');
+    await selectImage(page, 'image-v1');
     assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
     assert.equal(await page.evaluate(()=>window.visualPlayCount),1);
     await construct(page,'EIXE');
@@ -381,7 +424,7 @@ test('new illustrations decode offline and work with association and missing-let
   try {
     await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);
     await page.locator('#word').selectOption('polvo');
-    await page.locator('#presentation-select').selectOption('image-v3');
+    await selectImage(page, 'image-v3');
     await page.waitForFunction(()=>{const img=document.querySelector('#picture');return img.complete&&img.naturalWidth>0;});
     await page.locator('input[name="activity"][value="match"]').check();
     await page.locator('#match-options').getByRole('button',{name:'POLVO',exact:true}).click();
@@ -389,7 +432,7 @@ test('new illustrations decode offline and work with association and missing-let
     let record=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.at(-1);});
     assert.equal(record.activity,'match');assert.deepEqual(record.visualIds,['image-v3']);
     await page.locator('#word').selectOption('agua');
-    await page.locator('#presentation-select').selectOption('image-v2');
+    await selectImage(page, 'image-v2');
     await page.locator('input[name="activity"][value="missing"]').check();
     await page.getByRole('button',{name:'Adicionar U',exact:true}).click();
     await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
@@ -398,7 +441,7 @@ test('new illustrations decode offline and work with association and missing-let
     for(const word of ['peixe','polvo','agua']) {
       await page.locator('#word').selectOption(word);
       for(const id of ['image-v1','image-v2','image-v3']) {
-        await page.locator('#presentation-select').selectOption(id);
+        await selectImage(page, id);
         await page.waitForFunction(()=>{const img=document.querySelector('#picture');return img.complete&&img.naturalWidth>0;});
         if(id!=='image-v1') await page.locator('.picture-card').screenshot({path:`test-results/visual-${word}-${id}.png`});
       }

@@ -16,7 +16,7 @@ A leitura ao acertar ocorre somente após clicar/acionar “Conferir palavra” 
 
 Três opções nativas de atividade, sem desbloqueios ou tempo de resposta. Letras em espaços vazios continuam acionáveis por teclado; letras predefinidas da atividade de completar ficam identificadas como já preenchidas. Letras repetidas têm chaves distintas, acentos são preservados e o tamanho motor do gesto nunca é usado como evidência de aprendizagem.
 
-Mouse usa arraste nativo; toque/caneta usam segurar brevemente antes de mover. O limiar do gesto não é um tempo de atividade, não é medido ou salvo e pode ser evitado inteiramente pelo toque simples/teclado. A região das peças usa `touch-action:none`; o restante da página continua rolável. Soltar fora de um espaço ou cancelar não altera a atividade nem cria registro. Trocas entre espaços são permitidas, salvo as posições já preenchidas no exercício de letra ausente.
+Mouse usa arraste nativo. No toque ou com caneta, um breve deslocamento inicia o arraste e mostra a letra sob o ponteiro. Um toque simples coloca a letra no próximo espaço livre ou no espaço escolhido, e o teclado oferece as mesmas ações. A rolagem pode começar nas áreas ao redor das peças e o zoom por pinça continua disponível. Soltar fora de um espaço ou cancelar preserva a atividade. Trocas entre espaços são permitidas, salvo nas posições já preenchidas no exercício de letra ausente.
 
 A associação usa descrição alternativa da imagem para acesso sem visão. Essa descrição pode nomear o conceito; o exercício não é uma prova de leitura ou capacidade. Pistas e escuta na associação contam como apoio, sem penalização. Revisão com leitores de tela e toque físico permanece necessária; a CI cobre ponteiro por eventos emulados e arraste de mouse nos navegadores.
 

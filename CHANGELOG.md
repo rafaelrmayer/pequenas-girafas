@@ -2,7 +2,7 @@
 
 ## 0.1.4 — 2026-11-26
 
-Associação entre imagem e palavra e completar uma letra, com escolha livre e registros separados. Arraste opcional por mouse e toque/caneta, posições fixas, troca de letras e cancelamento sem registro. Mantidos clique, teclado, áudio, dados locais e uso offline. Exportação schemaVersion 2 compatível com eventos antigos.
+Associação entre imagem e palavra e completar uma letra, com escolha livre e registros separados. Arraste opcional por mouse e toque/caneta, posições fixas, troca de letras e cancelamento sem registro. Mantidos clique, teclado, áudio, dados locais e uso offline. Exportação schemaVersion 2 compatível com eventos antigos. Crédito de autoria no rodapé: Desenvolvido por Rafael Ricardo Mayer.
 
 ## 0.1.3 — 2026-11-26
 

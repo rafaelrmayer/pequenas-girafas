@@ -8,7 +8,7 @@ Aplicação independente, sem autenticação compartilhada ou transferência ent
 - `frontend/ai/adaptive-learning/engine.mjs`: regras puras, sem rede, relógio ou identificadores pessoais.
 - `frontend/ai/semantic-expansion/graph.mjs`: relações locais e recomendações ordenadas.
 - `frontend/storage/store.mjs`: transações IndexedDB no object store `local`, banco `pequenas-girafas-v1`. Guarda chave `state` com eventos limitados e preferências. Sem localStorage, cookies ou transmissão.
-- `frontend/accessibility/speech.mjs`: somente voz identificada como local e portuguesa; nunca reproduz automaticamente.
+- `frontend/accessibility/speech.mjs`: 33 MP3 pt-BR genéricos empacotados, com voz local portuguesa somente como alternativa em falha de arquivo; nunca reproduz automaticamente.
 - `knowledge/vocabulary/fundo-do-mar.json`: catálogo de nós e arestas em um contrato. Regras ficam em `knowledge/pedagogical-rules/v0.1.json`.
 - `backend/app/integrations/giraf.py`: adaptador mock independente. Converte exclusivamente palavras do catálogo nos contratos upstream. Não aceita texto livre ou dados pessoais.
 - `frontend/sw.js`: cache explícito de recursos genéricos. Não intercepta outros hosts, consultas ou métodos diferentes de GET.

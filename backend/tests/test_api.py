@@ -63,3 +63,19 @@ def test_absolute_paths_from_another_working_directory(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     assert client.get('/').status_code == 200
     assert client.get('/assets/peixe.svg').status_code == 200
+
+def test_visual_presentations_are_local_unique_and_have_accessible_assets():
+    import xml.etree.ElementTree as ET
+    catalog=client.get('/api/v1/catalog').json()
+    for word in catalog['words']:
+        values=word['pedagogy']['presentations']
+        assert len(values)==(3 if word['id'] in {'peixe','polvo','agua'} else 1)
+        assert len({p['id'] for p in values})==len(values)
+        for presentation in values:
+            assert presentation['alt'] and presentation['label']
+            assert presentation['asset'].startswith('/assets/')
+            response=client.get(presentation['asset'])
+            assert response.status_code==200
+            svg=ET.fromstring(response.text)
+            assert svg.attrib['viewBox']=='0 0 300 300'
+            assert svg.find('{http://www.w3.org/2000/svg}title') is not None

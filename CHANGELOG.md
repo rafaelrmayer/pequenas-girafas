@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6 — 2026-11-26
+
+Três apresentações visuais para PEIXE, POLVO e ÁGUA, com escolha livre e novas sugestões opcionais. Trocar durante a rodada preserva a resposta e registra contexto misto; registros antigos sem imagem identificada continuam desconhecidos. Seis SVGs locais adicionais, cache offline e exportação schemaVersion 4. Sem análise de imagem ou inferência de generalização.
+
 ## 0.1.5 — 2026-11-26
 
 Planejador local explicável, preferências explícitas e resumo por atividade. Datas de dia local e apresentações novas distinguem observações sem alegar retenção/generalização; registros antigos permanecem sem data. Conceitos explicativos no grafo, sugestões opcionais e revisita configurável. Sem envio do histórico ou modelos treinados.

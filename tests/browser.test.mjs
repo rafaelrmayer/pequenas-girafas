@@ -57,6 +57,18 @@ test('keyboard and hint are sufficient; settings, accent and mobile layout', asy
     await page.locator('#dark').check(); await page.locator('#reduced').check(); await page.locator('#lowercase').check();
     await page.waitForFunction(()=>document.body.classList.contains('dark')&&document.body.classList.contains('reduced'));
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    const contrast = await page.evaluate(() => {
+      const luminance = color => {
+        const [r,g,b] = color.match(/[\d.]+/g).slice(0,3).map(value => {
+          const v = Number(value)/255; return v <= .04045 ? v/12.92 : ((v+.055)/1.055)**2.4;
+        });
+        return .2126*r+.7152*g+.0722*b;
+      };
+      const fg = luminance(getComputedStyle(document.querySelector('#activity-title')).color);
+      const bg = luminance(getComputedStyle(document.querySelector('.workspace')).backgroundColor);
+      return (Math.max(fg,bg)+.05)/(Math.min(fg,bg)+.05);
+    });
+    assert.ok(contrast >= 4.5, `Dark heading contrast ${contrast}`);
     await page.screenshot({path:'test-results/girafas-mobile.png',fullPage:true});
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}

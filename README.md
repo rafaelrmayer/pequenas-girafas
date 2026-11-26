@@ -80,4 +80,17 @@ V0.2–V1.0 não estão implementadas: frases, desenho, histórias, relatórios 
 
 ### Áudio do catálogo
 
-33 arquivos MP3 sintéticos (~284 KiB), gerados offline com eSpeak NG 1.52.0 (`pt-br`) e FFmpeg. Não há geração no servidor ou em provedores. `scripts/generate_audio.py` documenta a reprodução da geração. Nomes de letras não são fonemas. Voz sintética experimental, com revisão de pronúncia pedagógica ainda pendente.
+As 7 palavras e os 26 nomes de letras usam MP3 gerados com **edge-tts 7.3.1**, voz **pt-BR-FranciscaNeural**, velocidade **-15%**. O aplicativo apenas reproduz os arquivos da própria origem; não depende de Edge TTS durante o uso e não envia progresso ou dados pessoais. Os arquivos entram no cache offline. A voz ainda precisa de revisão pedagógica de pronúncia; nomes de letras não são fonemas.
+
+A geração é uma ferramenta opcional de desenvolvimento, separada das dependências do servidor:
+
+```sh
+python -m pip install -r requirements-audio.txt
+python scripts/generate_audio.py
+```
+
+Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 33 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
+
+`frontend/assets/audio/manifest.json` registra provedor, versão, voz, taxa, transcrições e hashes de cada MP3. `scripts/generate_audio_espeak.py` preserva a alternativa antiga, de qualidade mais robótica; não é o padrão. Edge TTS usa um serviço online do Edge, não a API contratada do Azure Speech, e sua disponibilidade pode variar. Biblioteca e serviço têm condições próprias; ver [licenças](THIRD_PARTY_LICENSES.md).
+
+Em redes gerenciadas que usam CA própria, `--ca-file /caminho/ca-confiavel.pem` acrescenta o certificado confiável ao verificador; a validação TLS nunca é desligada. Proxy HTTPS configurado no ambiente é reutilizado sem ser registrado nos logs.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 — 2026-11-26
+
+Substitui a voz eSpeak pelo catálogo gerado com Edge TTS/Francisca Neural pt-BR, mantendo reprodução e cache locais. Ferramenta de geração separada do runtime, com catálogo fixo, staging, manifesto e hashes. Nenhuma chamada de voz durante o uso da criança.
+
 ## 0.1.1 — 2026-11-26
 
 Correção de áudio: catálogo MP3 pt-BR empacotado (palavras e nomes de letras), mensagens junto aos botões, volume zero explícito, cancelamento seguro e cache offline atualizado. CI cobre Chromium e Firefox, incluindo decodificação e reprodução sem vozes instaladas. A reprodução observada nos testes não comprova saída audível do dispositivo do usuário; revisão humana de pronúncia segue pendente.

@@ -1,0 +1,208 @@
+{
+  "provider": "edge-tts",
+  "packageVersion": "7.3.1",
+  "voice": "pt-BR-FranciscaNeural",
+  "rate": "-15%",
+  "language": "pt-BR",
+  "personalData": false,
+  "entries": [
+    {
+      "id": "peixe",
+      "text": "peixe",
+      "file": "peixe.mp3",
+      "sha256": "ad761f94009afe4cbb729d5c4ffa310a2381beb86795eed2d78b8e9db0431bb8"
+    },
+    {
+      "id": "mar",
+      "text": "mar",
+      "file": "mar.mp3",
+      "sha256": "b70709676d996ca5b8fc8c4f6f2b9b89d258a6b5c4e666d9c05186872aaf8031"
+    },
+    {
+      "id": "agua",
+      "text": "água",
+      "file": "agua.mp3",
+      "sha256": "b9b9fa342d44089d51000a2b48d9ce535c106771246a7656c450fdd76c9b95d6"
+    },
+    {
+      "id": "polvo",
+      "text": "polvo",
+      "file": "polvo.mp3",
+      "sha256": "1b82423ea6ac368d003dc8bcf02b6e52778b375d48a07f5b39bc41dbe4a204a0"
+    },
+    {
+      "id": "concha",
+      "text": "concha",
+      "file": "concha.mp3",
+      "sha256": "d993003c84c921d8e32d59e81de3a949396b97e0123b6cf63cea029c65871e72"
+    },
+    {
+      "id": "praia",
+      "text": "praia",
+      "file": "praia.mp3",
+      "sha256": "a21cea0f34e32656fcc0027cbfe04808091eb2798b35fd8265f0ca1828d4a10a"
+    },
+    {
+      "id": "caranguejo",
+      "text": "caranguejo",
+      "file": "caranguejo.mp3",
+      "sha256": "240f152d5bbcfe402361ad9d0969eeb86721d633bfee79ec8b3d16d2b284ddb3"
+    },
+    {
+      "id": "letra-a",
+      "text": "á",
+      "file": "letra-a.mp3",
+      "sha256": "ef2a70e2daf7d3615ff74de93cb4d46e329c7ac43a9e1e57aeac1b95e65f5e5b"
+    },
+    {
+      "id": "letra-b",
+      "text": "bê",
+      "file": "letra-b.mp3",
+      "sha256": "cbf04d8a20246d2bbe14137c273110472bac687c2089a6621264df1090a89f60"
+    },
+    {
+      "id": "letra-c",
+      "text": "cê",
+      "file": "letra-c.mp3",
+      "sha256": "aaa123d8c8170f8fade8246f79203b5a955bc9469e0eee95b6a2b27af228a587"
+    },
+    {
+      "id": "letra-d",
+      "text": "dê",
+      "file": "letra-d.mp3",
+      "sha256": "ec5302a1248681373b4ad18ce1d20aeed34b8342b041eca5e42eb14bf589f216"
+    },
+    {
+      "id": "letra-e",
+      "text": "é",
+      "file": "letra-e.mp3",
+      "sha256": "fd87407a909bb1c2e65a979e062a1410ea8007b4367a023408b9b4c42175cf8b"
+    },
+    {
+      "id": "letra-f",
+      "text": "éfe",
+      "file": "letra-f.mp3",
+      "sha256": "5cf0b2c6232c939e0593e50bdd5e7f5b388adee3008ed960a8365a66d21660af"
+    },
+    {
+      "id": "letra-g",
+      "text": "gê",
+      "file": "letra-g.mp3",
+      "sha256": "92f189a6da800d8529685fe6113c2b62064e46137afc7a3fe623c748607bacc2"
+    },
+    {
+      "id": "letra-h",
+      "text": "agá",
+      "file": "letra-h.mp3",
+      "sha256": "de17cb1addceff13f05426b83566ad398670fdfed922fe95b4c1094abf8ef401"
+    },
+    {
+      "id": "letra-i",
+      "text": "i",
+      "file": "letra-i.mp3",
+      "sha256": "c6384976a66ae0b3e0e3c1c3a5542297454e205a86136daeb3b60ba981f9433b"
+    },
+    {
+      "id": "letra-j",
+      "text": "jóta",
+      "file": "letra-j.mp3",
+      "sha256": "cd1a66a863029c1bf6cf5d6a05cf22bd160e9846575252d1a0ec16344032e852"
+    },
+    {
+      "id": "letra-k",
+      "text": "cá",
+      "file": "letra-k.mp3",
+      "sha256": "0f380382a96b376403f6709afce6d95df927765fbad419c3d46c261cd775ea92"
+    },
+    {
+      "id": "letra-l",
+      "text": "éle",
+      "file": "letra-l.mp3",
+      "sha256": "2296d54d18ebc28c087bd8dadac04c209cd6da38b7252afd2a496fa6a4a99b83"
+    },
+    {
+      "id": "letra-m",
+      "text": "ême",
+      "file": "letra-m.mp3",
+      "sha256": "34da51e08640497b58c7c302429e2fc5d0865f659ec9942b6cdd3415b34e9f7a"
+    },
+    {
+      "id": "letra-n",
+      "text": "êne",
+      "file": "letra-n.mp3",
+      "sha256": "4facad073107d0f8fcbf08234e38f4344b6234d4f5c4d60657a61117937c0493"
+    },
+    {
+      "id": "letra-o",
+      "text": "ó",
+      "file": "letra-o.mp3",
+      "sha256": "2a71091e0a0ceb48f026b50b74e41e1f6784c3b07eca58d21a773f22abc1926b"
+    },
+    {
+      "id": "letra-p",
+      "text": "pê",
+      "file": "letra-p.mp3",
+      "sha256": "a25c71a40a7e2ad1466614de255ad5d51e4735a5fda7216b41f13f82e6cfbd14"
+    },
+    {
+      "id": "letra-q",
+      "text": "quê",
+      "file": "letra-q.mp3",
+      "sha256": "490bf8facaaf2a4a8179ed3a9fcec38fc7e4a880ff43c3ba27308b1734765f2a"
+    },
+    {
+      "id": "letra-r",
+      "text": "érre",
+      "file": "letra-r.mp3",
+      "sha256": "ab2150902a45405a85885af4793da5cb4171554e6645ca3cf2081e2f188a47ab"
+    },
+    {
+      "id": "letra-s",
+      "text": "ésse",
+      "file": "letra-s.mp3",
+      "sha256": "11314c3800b7a0bdafe50351a3918991f5a52eaf801309f58a37268ca42b4e5a"
+    },
+    {
+      "id": "letra-t",
+      "text": "tê",
+      "file": "letra-t.mp3",
+      "sha256": "dbaa092dd51dde3e77a4992d07220fb9c7b2e7cf37537b138503769f12ee6d30"
+    },
+    {
+      "id": "letra-u",
+      "text": "u",
+      "file": "letra-u.mp3",
+      "sha256": "a41a90c95fd880231bd955e10f3ff2fdeb99ec244751f836960d12b847617c8c"
+    },
+    {
+      "id": "letra-v",
+      "text": "vê",
+      "file": "letra-v.mp3",
+      "sha256": "76609528b34108ee91c4657d3a68b1da14902559b8dda80309182696947d58f5"
+    },
+    {
+      "id": "letra-w",
+      "text": "dáblio",
+      "file": "letra-w.mp3",
+      "sha256": "49d41709f9ba75577ad543d21f212e5db39fecc67d1648dd91737a78d382b50d"
+    },
+    {
+      "id": "letra-x",
+      "text": "xis",
+      "file": "letra-x.mp3",
+      "sha256": "ff45b7e7ce74b31a710f1f738a2ca524380a70c04625fe0b16753e1643c0283c"
+    },
+    {
+      "id": "letra-y",
+      "text": "ípsilon",
+      "file": "letra-y.mp3",
+      "sha256": "8672ac2ebe7989174f4bd5b65f44c944ec402a37f95f3cd1425d15b3236d2fc2"
+    },
+    {
+      "id": "letra-z",
+      "text": "zê",
+      "file": "letra-z.mp3",
+      "sha256": "5f8a43367633ab683a63e776c912053e88f3ba5009b09c2945a070ab01de3c44"
+    }
+  ]
+}

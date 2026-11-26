@@ -25,3 +25,9 @@ As distribuições mantêm os avisos próprios; dependências transitivas e a im
 ## Áudio sintético do catálogo
 
 Os 33 MP3 foram gerados offline com eSpeak NG 1.52.0 (voz `pt-br`, velocidade 145) e codificados com FFmpeg/libmp3lame. Fonte do sintetizador: https://github.com/espeak-ng/espeak-ng (GPL-3.0-or-later); pacotes oficiais Debian 1.52.0+dfsg-5 usados apenas na geração. Código, bibliotecas e bases de voz do sintetizador não foram incorporados ao aplicativo. São distribuídas somente as gravações de palavras genéricas e nomes de letras, com transcrições e comandos em `scripts/generate_audio.py`. Não há clonagem de voz ou gravação de usuários. Revisão de pronúncia e licença própria do projeto continuam pendentes.
+
+## Atualização do catálogo — Edge TTS
+
+O catálogo atual substitui os áudios eSpeak por gravações geradas com `edge-tts==7.3.1`, voz Microsoft `pt-BR-FranciscaNeural`, taxa -15%. [Projeto upstream](https://github.com/rany2/edge-tts): LGPLv3 para a biblioteca e MIT apenas para `srt_composer.py`; nenhuma cópia ou modificação de fontes upstream foi incorporada. A ferramenta é dependência opcional de geração, ausente do runtime Docker. Não atribuir a licença da biblioteca aos direitos do serviço Microsoft ou às vozes. Esses termos devem ser revisados antes da distribuição estável. Não há contratação de Azure, chave paga ou treinamento/clonagem de voz nesta entrega.
+
+O manifesto ao lado dos MP3 contém transcrições genéricas e hashes. A geração usa o serviço online uma vez por catálogo; o aplicativo distribuído toca somente os arquivos locais. O script eSpeak foi mantido como alternativa histórica, mas os MP3 atuais não foram produzidos por ele.

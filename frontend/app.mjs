@@ -4,6 +4,8 @@ import {relatedWords} from './ai/semantic-expansion/graph.mjs';
 import {speak, stop} from './accessibility/speech.mjs';
 const $ = id => document.getElementById(id);
 const sessionId = crypto.randomUUID();
+const environment = document.body.dataset.environment;
+$('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
 let catalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 const text = value => state.settings.lowercase ? value.toLocaleLowerCase('pt-BR') : value;
 const announce = message => {$('feedback').textContent = message;};

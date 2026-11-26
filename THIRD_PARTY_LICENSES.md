@@ -2,7 +2,7 @@
 
 ## Código próprio
 
-Interface, SVGs e motores desta V0.1 foram criados para o projeto. O mantenedor ainda deve definir a licença de distribuição do código próprio antes de torná-lo público. Ausência de LICENSE não concede licença de software livre. Repositório privado para revisão; não há produção.
+Interface, SVGs e motores desta V0.1 foram criados para o projeto. O mantenedor ainda deve definir a licença de distribuição do código próprio antes de torná-lo público. Ausência de LICENSE não concede licença de software livre. O mantenedor criou o repositório público. Não há produção; nenhuma licença de distribuição do código próprio foi concedida ainda.
 
 ## Referências GIRAF
 

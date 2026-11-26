@@ -1,7 +1,8 @@
 from pathlib import Path
 import json
+import os
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from backend.app.integrations.giraf import MockGiraf
 
@@ -9,6 +10,9 @@ ROOT = Path(__file__).resolve().parents[2]
 FRONTEND = ROOT / "frontend"
 CATALOG = json.loads((ROOT / "knowledge/vocabulary/fundo-do-mar.json").read_text())
 RULES = json.loads((ROOT / "knowledge/pedagogical-rules/v0.1.json").read_text())
+ENVIRONMENT = os.environ.get('APP_ENV', 'local')
+if ENVIRONMENT not in {'local', 'principal', 'testes'}:
+    raise RuntimeError('APP_ENV deve ser local, principal ou testes')
 mock = MockGiraf()
 app = FastAPI(title="Pequenas Girafas", version="0.1.0", docs_url=None, redoc_url=None)
 
@@ -48,6 +52,6 @@ def sw():
 
 @app.get("/", include_in_schema=False)
 def index():
-    return FileResponse(FRONTEND / "index.html")
+    return HTMLResponse((FRONTEND / "index.html").read_text().replace('data-environment="local"', f'data-environment="{ENVIRONMENT}"'))
 
 app.mount("/", StaticFiles(directory=FRONTEND), name="frontend")

@@ -72,4 +72,8 @@ O código público GIRAF-ai foi analisado em commit fixado, assim como a alterna
 - [Privacidade](PRIVACY.md), [segurança](SECURITY.md), [acessibilidade](ACCESSIBILITY.md).
 - [Diretrizes pedagógicas](PEDAGOGICAL_GUIDELINES.md) e [histórico](CHANGELOG.md).
 
-V0.2–V1.0 não estão implementadas: frases, desenho, histórias, relatórios avançados, restauração de backup, reconhecimento de escrita, embeddings, RAG e modelos treinados ficam fora desta entrega. A Jornada de Bia e as outras APIs não foram modificadas. A licença de distribuição do código próprio ainda deverá ser definida antes de publicação pública.
+V0.2–V1.0 não estão implementadas: frases, desenho, histórias, relatórios avançados, restauração de backup, reconhecimento de escrita, embeddings, RAG e modelos treinados ficam fora desta entrega. A Jornada de Bia e as outras APIs não foram modificadas. A licença de distribuição do código próprio ainda deverá ser definida; a ausência de LICENSE não concede uma licença de software livre.
+
+## Ambientes separados
+
+`main` para a principal e `develop` para testes; configuração preparada, sem hospedagem aplicada. Veja [ambientes](docs/ENVIRONMENTS.md). O repositório criado pelo mantenedor é público; nenhum dado pessoal ou segredo está incluído.

@@ -22,7 +22,7 @@ test('supported completions are distinguished; thresholds and personalization ar
   assert.equal(recommendSupport(events,'peixe',{minIndependentSessions:3}).mode,'model');
 });
 test('no timing, personal details, errors or abandonments are recorded', () => {
-  assert.deepEqual(Object.keys(completion('peixe','a',false)), ['wordId','sessionId','support','outcome']);
+  assert.deepEqual(Object.keys(completion('peixe','a',false)), ['wordId','sessionId','support','outcome','activity']);
 });
 test('related words account for relation, length annotation and prior exploration; never gate', () => {
   const results = relatedWords(catalog,'peixe');
@@ -38,4 +38,11 @@ test('accents, repeated letters and order are preserved', () => {
   assert.ok(matchesWord(['A\u0301','G','U','A'],'ÁGUA'));
   assert.ok(!matchesWord(['A','G','U','A'],'ÁGUA'));
   assert.ok(!matchesWord(['P','E','X','I','E'],'PEIXE'));
+});
+
+test('association and missing-letter completions do not become independent full-word evidence', () => {
+  const events=[completion('peixe','a',false,'match'),completion('peixe','b',false,'missing')];
+  assert.equal(recommendSupport(events,'peixe',rules).mode,'model');
+  assert.equal(recommendSupport([...events,completion('peixe','c',false)],'peixe',rules).mode,'model');
+  assert.equal(recommendSupport([{wordId:'peixe',sessionId:'a',support:'independent',outcome:'completed'},{wordId:'peixe',sessionId:'b',support:'independent',outcome:'completed'}],'peixe',rules).mode,'memory');
 });

@@ -1,12 +1,15 @@
 import * as store from './storage/store.mjs';
 import {recommendSupport, completion, matchesWord} from './ai/adaptive-learning/engine.mjs';
 import {relatedWords} from './ai/semantic-expansion/graph.mjs';
+import {ACTIVITIES, lettersRound, placeLetter, associationChoices} from './modules/activities.mjs';
+import {letterDrag} from './accessibility/letter-drag.mjs';
 import {speak, stop} from './accessibility/speech.mjs';
 const $ = id => document.getElementById(id);
 const sessionId = crypto.randomUUID();
 const environment = document.body.dataset.environment;
 $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
 let catalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
+let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
 const text = value => state.settings.lowercase ? value.toLocaleLowerCase('pt-BR') : value;
 const announce = message => {$('feedback').textContent = message;};
 function button(label, handler, className = '') { const node = document.createElement('button'); node.type = 'button'; node.textContent = label; node.className = className; node.addEventListener('click', handler); return node; }
@@ -15,9 +18,16 @@ function summary() {
   $('progress').replaceChildren();
   for (const item of catalog.words) {
     const events = state.events.filter(e => e.wordId === item.id && e.outcome === 'completed');
+    const builds=events.filter(e=>(e.activity || 'build')==='build');
     if (!events.length) continue;
     const li = document.createElement('li');
-    li.textContent = `${item.text}: ${events.length} construções; ${events.filter(e => e.support === 'assisted').length} com apoio visual ou pista. Registro de exploração, sem conclusão sobre domínio.`;
+    const parts=[];
+    if(builds.length) parts.push(`${builds.length} construções; ${builds.filter(e=>e.support==='assisted').length} com apoio visual ou pista`);
+    for(const type of ['missing','match']) {
+      const count=events.filter(e=>e.activity===type).length;
+      if(count) parts.push(`${ACTIVITIES[type]}: ${count} conclusões`);
+    }
+    li.textContent = `${item.text}: ${parts.join(' · ')}. Registro de exploração, sem conclusão sobre domínio.`;
     $('progress').append(li);
   }
   if (!$('progress').children.length) {const li = document.createElement('li'); li.textContent = 'Ainda não há construções registradas. Explore no seu tempo.'; $('progress').append(li);}
@@ -51,7 +61,7 @@ function recommendation() {
 }
 function chooseWord(id) {
   if (saving) { $('word').value = word.id; return; }
-  stop(); word = catalog.words.find(w => w.id === id) || catalog.words[0];
+  stop(); drag?.cancel(); round=0; word = catalog.words.find(w => w.id === id) || catalog.words[0];
   $('word').value = word.id;
   $('picture').src = word.image; $('picture').alt = word.alt;
   mode = recommendation().mode;
@@ -67,42 +77,71 @@ function chooseWord(id) {
   }
 }
 function reset() {
-  selected = []; completed = false; usedSupport = mode === 'model';
-  // Stable tiles, including duplicate letters, in a deliberately non-target order.
-  bank = Array.from(word.text).map((value, key) => ({value, key}));
-  bank = [...bank.slice(2), ...bank.slice(0, 2)].reverse();
-  $('repeat').hidden = true; $('check').disabled = false; $('hint').disabled = false;
-  renderModel(); renderLetters(); announce('Escolha a primeira letra quando quiser.');
+  stop(); drag?.cancel(); completed=false; matchChoice=null; showAnswer=false; activeSlot=null;
+  usedSupport=activity==='build' && mode==='model';
+  const next=lettersRound(word.text,activity,round);
+  bank=next.bank; selected=next.slots; locked=next.locked;
+  $('repeat').hidden=true; $('check').disabled=false; $('hint').disabled=false;
+  $('task-title').textContent = activity==='build' ? 'Vamos juntar as letras?' : activity==='missing' ? 'Qual letra está faltando?' : 'Qual palavra combina com a imagem?';
+  $('task-instructions').textContent = activity==='build' ? 'Clique nas letras ou arraste-as para os espaços. Para retirar uma, toque nela na palavra.' : activity==='missing' ? 'Escolha uma letra para completar o espaço. Você também pode arrastá-la.' : 'Observe a imagem e escolha uma palavra. Depois, clique em Conferir palavra.';
+  $('support-controls').hidden=activity!=='build';
+  $('word-audio-status').textContent='';
+  renderModel();renderLetters();announce('Escolha quando quiser. Você pode pedir uma pista.');
 }
 function renderModel() {
-  $('word-model').classList.toggle('masked', mode === 'memory');
-  $('word-model').textContent = mode === 'model' ? text(word.text) : 'O modelo está guardado. Você pode pedir uma pista.';
-  $('mode-description').textContent = mode === 'model' ? 'A palavra está disponível como modelo.' : 'Explorando sem modelo. As pistas continuam disponíveis.';
+  const visible=activity==='build' ? mode==='model' : showAnswer;
+  $('word-model').classList.toggle('masked',!visible);
+  $('word-model').textContent=visible ? text(word.text) : activity==='build' ? 'O modelo está guardado. Você pode pedir uma pista.' : 'Observe a imagem. Peça uma pista quando quiser.';
+  $('mode-description').textContent=activity==='build' ? (mode==='model' ? 'A palavra está disponível como modelo.' : 'Explorando sem modelo. As pistas continuam disponíveis.') : 'Você pode escolher livremente outra atividade ou pedir apoio.';
+}
+function putLetter(key,index,focus=true) {
+  if(completed || saving || activity==='match') return;
+  const next=placeLetter(selected,bank,key,index,locked);
+  if(next===selected) return;
+  selected=next;activeSlot=null;renderLetters();
+  announce(`Letra ${text(selected[index].value)} na posição ${index+1}.`);
+  if(focus) ($('letter-bank').querySelector('button:not(:disabled)') || $('check')).focus();
 }
 function renderLetters() {
-  const focus = document.activeElement;
-  const oldKey = focus?.dataset?.tile;
-  $('slots').replaceChildren(); $('letter-bank').replaceChildren();
-  const letters = Array.from(word.text);
-  letters.forEach((_, index) => {
-    const entry = selected[index];
-    const node = button(entry ? text(entry.value) : '·', () => {if (!completed && !saving && entry) { selected.splice(index, 1); renderLetters(); $('slots').children[Math.min(index, selected.length)].focus(); }}, 'slot');
-    node.setAttribute('aria-label', entry ? `Posição ${index+1}: ${text(entry.value)}. Retirar letra` : `Posição ${index+1}: vazia`);
-    node.disabled = !entry || completed; $('slots').append(node);
+  drag?.cancel();
+  $('slots').replaceChildren();$('letter-bank').replaceChildren();$('match-options').replaceChildren();
+  $('letter-play').hidden=activity==='match';$('match-options').hidden=activity!=='match';
+  if(activity==='match') {
+    for(const option of associationChoices(catalog,word.id,round)) {
+      const node=button(text(option.text),()=>{
+        if(completed || saving) return;
+        matchChoice=option.id;renderLetters();
+        [...$('match-options').children].find(n=>n.dataset.wordId===option.id)?.focus();
+      },'word-choice');
+      node.dataset.wordId=option.id;node.setAttribute('aria-pressed',String(matchChoice===option.id));node.disabled=completed;
+      $('match-options').append(node);
+    }
+    return;
+  }
+  Array.from(word.text).forEach((_,index)=>{
+    const entry=selected[index];
+    const node=button(entry?text(entry.value):'·',()=>{
+      if(completed || saving || locked[index]) return;
+      if(entry) {selected[index]=null;activeSlot=index;renderLetters();$('slots').children[index].focus();}
+      else {activeSlot=index;renderLetters();$('letter-bank').querySelector('button:not(:disabled)')?.focus();}
+    },'slot');
+    node.dataset.slot=String(index);
+    node.setAttribute('aria-label',`Posição ${index+1}: ${entry?text(entry.value):'vazia'}. ${locked[index]?'Já preenchida':entry?'Retirar letra':'Escolher espaço'}`);
+    node.disabled=completed || locked[index];node.classList.toggle('fixed',locked[index]);node.classList.toggle('chosen-slot',activeSlot===index);
+    if(entry && !node.disabled) {node.dataset.letterKey=entry.key;node.draggable=true;}
+    $('slots').append(node);
   });
-  bank.forEach(entry => {
-    const node = button(text(entry.value), () => {
-      if (completed || saving || selected.some(item => item.key === entry.key) || selected.length >= letters.length) return;
-      selected.push(entry); renderLetters();
-      const next = [...$('letter-bank').children].find(n => !n.disabled);
-      (next || $('check')).focus();
-    }, 'tile');
-    node.dataset.tile = String(entry.key); node.setAttribute('aria-label', `Adicionar ${text(entry.value)}`);
-    node.disabled = completed || selected.some(item => item.key === entry.key);
+  bank.forEach(entry=>{
+    const node=button(text(entry.value),()=>{
+      const index=activity==='missing'?locked.findIndex(value=>!value):activeSlot!==null?activeSlot:selected.findIndex(item=>!item);
+      putLetter(entry.key,index);
+    },'tile');
+    node.dataset.tile=entry.key;node.dataset.letterKey=entry.key;node.setAttribute('aria-label',`Adicionar ${text(entry.value)}`);
+    node.disabled=completed || selected.some(item=>item?.key===entry.key);node.draggable=!node.disabled;
     $('letter-bank').append(node);
   });
-  if (oldKey !== undefined) [...$('letter-bank').children].find(n => n.dataset.tile === oldKey && !n.disabled)?.focus();
 }
+
 function readWord() {
   speak(word.text, $('volume').value, message => {
     $('word-audio-status').textContent = message;
@@ -111,30 +150,40 @@ function readWord() {
 }
 async function check() {
   if (completed || saving) return;
-  if (!matchesWord(selected.map(e => e.value), word.text)) {
+  if (!(activity==='match' ? matchChoice===word.id : selected.every(Boolean) && matchesWord(selected.map(e=>e.value),word.text))) {
     announce('Podemos continuar explorando. Você pode retirar letras ou pedir uma pista.'); return;
   }
   completed = true; saving = true; $('check').disabled = true; $('hint').disabled = true; renderLetters();
   // Start within the confirmation click, before asynchronous storage work.
   if (state.settings.onSuccessAudio !== false && Number($('volume').value) > 0) readWord();
-  const event = completion(word.id, sessionId, usedSupport);
+  const event = completion(word.id, sessionId, usedSupport, activity);
   let saved = false;
   try {await settingsQueue; const stored = await store.record(event); state.events = stored.events; saved = true;}
   catch {storageOK = false; state.events = [...state.events, event].slice(-200);}
   finally {saving = false;}
-  announce(`Você construiu ${word.text}! Pode repetir ou explorar outra palavra.${saved ? '' : ' O registro não pôde ser salvo neste dispositivo.'}`);
+  announce(`Você ${activity==='match'?'associou':activity==='missing'?'completou':'construiu'} ${word.text}! Pode repetir ou explorar outra palavra.${saved ? '' : ' O registro não pôde ser salvo neste dispositivo.'}`);
   $('repeat').hidden = false; summary(); recommendation();
 }
 function hint() {
-  if (completed || saving) return;
-  usedSupport = true;
-  const target = Array.from(word.text);
-  let prefix = 0;
-  while (prefix < selected.length && selected[prefix].value === target[prefix]) prefix++;
-  selected = selected.slice(0, prefix);
-  if (prefix < target.length) selected.push(bank.find(e => e.value === target[prefix] && !selected.some(s => s.key === e.key)));
-  renderLetters(); announce(`Pista: a posição ${Math.min(prefix+1,target.length)} tem a letra ${target[Math.min(prefix,target.length-1)]}.`);
+  if(completed || saving) return;
+  usedSupport=true;
+  if(activity==='match') {showAnswer=true;renderModel();announce('Pista: a palavra apareceu junto da imagem. Escolha a palavra correspondente.');return;}
+  const target=Array.from(word.text);
+  if(activity==='missing') {
+    const index=locked.findIndex(value=>!value);
+    const entry=bank.find(value=>value.value===target[index]);
+    putLetter(entry.key,index,false);announce(`Pista: a letra que falta é ${target[index]}.`);return;
+  }
+  let prefix=0;
+  while(prefix<selected.length && selected[prefix]?.value===target[prefix]) prefix++;
+  if(prefix<target.length) {
+    selected=selected.map((entry,index)=>index<prefix?entry:null);
+    const entry=bank.find(e=>e.value===target[prefix] && !selected.some(value=>value?.key===e.key));
+    putLetter(entry.key,prefix,false);
+  }
+  announce(`Pista: a posição ${Math.min(prefix+1,target.length)} tem a letra ${target[Math.min(prefix,target.length-1)]}.`);
 }
+
 function alphabet() {
   for (const value of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
     const node = button('', () => {letter = value; renderAlphabet();});
@@ -158,10 +207,18 @@ async function boot() {
     try {state = await store.load();} catch {storageOK = false; state.settings = {adapt:true};}
     for (const item of catalog.words) {const option = document.createElement('option'); option.value = item.id; option.textContent = item.text; $('word').append(option);}
     $('word').addEventListener('change', event => chooseWord(event.target.value));
+    for(const input of document.querySelectorAll('input[name="activity"]')) input.addEventListener('change',()=>{
+      if(saving) {document.querySelector(`input[name="activity"][value="${activity}"]`).checked=true;return;}
+      activity=input.value;round=0;reset();
+    });
+    drag=letterDrag($('atividade'),{
+      canDrop:index=>activity!=='match' && !completed && !saving && index>=0 && index<selected.length && !locked[index],
+      drop:(key,index)=>putLetter(key,index,false),announce
+    });
     $('check').addEventListener('click', check); $('hint').addEventListener('click', hint);
-    $('clear').addEventListener('click', () => {if (!saving) reset();}); $('repeat').addEventListener('click', () => {if (saving) return; reset(); $('letter-bank').querySelector('button')?.focus();});
+    $('clear').addEventListener('click', () => {if (!saving) reset();}); $('repeat').addEventListener('click', () => {if (saving) return; round++; reset(); ($('letter-bank').querySelector('button:not(:disabled)') || $('match-options').querySelector('button'))?.focus();});
     for (const input of document.querySelectorAll('input[name="mode"]')) input.addEventListener('change', () => {if (saving) {document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true; return;} mode = input.value; reset();});
-    $('listen').addEventListener('click', readWord);
+    $('listen').addEventListener('click', () => {if(activity!=='build') usedSupport=true;readWord();});
     $('listen-letter').addEventListener('click', () => speak(letter, $('volume').value, message => { $('letter-audio-status').textContent = message; $('audio-status').textContent = message; }, `/assets/audio/letra-${letter.toLowerCase()}.mp3`));
     $('stop-sound').addEventListener('click', () => {stop(); $('word-audio-status').textContent = 'Áudio interrompido.';});
     $('on-success-audio').addEventListener('change', () => changeSettings({onSuccessAudio:$('on-success-audio').checked}));
@@ -180,7 +237,7 @@ async function boot() {
       finally {saving = false;}
     });
     $('export').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify({schemaVersion:1, ...state}, null, 2)], {type:'application/json'});
+      const blob = new Blob([JSON.stringify({schemaVersion:2, ...state}, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });

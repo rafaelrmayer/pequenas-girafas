@@ -174,3 +174,93 @@ test('confirmation reads only correct words; preference persists and manual play
     assert.equal(await page.evaluate(()=>window.playedAudio.length),1);
   } finally {await browser.close();}
 });
+
+test('association and missing-letter activities remain freely selectable, keyboard-accessible and separately recorded', async () => {
+  const {browser,page,failures,network} = await setup();
+  try {
+    await page.locator('input[name="activity"][value="match"]').check();
+    assert.equal(await page.locator('#match-options button').count(),3);
+    assert.ok(!(await page.locator('#word-model').textContent()).includes('PEIXE'));
+    await page.locator('#match-options button').filter({hasText:'MAR'}).click();
+    await page.locator('#check').click();
+    assert.equal(await page.locator('#repeat').isVisible(),false);
+    assert.match(await page.locator('#progress').textContent(),/Ainda não há/);
+    await page.locator('#hint').click();
+    assert.equal(await page.locator('#word-model').textContent(),'PEIXE');
+    await page.locator('#match-options button').filter({hasText:'PEIXE'}).focus(); await page.keyboard.press('Enter');
+    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    assert.match(await page.locator('#progress').textContent(),/Associar imagem e palavra: 1/);
+    assert.ok(!(await page.locator('#progress').textContent()).includes('1 construções'));
+    await page.locator('input[name="activity"][value="missing"]').check();
+    await page.locator('#word').selectOption('agua');
+    assert.equal(await page.locator('#slots .fixed').count(),3);
+    await page.getByRole('button',{name:'Adicionar A',exact:true}).click();
+    await page.locator('#check').click();assert.equal(await page.locator('#repeat').isVisible(),false);
+    await page.getByRole('button',{name:'Adicionar U',exact:true}).focus();await page.keyboard.press('Enter');
+    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    assert.match(await page.locator('#feedback').textContent(),/Você completou ÁGUA/);
+    assert.match(await page.locator('#progress').textContent(),/Completar uma letra: 1/);
+    await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+    assert.match(await page.locator('#progress').textContent(),/Associar imagem e palavra: 1/);
+    assert.match(await page.locator('#progress').textContent(),/Completar uma letra: 1/);
+    assert.equal(network.filter(request=>request.method!=='GET').length,0);
+    assert.deepEqual(failures,[]);
+    await page.screenshot({path:'test-results/activities-desktop.png',fullPage:true});
+  } finally {await browser.close();}
+});
+
+test('desktop drag places letters out of order, swaps occupied spaces and leaves canceled drops unchanged', async () => {
+  const {browser,page,failures} = await setup();
+  try {
+    const tile = key=>page.locator(`#letter-bank [data-letter-key="${key}"]`);
+    const slot = index=>page.locator(`#slots [data-slot="${index}"]`);
+    await tile('2').dragTo(slot(2));
+    assert.equal(await slot(2).textContent(),'I');assert.equal(await slot(0).textContent(),'·');
+    await tile('0').dragTo(page.locator('#task-title'));
+    assert.equal(await tile('0').isDisabled(),false);
+    await tile('0').dragTo(slot(0));
+    await slot(2).dragTo(slot(0));
+    assert.equal(await slot(0).textContent(),'I');assert.equal(await slot(2).textContent(),'P');
+    await slot(0).dragTo(slot(2));
+    for(const index of [1,3,4]) await tile(String(index)).dragTo(slot(index));
+    assert.equal((await page.locator('#slots').textContent()).trim(),'PEIXE');
+    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    assert.match(await page.locator('#feedback').textContent(),/Você construiu PEIXE/);
+    await page.locator('input[name="activity"][value="missing"]').check();
+    const wrong = page.getByRole('button',{name:'Adicionar A',exact:true});
+    await wrong.dragTo(slot(0));assert.equal(await slot(0).textContent(),'P');
+    const right = page.getByRole('button',{name:'Adicionar I',exact:true});
+    await right.dragTo(slot(2));
+    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    assert.match(await page.locator('#feedback').textContent(),/Você completou PEIXE/);
+    assert.deepEqual(failures,[]);
+  } finally {await browser.close();}
+});
+
+test('touch hold, drop and cancellation preserve accented letters on mobile', async () => {
+  const {browser,page,failures} = await setup({viewport:{width:390,height:844}});
+  try {
+    await page.locator('#word').selectOption('agua');
+    const source=page.getByRole('button',{name:'Adicionar Á',exact:true});
+    await source.scrollIntoViewIfNeeded();
+    const start=await source.boundingBox();
+    await source.dispatchEvent('pointerdown',{pointerId:42,pointerType:'touch',clientX:start.x+10,clientY:start.y+10});
+    await page.waitForFunction(()=>document.querySelector('.letter-dragging'));
+    await source.dispatchEvent('pointercancel',{pointerId:42,pointerType:'touch'});
+    assert.equal(await source.isDisabled(),false);
+    await source.dispatchEvent('pointerdown',{pointerId:43,pointerType:'touch',clientX:start.x+10,clientY:start.y+10});
+    await page.waitForFunction(()=>document.querySelector('.letter-dragging'));
+    const target=page.locator('#slots [data-slot="0"]');await target.scrollIntoViewIfNeeded();
+    const box=await target.boundingBox();
+    await source.dispatchEvent('pointermove',{pointerId:43,pointerType:'touch',clientX:box.x+box.width/2,clientY:box.y+box.height/2});
+    await source.dispatchEvent('pointerup',{pointerId:43,pointerType:'touch',clientX:box.x+box.width/2,clientY:box.y+box.height/2});
+    assert.equal(await target.textContent(),'Á');
+    assert.equal(await page.getByRole('button',{name:'Adicionar Á',exact:true}).isDisabled(),true);
+    for(const letter of 'GUA') await page.getByRole('button',{name:`Adicionar ${letter}`,exact:true}).click();
+    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    await page.locator('input[name="activity"][value="missing"]').check();
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await page.screenshot({path:'test-results/activities-mobile.png',fullPage:true});
+    assert.deepEqual(failures,[]);
+  } finally {await browser.close();}
+});

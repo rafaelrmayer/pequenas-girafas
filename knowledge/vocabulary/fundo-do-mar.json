@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "language": "pt-BR",
+  "theme": {
+    "id": "fundo-do-mar",
+    "label": "Fundo do mar"
+  },
+  "words": [
+    {
+      "id": "peixe",
+      "text": "PEIXE",
+      "alt": "um peixe",
+      "category": "animal",
+      "complexity": 2,
+      "image": "/assets/peixe.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "ordenar-letras"
+      ]
+    },
+    {
+      "id": "mar",
+      "text": "MAR",
+      "alt": "o mar",
+      "category": "ambiente",
+      "complexity": 1,
+      "image": "/assets/mar.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "ordenar-letras"
+      ]
+    },
+    {
+      "id": "agua",
+      "text": "ÁGUA",
+      "alt": "água",
+      "category": "elemento",
+      "complexity": 2,
+      "image": "/assets/agua.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "ordenar-letras"
+      ]
+    },
+    {
+      "id": "polvo",
+      "text": "POLVO",
+      "alt": "um polvo",
+      "category": "animal",
+      "complexity": 2,
+      "image": "/assets/polvo.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "ordenar-letras"
+      ]
+    },
+    {
+      "id": "concha",
+      "text": "CONCHA",
+      "alt": "uma concha",
+      "category": "objeto",
+      "complexity": 3,
+      "image": "/assets/concha.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "ordenar-letras"
+      ]
+    },
+    {
+      "id": "praia",
+      "text": "PRAIA",
+      "alt": "uma praia",
+      "category": "ambiente",
+      "complexity": 3,
+      "image": "/assets/praia.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "ordenar-letras"
+      ]
+    },
+    {
+      "id": "caranguejo",
+      "text": "CARANGUEJO",
+      "alt": "um caranguejo",
+      "category": "animal",
+      "complexity": 4,
+      "image": "/assets/caranguejo.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "ordenar-letras"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "peixe",
+      "to": "agua",
+      "label": "vive em"
+    },
+    {
+      "from": "peixe",
+      "to": "mar",
+      "label": "relacionado a"
+    },
+    {
+      "from": "peixe",
+      "to": "polvo",
+      "label": "compartilha ambiente com"
+    },
+    {
+      "from": "peixe",
+      "to": "concha",
+      "label": "relacionado a"
+    },
+    {
+      "from": "peixe",
+      "to": "praia",
+      "label": "relacionado a"
+    },
+    {
+      "from": "peixe",
+      "to": "caranguejo",
+      "label": "compartilha tema com"
+    },
+    {
+      "from": "mar",
+      "to": "agua",
+      "label": "contém"
+    },
+    {
+      "from": "praia",
+      "to": "concha",
+      "label": "relacionado a"
+    },
+    {
+      "from": "praia",
+      "to": "caranguejo",
+      "label": "relacionado a"
+    }
+  ]
+}

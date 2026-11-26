@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "minIndependentSessions": 2,
+  "maxRecentEvents": 200,
+  "note": "Heurísticas experimentais configuráveis; não são critérios de domínio ou capacidade."
+}

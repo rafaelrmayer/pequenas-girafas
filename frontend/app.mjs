@@ -152,9 +152,9 @@ async function boot() {
     $('check').addEventListener('click', check); $('hint').addEventListener('click', hint);
     $('clear').addEventListener('click', () => {if (!saving) reset();}); $('repeat').addEventListener('click', () => {if (saving) return; reset(); $('letter-bank').querySelector('button')?.focus();});
     for (const input of document.querySelectorAll('input[name="mode"]')) input.addEventListener('change', () => {if (saving) {document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true; return;} mode = input.value; reset();});
-    $('listen').addEventListener('click', () => speak(word.text, $('volume').value, message => $('audio-status').textContent = message));
-    $('listen-letter').addEventListener('click', () => speak(letter, $('volume').value, message => $('audio-status').textContent = message));
-    $('stop-sound').addEventListener('click', stop);
+    $('listen').addEventListener('click', () => speak(word.text, $('volume').value, message => { $('word-audio-status').textContent = message; $('audio-status').textContent = message; }, `/assets/audio/${word.id}.mp3`));
+    $('listen-letter').addEventListener('click', () => speak(letter, $('volume').value, message => { $('letter-audio-status').textContent = message; $('audio-status').textContent = message; }, `/assets/audio/letra-${letter.toLowerCase()}.mp3`));
+    $('stop-sound').addEventListener('click', () => {stop(); $('word-audio-status').textContent = 'Áudio interrompido.';});
     $('volume').addEventListener('change', () => changeSettings({volume:Number($('volume').value)}));
     for (const id of ['reduced','dark','lowercase','adapt']) $(id).addEventListener('change', () => changeSettings({[id]:$(id).checked}));
     $('threshold').addEventListener('change', () => {
@@ -177,7 +177,7 @@ async function boot() {
     applySettings(); alphabet(); chooseWord('peixe'); summary(); $('experience').hidden = false; $('boot').hidden = true;
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(() => {
-        const ready = () => {$('offline-status').textContent = 'Atividades essenciais disponíveis offline neste navegador. A leitura depende de uma voz instalada.';};
+        const ready = () => {$('offline-status').textContent = 'Atividades essenciais disponíveis offline neste navegador. Os áudios do catálogo estão incluídos.';};
         navigator.serviceWorker.ready.then(() => {if (navigator.serviceWorker.controller) ready(); else navigator.serviceWorker.addEventListener('controllerchange', ready, {once:true});});
       }).catch(() => {$('offline-status').textContent = 'Modo offline indisponível neste navegador. Você pode continuar online.';});
     }

@@ -21,3 +21,7 @@ GIRAF-ai e GIRAF-ai-v2: GNU GPL v3, commits e caminhos em `docs/GIRAF_REVIEW.md`
 - Playwright (testes): Apache-2.0 — https://github.com/microsoft/playwright
 
 As distribuições mantêm os avisos próprios; dependências transitivas e a imagem Python têm licenças adicionais e precisam de inventário antes de distribuição estável. Fontes são do sistema operacional, sem download de webfont. Vozes são recursos instalados e suas condições dependem do fornecedor/SO. Não distribuímos modelo de voz. Ilustrações não são pictogramas ARASAAC ou assets GIRAF e não devem ser apresentadas como validadas por essas instituições.
+
+## Áudio sintético do catálogo
+
+Os 33 MP3 foram gerados offline com eSpeak NG 1.52.0 (voz `pt-br`, velocidade 145) e codificados com FFmpeg/libmp3lame. Fonte do sintetizador: https://github.com/espeak-ng/espeak-ng (GPL-3.0-or-later); pacotes oficiais Debian 1.52.0+dfsg-5 usados apenas na geração. Código, bibliotecas e bases de voz do sintetizador não foram incorporados ao aplicativo. São distribuídas somente as gravações de palavras genéricas e nomes de letras, com transcrições e comandos em `scripts/generate_audio.py`. Não há clonagem de voz ou gravação de usuários. Revisão de pronúncia e licença própria do projeto continuam pendentes.

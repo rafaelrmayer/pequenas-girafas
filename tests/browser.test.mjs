@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {chromium} from 'playwright';
+import {chromium, firefox} from 'playwright';
+const browserEngine = process.env.TEST_BROWSER === 'firefox' ? firefox : chromium;
 const URL = process.env.TEST_URL || 'http://127.0.0.1:8000';
 async function setup(options = {}) {
-  const browser = await chromium.launch();
+  const browser = await browserEngine.launch();
   const context = await browser.newContext({...options, serviceWorkers:'allow'});
   const page = await context.newPage();
   const failures = [];
@@ -103,8 +104,8 @@ test('offline reload still supports word activity after caching', async () => {
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
 });
-test('storage and local voice unavailable remain explicit and usable', async () => {
-  const browser = await chromium.launch(); const context = await browser.newContext();
+test('bundled audio works even when storage and browser voices are unavailable', async () => {
+  const browser = await browserEngine.launch(); const context = await browser.newContext();
   try {
     await context.addInitScript(()=>{
       Object.defineProperty(window,'indexedDB',{value:{open(){throw new Error('blocked');}}});
@@ -112,9 +113,25 @@ test('storage and local voice unavailable remain explicit and usable', async () 
     });
     const page = await context.newPage(); await page.goto(URL); await page.locator('#experience').waitFor({state:'visible'});
     await page.locator('#listen').click();
-    assert.match(await page.locator('#audio-status').textContent(),/não há voz local/);
+    await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
     await construct(page,'PEIXE');
     assert.match(await page.locator('#feedback').textContent(),/não pôde ser salvo/);
     assert.match(await page.locator('#storage-status').textContent(),/apenas na memória/);
+  } finally {await browser.close();}
+});
+
+test('word and letter audio decode offline and zero volume gives feedback beside the button', async () => {
+  const {browser,context,page,failures} = await setup();
+  try {
+    await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
+    await context.setOffline(true);
+    await page.locator('#listen').click();
+    await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
+    await page.locator('#listen-letter').click();
+    await page.waitForFunction(()=>document.querySelector('#letter-audio-status').textContent==='Leitura concluída.');
+    await page.locator('#volume').focus(); await page.keyboard.press('Home');
+    await page.locator('#listen').click();
+    assert.match(await page.locator('#word-audio-status').textContent(),/volume.*zero/);
+    assert.deepEqual(failures,[]);
   } finally {await browser.close();}
 });

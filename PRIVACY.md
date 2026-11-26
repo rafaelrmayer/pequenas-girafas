@@ -18,7 +18,7 @@ Sem proteção por senha ou perfis: pessoas que compartilham o navegador podem l
 
 Arquivos estáticos e catálogo exigem uma requisição inicial ao servidor. Infraestrutura pode receber IP e metadados técnicos. Comando de desenvolvimento/Docker desativa access logs; futura hospedagem exige política de logs e retenção revisada. Cabeçalhos desabilitam câmera, microfone e geolocalização e restringem conexões à própria origem.
 
-Síntese usa somente vozes que Web Speech expõe como `localService=true` em português. A sinalização é do navegador/SO; não prova um fornecedor auditado. Sem voz, aviso explícito e atividade silenciosa. Nunca selecionamos uma voz remota como fallback. Catálogo e nomes de letras são textos genéricos fixos; não há entrada livre enviada para síntese.
+O áudio principal usa 33 MP3 genéricos gerados offline, servidos pela própria origem e cacheados com as atividades; nenhum progresso é enviado para reproduzi-los. Somente se o arquivo falhar, a síntese alternativa usa vozes que Web Speech expõe como `localService=true` em português. A sinalização é do navegador/SO; não prova um fornecedor auditado. Sem voz, aviso explícito e atividade silenciosa. Nunca selecionamos uma voz remota como fallback. Catálogo e nomes de letras são textos genéricos fixos; não há entrada livre enviada para síntese.
 
 ## Próximas versões
 

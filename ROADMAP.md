@@ -2,7 +2,7 @@
 
 ## V0.1 — Fundação experimental (esta entrega)
 
-Implementado: repositório independente; interface responsiva própria; A–Z; construção por letras; tema Fundo do mar com 7 palavras; grafo local; regras explicáveis configuráveis; IndexedDB; exclusão e cópia local; cache offline; adaptador GIRAF mock; ilustrações empacotadas e voz local opcional com fallback explícito; FastAPI, Docker, testes e documentação.
+Implementado: repositório independente; interface responsiva própria; A–Z; construção por letras; tema Fundo do mar com 7 palavras; grafo local; regras explicáveis configuráveis; IndexedDB; exclusão e cópia local; cache offline; adaptador GIRAF mock; ilustrações e 33 áudios pt-BR empacotados, com voz local como alternativa opcional; FastAPI, Docker, testes e documentação.
 
 Limites da V0.1: não há geração real nem chamada a microserviço GIRAF; o mock retorna ilustração empacotada e `no_audio`, com contratos serializados. Voz pt-BR depende de instalação local e deve ser testada no dispositivo. Sem validação pedagógica/conformidade AA declarada. Licença própria a definir antes de distribuição pública. Não foi implantado em produção.
 

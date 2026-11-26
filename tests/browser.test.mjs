@@ -135,3 +135,42 @@ test('word and letter audio decode offline and zero volume gives feedback beside
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
 });
+
+test('confirmation reads only correct words; preference persists and manual playback stays available', async () => {
+  const browser = await browserEngine.launch(); const context = await browser.newContext();
+  try {
+    await context.addInitScript(() => {
+      window.playedAudio = [];
+      const play = HTMLMediaElement.prototype.play;
+      HTMLMediaElement.prototype.play = function() {window.playedAudio.push(this.src); return play.call(this);};
+    });
+    const page = await context.newPage(); await page.goto(URL);
+    await page.locator('#experience').waitFor({state:'visible'});
+    assert.equal(await page.evaluate(()=>window.playedAudio.length),0);
+    await page.locator('#check').click(); await page.locator('#hint').click();
+    assert.equal(await page.evaluate(()=>window.playedAudio.length),0);
+    await page.locator('#clear').click(); await construct(page,'PEIXE');
+    await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
+    assert.equal(await page.evaluate(()=>window.playedAudio.length),1);
+    await page.locator('#on-success-audio').uncheck();
+    await page.waitForFunction(() => new Promise(resolve => {
+      const request = indexedDB.open('pequenas-girafas-v1', 1);
+      request.onsuccess = () => {
+        const db = request.result;
+        const read = db.transaction('local','readonly').objectStore('local').get('state');
+        read.onsuccess = () => {db.close(); resolve(read.result?.settings.onSuccessAudio === false);};
+      };
+    }));
+    await page.reload(); await page.locator('#experience').waitFor({state:'visible'});
+    assert.equal(await page.locator('#on-success-audio').isChecked(),false);
+    await construct(page,'PEIXE');
+    assert.equal(await page.evaluate(()=>window.playedAudio.length),0);
+    await page.locator('#listen').click();
+    await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
+    assert.equal(await page.evaluate(()=>window.playedAudio.length),1);
+    await page.locator('#on-success-audio').check();
+    await page.locator('#volume').focus(); await page.keyboard.press('Home');
+    await page.locator('#repeat').click(); await construct(page,'PEIXE');
+    assert.equal(await page.evaluate(()=>window.playedAudio.length),1);
+  } finally {await browser.close();}
+});

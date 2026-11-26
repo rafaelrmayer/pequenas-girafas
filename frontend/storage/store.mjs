@@ -1,5 +1,5 @@
 const NAME = 'pequenas-girafas-v1';
-const defaults = () => ({events: [], settings: {adapt: true, reduced: false, dark: false, lowercase: false, volume: 0.7, minIndependentSessions: 2}});
+const defaults = () => ({events: [], settings: {adapt: true, reduced: false, dark: false, lowercase: false, volume: 0.7, onSuccessAudio: true, minIndependentSessions: 2}});
 let db;
 function open() {
   if (db) return Promise.resolve(db);

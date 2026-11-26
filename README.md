@@ -27,7 +27,7 @@ Alternativa Docker: `docker compose up --build`, também em http://127.0.0.1:800
 2. Opcionalmente peça a leitura. As sete palavras e os 26 nomes de letras têm áudios sintéticos pt-BR empacotados, reproduzidos por clique mesmo sem voz instalada. Se um arquivo falhar, há tentativa de voz local e aviso próximo ao botão; não há chamada remota.
 3. Selecione P, E, I, X, E por toque, clique ou foco + Enter/Espaço. Os dois E são peças independentes.
 4. Use “Quero uma pista” se desejar. A pista completa a próxima posição correta; um modelo visível ou pista identifica a construção como apoiada.
-5. Confira a palavra; somente uma conclusão é registrada por rodada. Tente outra palavra ou repita.
+5. Confira a palavra; ao acertar, ela é lida com o volume escolhido. A leitura ao acertar pode ser desligada em Apoios e preferências. Somente uma conclusão é registrada por rodada. Tente outra palavra ou repita.
 6. Em “Escolher apoio”, experimente sem modelo. Duas sessões diferentes com construção sem pistas permitem sugerir esse modo; a sugestão é opcional e não é prova de domínio ou retenção. Repetir na mesma sessão não conta como sessões diferentes. Recarregar a página inicia uma sessão local nova.
 7. A área de responsáveis permite desligar adaptação, ajustar o critério entre 2 e 10 sessões, ver registros, baixar uma cópia e apagá-los com confirmação. Cópias baixadas não são apagadas pelo aplicativo.
 

@@ -9,3 +9,5 @@ O alfabeto mostra maiúsculas/minúsculas, nomes lidos apenas por solicitação 
 Testes automatizados de navegador cobrem teclado, largura de celular, mensagens, persistência e offline. Não substituem TalkBack, NVDA/VoiceOver, contraste calculado, zoom 200–400%, acionadores alternativos, distração visual e validação motora/pedagógica. Leituras de ÁGUA e nomes de letras devem ser revistas com vozes locais pt-BR em dispositivos reais.
 
 Próxima revisão: contraste em todos os estados, comportamento de foco durante edição e erro, leitura de letras repetidas, clareza de pictogramas, tamanhos de toque, uso sem som, com baixa visão e diferentes idades. Estética não infantilizadora configurável é etapa futura.
+
+A leitura ao acertar ocorre somente após clicar/acionar “Conferir palavra” numa construção correta; é informada ao lado da ação e pode ser desligada nos ajustes locais. Respeita volume zero; não toca ao abrir a página, pedir pistas ou conferir uma construção incompleta/incorreta. O botão de ouvir continua disponível independentemente dessa preferência.

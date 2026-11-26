@@ -24,7 +24,7 @@ Alternativa Docker: `docker compose up --build`, também em http://127.0.0.1:800
 ## Primeira demonstração
 
 1. Escolha PEIXE no tema Fundo do mar; a ilustração é local e original.
-2. Opcionalmente peça a leitura. Ela depende de uma voz local em português instalada e identificada pelo navegador. Sem essa voz, há aviso explícito e a atividade continua sem áudio; não há chamada remota.
+2. Opcionalmente peça a leitura. As sete palavras e os 26 nomes de letras têm áudios sintéticos pt-BR empacotados, reproduzidos por clique mesmo sem voz instalada. Se um arquivo falhar, há tentativa de voz local e aviso próximo ao botão; não há chamada remota.
 3. Selecione P, E, I, X, E por toque, clique ou foco + Enter/Espaço. Os dois E são peças independentes.
 4. Use “Quero uma pista” se desejar. A pista completa a próxima posição correta; um modelo visível ou pista identifica a construção como apoiada.
 5. Confira a palavra; somente uma conclusão é registrada por rodada. Tente outra palavra ou repita.
@@ -37,7 +37,7 @@ A demonstração inclui sete palavras (PEIXE, MAR, ÁGUA, POLVO, CONCHA, PRAIA, 
 
 IndexedDB mantém até 200 construções recentes e preferências somente neste perfil de navegador. Não há nomes, diagnósticos, fotos, telemetria ou treinamento com registros dos usuários. O servidor recebe pedidos dos arquivos genéricos; nunca recebe o progresso. O Service Worker guarda uma lista explícita de arquivos e catálogo, sem dados pessoais. Registros locais não são criptografados; outras pessoas no mesmo perfil podem acessá-los. Não há múltiplos perfis nesta versão.
 
-Para usar offline, aguarde o aviso no rodapé depois do primeiro carregamento. A leitura continua dependente da voz instalada. Para atualizar o cache numa próxima versão, alterar o identificador de cache em `frontend/sw.js`; esta fundação usa cache versionado para impedir atualização parcial do catálogo durante uma sessão.
+Para usar offline, aguarde o aviso no rodapé depois do primeiro carregamento. Os áudios do catálogo também ficam disponíveis offline. Para atualizar o cache numa próxima versão, alterar o identificador de cache em `frontend/sw.js`; esta fundação usa cache versionado para impedir atualização parcial do catálogo durante uma sessão.
 
 ## Testes
 
@@ -77,3 +77,7 @@ V0.2–V1.0 não estão implementadas: frases, desenho, histórias, relatórios 
 ## Ambientes separados
 
 `main` para a principal e `develop` para testes; configuração preparada, sem hospedagem aplicada. Veja [ambientes](docs/ENVIRONMENTS.md). O repositório criado pelo mantenedor é público; nenhum dado pessoal ou segredo está incluído.
+
+### Áudio do catálogo
+
+33 arquivos MP3 sintéticos (~284 KiB), gerados offline com eSpeak NG 1.52.0 (`pt-br`) e FFmpeg. Não há geração no servidor ou em provedores. `scripts/generate_audio.py` documenta a reprodução da geração. Nomes de letras não são fonemas. Voz sintética experimental, com revisão de pronúncia pedagógica ainda pendente.

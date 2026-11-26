@@ -18,6 +18,12 @@ jobs:
       - run: npm ci
       - run: npm test
   browser:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
+    env:
+      TEST_BROWSER: ${{ matrix.browser }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -30,7 +36,7 @@ jobs:
           node-version: '24'
       - run: pip install -r requirements.txt
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
       - name: Iniciar aplicação e verificar navegador
         run: |
           python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --no-access-log > /tmp/girafas-server.log 2>&1 &
@@ -42,6 +48,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: girafas-demo
+          name: girafas-demo-${{ matrix.browser }}
           path: test-results/
           retention-days: 7

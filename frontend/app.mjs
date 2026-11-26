@@ -26,6 +26,7 @@ function applySettings() {
   document.body.classList.toggle('reduced', Boolean(state.settings.reduced));
   document.body.classList.toggle('dark', Boolean(state.settings.dark));
   for (const id of ['reduced','dark','lowercase','adapt']) $(id).checked = Boolean(state.settings[id]);
+  $('on-success-audio').checked = state.settings.onSuccessAudio !== false;
   $('volume').value = state.settings.volume ?? 0.7;
   $('threshold').value = state.settings.minIndependentSessions || rules.minIndependentSessions;
 }
@@ -102,12 +103,20 @@ function renderLetters() {
   });
   if (oldKey !== undefined) [...$('letter-bank').children].find(n => n.dataset.tile === oldKey && !n.disabled)?.focus();
 }
+function readWord() {
+  speak(word.text, $('volume').value, message => {
+    $('word-audio-status').textContent = message;
+    $('audio-status').textContent = message;
+  }, `/assets/audio/${word.id}.mp3`);
+}
 async function check() {
   if (completed || saving) return;
   if (!matchesWord(selected.map(e => e.value), word.text)) {
     announce('Podemos continuar explorando. Você pode retirar letras ou pedir uma pista.'); return;
   }
   completed = true; saving = true; $('check').disabled = true; $('hint').disabled = true; renderLetters();
+  // Start within the confirmation click, before asynchronous storage work.
+  if (state.settings.onSuccessAudio !== false && Number($('volume').value) > 0) readWord();
   const event = completion(word.id, sessionId, usedSupport);
   let saved = false;
   try {await settingsQueue; const stored = await store.record(event); state.events = stored.events; saved = true;}
@@ -152,9 +161,10 @@ async function boot() {
     $('check').addEventListener('click', check); $('hint').addEventListener('click', hint);
     $('clear').addEventListener('click', () => {if (!saving) reset();}); $('repeat').addEventListener('click', () => {if (saving) return; reset(); $('letter-bank').querySelector('button')?.focus();});
     for (const input of document.querySelectorAll('input[name="mode"]')) input.addEventListener('change', () => {if (saving) {document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true; return;} mode = input.value; reset();});
-    $('listen').addEventListener('click', () => speak(word.text, $('volume').value, message => { $('word-audio-status').textContent = message; $('audio-status').textContent = message; }, `/assets/audio/${word.id}.mp3`));
+    $('listen').addEventListener('click', readWord);
     $('listen-letter').addEventListener('click', () => speak(letter, $('volume').value, message => { $('letter-audio-status').textContent = message; $('audio-status').textContent = message; }, `/assets/audio/letra-${letter.toLowerCase()}.mp3`));
     $('stop-sound').addEventListener('click', () => {stop(); $('word-audio-status').textContent = 'Áudio interrompido.';});
+    $('on-success-audio').addEventListener('change', () => changeSettings({onSuccessAudio:$('on-success-audio').checked}));
     $('volume').addEventListener('change', () => changeSettings({volume:Number($('volume').value)}));
     for (const id of ['reduced','dark','lowercase','adapt']) $(id).addEventListener('change', () => changeSettings({[id]:$(id).checked}));
     $('threshold').addEventListener('change', () => {

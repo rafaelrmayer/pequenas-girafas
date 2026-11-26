@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 — 2026-11-26
+
+Leitura da palavra ao confirmar uma construção correta, iniciada no clique antes de salvar o registro. Preferência local para desligar, volume respeitado e botão manual preservado. Sem som em erro, pista ou abertura de página.
+
 ## 0.1.2 — 2026-11-26
 
 Substitui a voz eSpeak pelo catálogo gerado com Edge TTS/Francisca Neural pt-BR, mantendo reprodução e cache locais. Ferramenta de geração separada do runtime, com catálogo fixo, staging, manifesto e hashes. Nenhuma chamada de voz durante o uso da criança.

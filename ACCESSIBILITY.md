@@ -11,3 +11,11 @@ Testes automatizados de navegador cobrem teclado, largura de celular, mensagens,
 Próxima revisão: contraste em todos os estados, comportamento de foco durante edição e erro, leitura de letras repetidas, clareza de pictogramas, tamanhos de toque, uso sem som, com baixa visão e diferentes idades. Estética não infantilizadora configurável é etapa futura.
 
 A leitura ao acertar ocorre somente após clicar/acionar “Conferir palavra” numa construção correta; é informada ao lado da ação e pode ser desligada nos ajustes locais. Respeita volume zero; não toca ao abrir a página, pedir pistas ou conferir uma construção incompleta/incorreta. O botão de ouvir continua disponível independentemente dessa preferência.
+
+## Atividades e arraste opcionais
+
+Três opções nativas de atividade, sem desbloqueios ou tempo de resposta. Letras em espaços vazios continuam acionáveis por teclado; letras predefinidas da atividade de completar ficam identificadas como já preenchidas. Letras repetidas têm chaves distintas, acentos são preservados e o tamanho motor do gesto nunca é usado como evidência de aprendizagem.
+
+Mouse usa arraste nativo; toque/caneta usam segurar brevemente antes de mover. O limiar do gesto não é um tempo de atividade, não é medido ou salvo e pode ser evitado inteiramente pelo toque simples/teclado. A região das peças usa `touch-action:none`; o restante da página continua rolável. Soltar fora de um espaço ou cancelar não altera a atividade nem cria registro. Trocas entre espaços são permitidas, salvo as posições já preenchidas no exercício de letra ausente.
+
+A associação usa descrição alternativa da imagem para acesso sem visão. Essa descrição pode nomear o conceito; o exercício não é uma prova de leitura ou capacidade. Pistas e escuta na associação contam como apoio, sem penalização. Revisão com leitores de tela e toque físico permanece necessária; a CI cobre ponteiro por eventos emulados e arraste de mouse nos navegadores.

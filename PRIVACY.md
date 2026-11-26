@@ -4,7 +4,7 @@ Projetado para minimizar dados. Não é uma declaração de conformidade jurídi
 
 ## Dados locais
 
-IndexedDB guarda até 200 construções concluídas: identificador da palavra do catálogo, identificador aleatório de sessão, apoio utilizado e conclusão; também preferências de apresentação e adaptação. A sessão é recriada ao recarregar a página. Mesmo sem nome, esse histórico pode revelar informações sobre aprendizagem; é tratado como privado e não enviado ao servidor.
+IndexedDB guarda até 200 atividades concluídas: identificador da palavra do catálogo, identificador aleatório de sessão, apoio utilizado, conclusão e tipo de atividade; também preferências de apresentação e adaptação. A sessão é recriada ao recarregar a página. Mesmo sem nome, esse histórico pode revelar informações sobre aprendizagem; é tratado como privado e não enviado ao servidor.
 
 Sem banco central de crianças/familiares, nome, diagnóstico, foto, áudio, geolocalização, conta, telemetria pessoal, publicidade ou cookies. Nenhum uso para treinamento global, pesquisa própria ou comercialização. Projetos independentes não recebem esses dados. Não há transmissão para GIRAF ou provedores.
 

@@ -94,3 +94,15 @@ Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os
 `frontend/assets/audio/manifest.json` registra provedor, versão, voz, taxa, transcrições e hashes de cada MP3. `scripts/generate_audio_espeak.py` preserva a alternativa antiga, de qualidade mais robótica; não é o padrão. Edge TTS usa um serviço online do Edge, não a API contratada do Azure Speech, e sua disponibilidade pode variar. Biblioteca e serviço têm condições próprias; ver [licenças](THIRD_PARTY_LICENSES.md).
 
 Em redes gerenciadas que usam CA própria, `--ca-file /caminho/ca-confiavel.pem` acrescenta o certificado confiável ao verificador; a validação TLS nunca é desligada. Proxy HTTPS configurado no ambiente é reutilizado sem ser registrado nos logs.
+
+## Três formas de explorar
+
+A área da atividade oferece escolha livre entre **Montar a palavra**, **Completar uma letra** e **Associar imagem e palavra**. Mudar de atividade não conta como erro nem exige concluir a anterior. As sete palavras do tema estão disponíveis em todas.
+
+- Montar: clique nas letras ou arraste-as para posições específicas; letras colocadas podem ser retiradas por botão ou trocadas por arraste.
+- Completar: as outras letras ficam fixas; escolha ou arraste uma entre quatro opções para o espaço. Repetir varia a posição ausente. Uma nova opção substitui a anterior, sem punição.
+- Associar: observe a imagem, selecione uma entre três palavras e confira. A pista revela o modelo; ouvir a palavra também é registrado como apoio nesse contexto. As alternativas mudam de ordem ao repetir.
+
+A leitura ao acertar funciona nas três atividades, respeitando a preferência local e o volume. No celular, segure uma letra por um instante e arraste; para rolar a página, use a área fora das peças. Arrastar nunca é obrigatório: botões, toque e teclado permanecem disponíveis. Não há conclusão automática ao soltar; o botão de conferir mantém o controle com a pessoa.
+
+Os registros distinguem `build`, `missing` e `match`. Só as construções completas entram na regra que sugere experimentar sem modelo; acertar associação ou uma letra ausente não comprova construção independente. Eventos anteriores sem tipo continuam sendo interpretados como `build`. Exportações passam a `schemaVersion: 2`, com eventos anteriores preservados. Não há migração ou transmissão para servidor.

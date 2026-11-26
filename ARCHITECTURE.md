@@ -24,3 +24,5 @@ A sessão usa UUID efêmero somente local para distinguir conclusões em página
 Storage pode ser bloqueado ou apagado pelo navegador. A interface avisa quando uma conclusão não foi salva. Transações serializam as alterações locais para evitar perda em gravações simultâneas. Ao apagar registros, o estado da aplicação também é reiniciado. Cache continua contendo só recursos genéricos. Contas e múltiplos perfis não existem nesta versão.
 
 Offline exige primeiro carregamento e Service Worker instalado em localhost/HTTPS. O identificador de cache deve mudar a cada conjunto de recursos novo. Não há sincronização de dados, infraestrutura de produção ou garantia de quota do dispositivo.
+
+`frontend/modules/activities.mjs` mantém regras puras de posições fixas, letras ausentes e alternativas. `frontend/accessibility/letter-drag.mjs` acrescenta arraste opcional por delegação de eventos, sem rede ou persistência. O estado de rodada é descartado ao trocar de atividade; somente conclusões são persistidas, com tipo explícito. Eventos antigos sem tipo continuam sendo construções completas.

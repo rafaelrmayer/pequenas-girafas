@@ -22,7 +22,7 @@
 #word-audio-status:empty { margin: 0; }
 #picture-options {
   width: 100%;
-  margin-top: .5rem;
+  margin-top: 1rem;
   border-top: 1px solid var(--line);
 }
 #picture-options summary { font-size: .9rem; }
@@ -56,12 +56,14 @@
   .workspace, .panel { padding: .75rem; }
   .section-head { gap: .5rem; margin-bottom: .75rem; }
   .activity-picker { gap: 0; margin: 0 0 .75rem; padding: 0 .65rem; }
-  .activity-grid { gap: .75rem; }
+  .activity-grid { display: block; }
   .picture-card {
     display: grid;
-    grid-template-columns: clamp(4rem, 24vw, 7rem) minmax(0, 1fr);
+    grid-template-columns: clamp(5rem, 33vw, 8.25rem) minmax(0, 1fr);
     gap: .25rem .75rem;
     padding: .65rem;
+    margin-bottom: .85rem;
+    border: 1px solid var(--line);
   }
   .picture-card img { grid-row: span 2; }
   .word-model, .word-model.masked {
@@ -72,8 +74,7 @@
   }
   .word-model { font-size: clamp(1.05rem, 4.6vw, 1.65rem); }
   .picture-audio button { padding-inline: .45rem; font-size: .875rem; }
-  #word-audio-status, #picture-options { grid-column: 1 / -1; }
-  #picture-options { margin-top: 0; }
+  #word-audio-status { grid-column: 1 / -1; }
   #picture-options summary { padding-block: .65rem; }
   .build-card { padding-top: 0; }
   .build-card h3 { margin-bottom: .3rem; }
@@ -93,4 +94,15 @@
   .actions { gap: .45rem; }
   .actions button { padding-inline: .65rem; }
   .feedback { min-height: 0; margin: .65rem 0; }
+}
+
+@media (max-width: 620px) and (min-height: 480px) {
+  .picture-card {
+    position: sticky;
+    top: .5rem;
+    z-index: 2;
+  }
+  .build-card :is(button, summary, input, select, [tabindex]) {
+    scroll-margin-block-start: 13rem;
+  }
 }

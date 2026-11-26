@@ -2,7 +2,7 @@ import * as store from './storage/store.mjs';
 import {recommendSupport, completion, matchesWord, evidenceFor, localDay} from './ai/adaptive-learning/engine.mjs';
 import {recommendActivities} from './ai/adaptive-learning/planner.mjs';
 import {relatedWords} from './ai/semantic-expansion/graph.mjs';
-import {presentationsFor,visualEvidence,changeRoundVisual} from './modules/presentations.mjs';
+import {presentationsFor,visualEvidence,changeRoundVisual,illustrationOnVisit,rememberIllustration,clearIllustrationRotation} from './modules/presentations.mjs';
 import {ACTIVITIES, lettersRound, placeLetter, associationChoices} from './modules/activities.mjs';
 import {letterDrag} from './accessibility/letter-drag.mjs';
 import {speak, stop} from './accessibility/speech.mjs';
@@ -76,7 +76,7 @@ function chooseWord(id, options={}) {
   stop(); drag?.cancel(); round=0; word = catalog.words.find(w => w.id === id) || catalog.words[0];
   $('word').value = word.id;
   $('picture-options').open=false;
-  currentImage=presentationsFor(word).find(image=>image.id===options.imageId) || presentationsFor(word)[0];renderPicture();
+  currentImage=illustrationOnVisit(word, options.imageId);renderPicture();
   const support=recommendation();mode = options.mode || support.mode;
   document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true;
   reset();
@@ -112,7 +112,7 @@ function changeVisual(id) {
   if(saving) {$('presentation-select').value=currentImage.id;return;}
   const next=presentationsFor(word).find(image=>image.id===id);
   if(!next || next.id===currentImage.id) return;
-  stop();currentImage=next;renderPicture();
+  stop();currentImage=next;rememberIllustration(word.id, next.id);renderPicture();
   if(completed) {reset();announce('Outra imagem escolhida. Uma nova rodada está disponível.');return;}
   roundVisualIds=changeRoundVisual(roundVisualIds,id,roundStarted);
   renderAdvice();
@@ -334,7 +334,7 @@ async function boot() {
     $('cancel-delete').addEventListener('click', () => {$('delete-confirm').hidden = true; $('delete').focus();});
     $('confirm-delete').addEventListener('click', async () => {
       if (saving) return; saving = true; stop();
-      try {await settingsQueue; state = await store.erase(); saving = false; storageOK = true; applySettings(); chooseWord('peixe'); summary(); $('data-feedback').textContent = 'Registros e preferências apagados deste navegador.'; $('delete-confirm').hidden = true; $('delete').focus();}
+      try {await settingsQueue; state = await store.erase(); clearIllustrationRotation(); saving = false; storageOK = true; applySettings(); chooseWord('peixe'); summary(); $('data-feedback').textContent = 'Registros e preferências apagados deste navegador.'; $('delete-confirm').hidden = true; $('delete').focus();}
       catch {$('data-feedback').textContent = 'Não foi possível apagar os registros. Tente novamente ou limpe os dados deste site nas configurações do navegador.';}
       finally {saving = false;}
     });

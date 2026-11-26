@@ -392,6 +392,55 @@ async function selectImage(page, id) {
   await page.locator('#presentation-select').selectOption(id);
 }
 
+test('mobile illustrations stay with the letters and rotate between visits', async () => {
+  const {browser,context,page,failures} = await setup({viewport:{width:390,height:740}});
+  try {
+    const currentImage = () => page.locator('#presentation-select').inputValue();
+    const word = page.locator('#word');
+    assert.equal(await currentImage(), 'image-v1');
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+    await context.setOffline(true);
+    for (const id of ['image-v2', 'image-v3', 'image-v1']) {
+      await page.reload();
+      await page.locator('#experience').waitFor({state:'visible'});
+      assert.equal(await currentImage(), id);
+    }
+    await page.locator('.activity-grid').evaluate(grid => {
+      window.scrollTo(0, window.scrollY + grid.getBoundingClientRect().top + 80);
+    });
+    const picture = await page.locator('#picture').boundingBox();
+    const letters = await page.locator('#letter-bank').boundingBox();
+    assert.ok(picture.y >= 0 && picture.width >= 112);
+    assert.ok(picture.y + picture.height < letters.y && letters.y + letters.height < 740);
+    await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
+    assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
+    assert.equal(await currentImage(), 'image-v1');
+
+    await word.selectOption('polvo');
+    assert.equal(await currentImage(), 'image-v1');
+    await word.selectOption('mar');
+    assert.equal(await currentImage(), 'image-v1');
+    await word.selectOption('polvo');
+    assert.equal(await currentImage(), 'image-v2');
+    await selectImage(page, 'image-v1');
+    await word.selectOption('peixe');
+    assert.equal(await currentImage(), 'image-v2');
+    await word.selectOption('polvo');
+    assert.equal(await currentImage(), 'image-v2');
+    assert.match(await page.locator('#progress').textContent(), /Ainda não há/);
+
+    await page.locator('#adult-title').click();
+    await page.locator('#delete').click();
+    await page.locator('#confirm-delete').click();
+    await page.waitForFunction(() => document.querySelector('#data-feedback').textContent.includes('apagados'));
+    assert.equal(await word.inputValue(), 'peixe');
+    assert.equal(await currentImage(), 'image-v1');
+    await word.selectOption('polvo');
+    assert.equal(await currentImage(), 'image-v1');
+    assert.deepEqual(failures,[]);
+  } finally {await browser.close();}
+});
+
 test('visual choice preserves the word and in-progress letters, records mixed rounds and accepts optional image revisits', async () => {
   const {browser,page,failures} = await setup();
   try {

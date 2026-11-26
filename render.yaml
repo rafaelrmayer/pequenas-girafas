@@ -1,0 +1,21 @@
+# Configuração preparada; aplicar este Blueprint cria serviços públicos.
+# Não foi aplicado automaticamente. Revisar antes de hospedar.
+services:
+  - type: web
+    name: pequenas-girafas
+    runtime: docker
+    branch: main
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: principal
+  - type: web
+    name: pequenas-girafas-testes
+    runtime: docker
+    branch: develop
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: testes

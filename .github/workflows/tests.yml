@@ -1,0 +1,47 @@
+name: Verificar Pequenas Girafas
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  api-and-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+      - run: npm ci
+      - run: npm test
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: pip install -r requirements.txt
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Iniciar aplicação e verificar navegador
+        run: |
+          python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --no-access-log > /tmp/girafas-server.log 2>&1 &
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:8000/health; then break; fi
+            sleep 1
+          done
+          npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: girafas-demo
+          path: test-results/
+          retention-days: 7

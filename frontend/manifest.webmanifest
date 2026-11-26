@@ -1,0 +1,1 @@
+{"name": "Pequenas Girafas", "short_name": "Girafas", "lang": "pt-BR", "start_url": "/", "scope": "/", "display": "standalone", "background_color": "#fbfaf6", "theme_color": "#285c56", "icons": [{"src": "/assets/girafa.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]}

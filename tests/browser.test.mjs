@@ -264,3 +264,75 @@ test('touch hold, drop and cancellation preserve accented letters on mobile', as
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
 });
+
+test('optional advice preserves a round when ignored, follows explicit preferences and can be disabled', async () => {
+  const {browser,page,failures,network} = await setup();
+  try {
+    assert.match(await page.locator('#adaptive-suggestions').textContent(),/Falta de registro não é dificuldade/);
+    await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
+    await page.locator('#ignore-advice').click();
+    assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
+    assert.equal(await page.locator('#adaptive-suggestions button').count(),0);
+    assert.match(await page.locator('#adaptive-status').textContent(),/Continue por aqui/);
+    await page.locator('#adult-title').click();
+    await page.locator('#category-interest').selectOption('animal');
+    await page.locator('#exploration-goal').selectOption('new');
+    await page.locator('#preferred-activity').selectOption('missing');
+    assert.equal(await page.locator('#recommendations button').first().locator('strong').textContent(),'POLVO');
+    const suggestion=page.locator('#adaptive-suggestions button[data-action="new_word"]');
+    assert.equal(await suggestion.getAttribute('data-word-id'),'polvo');
+    await suggestion.click();
+    assert.equal(await page.locator('#word').inputValue(),'polvo');
+    assert.equal(await page.locator('input[name="activity"][value="missing"]').isChecked(),true);
+    assert.match(await page.locator('#progress').textContent(),/Ainda não há/);
+    await page.locator('#adapt').uncheck();
+    assert.equal(await page.locator('#adaptive-suggestions button').count(),0);
+    assert.equal(await page.locator('#word option').count(),7);
+    assert.equal(await page.locator('#recommendations button').count(),6);
+    await page.waitForFunction(() => new Promise(resolve=>{
+      const request=indexedDB.open('pequenas-girafas-v1',1);
+      request.onsuccess=()=>{const db=request.result;const read=db.transaction('local','readonly').objectStore('local').get('state');read.onsuccess=()=>{db.close();resolve(read.result?.settings.adapt===false && read.result?.settings.preferredActivity==='missing');};};
+    }));
+    await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+    assert.equal(await page.locator('#category-interest').inputValue(),'animal');
+    assert.match(await page.locator('#adaptive-status').textContent(),/Personalização desligada/);
+    assert.equal(network.filter(request=>request.method!=='GET').length,0);
+    assert.deepEqual(failures,[]);
+  } finally {await browser.close();}
+});
+
+test('completed evidence records only day and presentation; revisits preserve legacy unknown dates', async () => {
+  const {browser,page,failures} = await setup();
+  try {
+    await page.locator('input[value="memory"]').evaluate(n=>n.closest('details').open=true);
+    await page.locator('input[value="memory"]').check();await construct(page,'PEIXE');
+    const first=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events[0];});
+    assert.match(first.day,/^\d{4}-\d{2}-\d{2}$/);assert.equal(first.contextId,'build:upper:image-v1');
+    assert.equal(first.hintUsed,false);assert.equal(first.modelUsed,false);assert.equal(first.audioRequested,false);
+    assert.ok(!('responseTime' in first) && !('timestamp' in first));
+    await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+    await page.locator('input[value="memory"]').evaluate(n=>n.closest('details').open=true);
+    await page.locator('input[value="memory"]').check();await construct(page,'PEIXE');
+    assert.match(await page.locator('#skill-evidence [data-activity="build"]').textContent(),/2 sessões, 1 dia local/);
+    assert.match(await page.locator('#adapt-reason').textContent(),/não comprova retenção/);
+    await page.evaluate(async()=>{
+      const store=await import('/storage/store.mjs');
+      await store.record({wordId:'mar',sessionId:'legacy',support:'assisted',outcome:'completed'});
+      await store.record({wordId:'agua',sessionId:'past',activity:'match',support:'independent',outcome:'completed',day:'2020-01-01',contextId:'match:upper:image-v1'});
+    });
+    await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+    const review=page.locator('#adaptive-suggestions button[data-action="review"]');
+    assert.equal(await review.getAttribute('data-word-id'),'agua');
+    assert.match(await review.locator('..').textContent(),/não significa.*esquecimento/);
+    await review.focus();await page.keyboard.press('Enter');
+    assert.equal(await page.locator('#word').inputValue(),'agua');
+    assert.equal(await page.locator('input[name="activity"][value="match"]').isChecked(),true);
+    await page.locator('#word').selectOption('mar');
+    assert.match(await page.locator('#skill-evidence [data-activity="build"]').textContent(),/1 registro sem data/);
+    const legacy=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.find(e=>e.sessionId==='legacy');});
+    assert.equal(legacy.day,undefined);
+    await page.locator('#adult-title').click();
+    await page.screenshot({path:'test-results/adaptive-evidence.png',fullPage:true});
+    assert.deepEqual(failures,[]);
+  } finally {await browser.close();}
+});

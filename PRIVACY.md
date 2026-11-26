@@ -27,3 +27,9 @@ Textos livres e histórias podem conter dados pessoais: não serão enviados aut
 ## Geração do catálogo de áudio
 
 A ferramenta de desenvolvimento Edge TTS envia somente 33 palavras e nomes de letras genéricos fixos ao serviço Microsoft Edge. Isso ocorre na preparação do catálogo pelo mantenedor, não no dispositivo da criança, no servidor de produção ou nos testes comuns. Não aceita texto livre. O aplicativo recebe apenas os MP3 empacotados e não chama Microsoft para reproduzi-los; progresso, configurações e sessão local continuam fora da rede. A infraestrutura do serviço pode observar IP e metadados da máquina de geração; isso é diferente de processar dados da criança.
+
+## Metadados locais da versão 0.1.5
+
+Conclusões novas acrescentam o dia do calendário local (sem horário), apresentação genérica (atividade, grafia e posição da lacuna), se houve pista/modelo e se o áudio foi solicitado antes da resposta. O objetivo é distinguir observações e organizar revisitas opcionais. A data depende do relógio do dispositivo e não comprova retenção. Não salvamos datas inventadas nos registros antigos, tempo de resposta, inatividade, abandono ou gestos.
+
+Preferências explícitas de categoria, objetivo, atividade e intervalo também ficam somente no IndexedDB. Desativar personalização para as sugestões não apaga os registros de progresso; exclusão continua disponível. Não registramos aceitação ou recusa de recomendação nem enviamos evidências para o servidor. Exportação local passa a schemaVersion 3, preservando eventos antigos sem metadados. Cópias exportadas contêm observações de aprendizagem e precisam de proteção pelo responsável.

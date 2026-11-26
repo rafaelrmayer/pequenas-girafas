@@ -27,3 +27,15 @@ Knowledge Tracing, embeddings, RAG e modelos neurais só após validação e nec
 A sugestão de retirar opcionalmente o modelo considera exclusivamente `build`. Registros antigos sem `activity` são compatíveis e pertencem a esse tipo. `missing` evidencia apenas a escolha da letra no contexto parcialmente preenchido; `match` evidencia somente a escolha da palavra dentre alternativas. Nenhum é convertido em construção completa ou capacidade geral. Dicas em qualquer atividade contam como apoio; ouvir o alvo em associação/completar também conta como apoio. A leitura após uma resposta correta não altera a evidência já demonstrada.
 
 Não há telemetria de arraste, duração do gesto, tentativas incorretas ou abandono. Botões e arraste produzem o mesmo tipo de evento de conclusão, sem inferir habilidade motora. Escolher outra atividade não gera evento negativo. A expansão de temas pode considerar que uma palavra foi explorada em qualquer atividade, sem afirmar aprendizagem.
+
+## Planejador ampliado (0.1.5)
+
+`planner.mjs` oferece no máximo duas recomendações, com ação, palavra, atividade e razão. Pode manter, reforçar por pistas, oferecer apoio, revisitar, explorar palavra relacionada, experimentar atividade, sugerir outra grafia ou variar após repetições. Não executa transições sem clique e não registra aceitação/recusa. Todas as atividades continuam livres.
+
+`evidenceFor` separa conclusões por palavra e atividade, apoio, pistas solicitadas, sessões, dias locais e apresentações. Registros antigos sem data permanecem desconhecidos. Não existe estimativa de retenção, domínio ou generalização: dois dias diferentes são só observações do calendário local; duas apresentações podem ser apenas maiúsculas/minúsculas. A data é usada para organização de revisitas, nunca para inferir capacidade a partir de ausência ou velocidade.
+
+`completion` aceita uma lista fechada de metadados genéricos; nome, diagnóstico, tempo de resposta e campos arbitrários não entram no evento. Uma conclusão pode conter `day`, `contextId`, `hintUsed`, `modelUsed`, `audioRequested`. Solicitar áudio não comprova que ele foi ouvido; a leitura após acerto não é confundida com solicitação anterior à resposta. A janela continua limitada a 200 conclusões locais; descarte ou exclusão reduz a evidência disponível sem significar perda de aprendizagem.
+
+O responsável pode escolher categoria de interesse, objetivo de exploração, atividade e intervalo de revisita. Sem preferências, usamos ordenação editorial equilibrada. Ao desligar personalização, o planejador não oferece recomendações individuais e a lista de palavras usa apenas relações genéricas. A interface não oculta conteúdo por dificuldade presumida.
+
+O grafo agora diferencia palavras executáveis e conceitos não executáveis, como NADAR. Há metadados de apresentação, habilidades e pré-requisitos opcionais, com revisão marcada como pendente. Uma única ilustração por palavra continua sendo uma limitação explícita. Expansão para contextos realmente diferentes exige materiais e avaliação pedagógica adicionais.

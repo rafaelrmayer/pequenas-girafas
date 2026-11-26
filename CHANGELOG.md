@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5 — 2026-11-26
+
+Planejador local explicável, preferências explícitas e resumo por atividade. Datas de dia local e apresentações novas distinguem observações sem alegar retenção/generalização; registros antigos permanecem sem data. Conceitos explicativos no grafo, sugestões opcionais e revisita configurável. Sem envio do histórico ou modelos treinados.
+
 ## 0.1.4 — 2026-11-26
 
 Associação entre imagem e palavra e completar uma letra, com escolha livre e registros separados. Arraste opcional por mouse e toque/caneta, posições fixas, troca de letras e cancelamento sem registro. Mantidos clique, teclado, áudio, dados locais e uso offline. Exportação schemaVersion 2 compatível com eventos antigos. Crédito de autoria no rodapé: Desenvolvido por Rafael Ricardo Mayer.

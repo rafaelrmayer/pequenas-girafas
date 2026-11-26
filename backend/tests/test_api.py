@@ -12,8 +12,10 @@ def test_catalog_graph_and_resources_are_consistent():
     data = response.json()
     ids = {w['id'] for w in data['words']}
     assert len(ids) == 7 and 'peixe' in ids
+    graph_ids=ids | {node['id'] for node in data['concepts']}
+    assert all(not node['playable'] for node in data['concepts'])
     for edge in data['relations']:
-        assert edge['from'] in ids and edge['to'] in ids
+        assert edge['from'] in graph_ids and edge['to'] in graph_ids
     for word in data['words']:
         assert client.get(word['image']).status_code == 200
         resource = client.get(f"/api/v1/resources/{word['id']}").json()

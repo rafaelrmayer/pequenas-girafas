@@ -106,3 +106,13 @@ A área da atividade oferece escolha livre entre **Montar a palavra**, **Complet
 A leitura ao acertar funciona nas três atividades, respeitando a preferência local e o volume. No celular, segure uma letra por um instante e arraste; para rolar a página, use a área fora das peças. Arrastar nunca é obrigatório: botões, toque e teclado permanecem disponíveis. Não há conclusão automática ao soltar; o botão de conferir mantém o controle com a pessoa.
 
 Os registros distinguem `build`, `missing` e `match`. Só as construções completas entram na regra que sugere experimentar sem modelo; acertar associação ou uma letra ausente não comprova construção independente. Eventos anteriores sem tipo continuam sendo interpretados como `build`. Exportações passam a `schemaVersion: 2`, com eventos anteriores preservados. Não há migração ou transmissão para servidor.
+
+## Sugestões locais explicadas
+
+A seção “Uma próxima descoberta” oferece até duas sugestões com motivo e botão para experimentar. Pode recomendar continuar com apoio, revisitar, explorar outra palavra/atividade ou outra grafia. “Continuar por aqui” preserva a rodada e as letras já colocadas. Nada é obrigatório e todas as palavras e atividades continuam disponíveis.
+
+Na área de responsáveis, configure categoria de interesse, exploração equilibrada/revisita/novas palavras, atividade preferida e intervalo para sugerir revisita (3–30 dias). Desligar a personalização remove as sugestões individuais e a ordenação por histórico. Não há inferência automática de interesses pessoais.
+
+O resumo da palavra separa as três atividades e informa conclusões sem pistas/com apoio, uso de pistas, sessões, dias com data e apresentações. Somente conclusões novas recebem data local sem horário e metadados genéricos de apresentação. **Sessões e dias diferentes não comprovam retenção; maiúsculas/minúsculas ou outra lacuna não comprovam generalização.** Registros antigos ficam identificados como sem data. A interface hoje tem uma única ilustração por palavra.
+
+O grafo adiciona conceitos explicativos como NADAR e FUNDO DO MAR, sem apresentá-los como atividades prontas. As sete palavras com imagem/áudio permanecem as mesmas. Tudo roda no navegador e offline; a API não recebe o histórico. Exportação schemaVersion 3 preserva eventos anteriores. Veja [ADR 0006](docs/adr/0006-local-evidence-and-advice.md).

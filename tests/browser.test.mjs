@@ -200,7 +200,9 @@ test('association and missing-letter activities remain freely selectable, keyboa
     await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/Associar imagem e palavra: 1/);
     assert.ok(!(await page.locator('#progress').textContent()).includes('1 construções'));
-    await page.locator('input[name="activity"][value="missing"]').check();
+    const missing = page.locator('input[name="activity"][value="missing"]');
+    await missing.press('Space');
+    assert.equal(await missing.isChecked(), true);
     await page.locator('#word').selectOption('agua');
     assert.equal(await page.locator('#slots .fixed').count(),3);
     await page.getByRole('button',{name:'Adicionar A',exact:true}).click();

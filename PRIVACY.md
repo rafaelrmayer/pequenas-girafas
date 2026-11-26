@@ -39,3 +39,5 @@ Preferências explícitas de categoria, objetivo, atividade e intervalo também 
 Conclusões novas podem incluir `visualIds` (até três IDs como `image-v1`), indicando quais ilustrações do catálogo estavam disponíveis durante as interações da rodada. Não há fotografia da criança, captura de câmera, upload de imagens, análise de olhar ou gravação de movimentos. Trocar uma imagem sem concluir não cria evento de progresso. Rodadas com troca são separadas das conclusões com uma só imagem; registros antigos sem essa informação continuam desconhecidos.
 
 Os arquivos SVG são genéricos, distribuídos e cacheados na própria origem. Nenhum ID visual ou histórico é enviado ao servidor. Exclusão local continua removendo esses registros. Exportação passa a schemaVersion 4 e contém esses metadados opcionais, mantendo os eventos anteriores.
+
+Para alternar as ilustrações entre visitas, o navegador guarda somente o último ID de imagem de cada palavra com mais de uma ilustração. A escolha fica no armazenamento local, sem horário nem histórico de visitas, e não faz parte da exportação. Apagar registros e preferências reinicia a sequência.

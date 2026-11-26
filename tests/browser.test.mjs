@@ -55,8 +55,13 @@ test('keyboard and hint are sufficient; settings, accent and mobile layout', asy
     await page.locator('#check').focus(); await page.keyboard.press('Enter');
     await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/ÁGUA: 1 construções; 1 com apoio/);
-    await page.locator('#dark').check(); await page.locator('#reduced').check(); await page.locator('#lowercase').check();
+    for (const id of ['dark', 'reduced', 'lowercase']) {
+      const setting = page.locator(`#${id}`);
+      await setting.press('Space');
+      assert.equal(await setting.isChecked(), true);
+    }
     await page.waitForFunction(()=>document.body.classList.contains('dark')&&document.body.classList.contains('reduced'));
+    assert.equal(await page.locator('#slots').textContent(), 'água');
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     const contrast = await page.evaluate(() => {
       const luminance = color => {
@@ -88,6 +93,10 @@ test('independent evidence across sessions recommends optional memory mode, neve
     assert.equal(await page.locator('#recommendations button').count(),6);
     await page.locator('#adult-title').click(); await page.locator('#adapt').uncheck();
     await page.waitForFunction(()=>document.querySelector('#adapt-reason').textContent.includes('desligada'));
+    await page.waitForFunction(async () => {
+      const {load} = await import('/storage/store.mjs');
+      return (await load()).settings.adapt === false;
+    });
     await page.reload(); await page.locator('#experience').waitFor({state:'visible'});
     assert.equal(await page.locator('input[value="model"]').isChecked(),true);
     assert.deepEqual(failures,[]);
@@ -191,7 +200,9 @@ test('association and missing-letter activities remain freely selectable, keyboa
     await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/Associar imagem e palavra: 1/);
     assert.ok(!(await page.locator('#progress').textContent()).includes('1 construções'));
-    await page.locator('input[name="activity"][value="missing"]').check();
+    const missing = page.locator('input[name="activity"][value="missing"]');
+    await missing.press('Space');
+    assert.equal(await missing.isChecked(), true);
     await page.locator('#word').selectOption('agua');
     assert.equal(await page.locator('#slots .fixed').count(),3);
     await page.getByRole('button',{name:'Adicionar A',exact:true}).click();
@@ -380,6 +391,55 @@ async function selectImage(page, id) {
   if (await options.getAttribute('open') === null) await options.locator('summary').click();
   await page.locator('#presentation-select').selectOption(id);
 }
+
+test('mobile illustrations stay with the letters and rotate between visits', async () => {
+  const {browser,context,page,failures} = await setup({viewport:{width:390,height:740}});
+  try {
+    const currentImage = () => page.locator('#presentation-select').inputValue();
+    const word = page.locator('#word');
+    assert.equal(await currentImage(), 'image-v1');
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+    await context.setOffline(true);
+    for (const id of ['image-v2', 'image-v3', 'image-v1']) {
+      await page.reload();
+      await page.locator('#experience').waitFor({state:'visible'});
+      assert.equal(await currentImage(), id);
+    }
+    await page.locator('.activity-grid').evaluate(grid => {
+      window.scrollTo(0, window.scrollY + grid.getBoundingClientRect().top + 80);
+    });
+    const picture = await page.locator('#picture').boundingBox();
+    const letters = await page.locator('#letter-bank').boundingBox();
+    assert.ok(picture.y >= 0 && picture.width >= 112);
+    assert.ok(picture.y + picture.height < letters.y && letters.y + letters.height < 740);
+    await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
+    assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
+    assert.equal(await currentImage(), 'image-v1');
+
+    await word.selectOption('polvo');
+    assert.equal(await currentImage(), 'image-v1');
+    await word.selectOption('mar');
+    assert.equal(await currentImage(), 'image-v1');
+    await word.selectOption('polvo');
+    assert.equal(await currentImage(), 'image-v2');
+    await selectImage(page, 'image-v1');
+    await word.selectOption('peixe');
+    assert.equal(await currentImage(), 'image-v2');
+    await word.selectOption('polvo');
+    assert.equal(await currentImage(), 'image-v2');
+    assert.match(await page.locator('#progress').textContent(), /Ainda não há/);
+
+    await page.locator('#adult-title').click();
+    await page.locator('#delete').click();
+    await page.locator('#confirm-delete').click();
+    await page.waitForFunction(() => document.querySelector('#data-feedback').textContent.includes('apagados'));
+    assert.equal(await word.inputValue(), 'peixe');
+    assert.equal(await currentImage(), 'image-v1');
+    await word.selectOption('polvo');
+    assert.equal(await currentImage(), 'image-v1');
+    assert.deepEqual(failures,[]);
+  } finally {await browser.close();}
+});
 
 test('visual choice preserves the word and in-progress letters, records mixed rounds and accepts optional image revisits', async () => {
   const {browser,page,failures} = await setup();

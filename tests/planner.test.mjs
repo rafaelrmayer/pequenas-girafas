@@ -21,7 +21,7 @@ test('sessions, local dates and presentations are distinct facts; no retention i
 });
 test('legacy events stay undated and isolated by activity',()=>{
   const events=[{wordId:'peixe',sessionId:'old',support:'independent',outcome:'completed'},make('peixe','new',false,'match')];
-  const facts=evidenceFor(events,'peixe');assert.equal(facts.completions,1);assert.equal(facts.undated,1);assert.equal(facts.days.length,0);
+  const facts=evidenceFor(events,'peixe');assert.equal(facts.completions,1);assert.equal(facts.undated,1);assert.equal(facts.days.length,0);assert.equal(facts.unknownHints,1);
   assert.equal(evidenceFor(events,'peixe','missing').status,'no_evidence');
   assert.equal(evidenceFor(events,'peixe','match').independent,1);
 });

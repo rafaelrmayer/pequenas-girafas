@@ -11,7 +11,7 @@ const environment = document.body.dataset.environment;
 $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
 let catalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
-let hintUsed=false, listenedBeforeAnswer=false, roundPresentation='upper', adviceDismissed=false;
+let hintUsed=false, audioRequested=false, roundPresentation='upper', adviceDismissed=false;
 const text = value => state.settings.lowercase ? value.toLocaleLowerCase('pt-BR') : value;
 const announce = message => {$('feedback').textContent = message;};
 function button(label, handler, className = '') { const node = document.createElement('button'); node.type = 'button'; node.textContent = label; node.className = className; node.addEventListener('click', handler); return node; }
@@ -97,7 +97,7 @@ function renderEvidence() {
     const li=document.createElement('li');li.dataset.activity=type;
     const label=facts.status==='no_evidence'?'Sem registro':facts.status==='observed_independent'?'Há conclusão sem pistas':'Explorada com apoio';
     li.textContent=`${ACTIVITIES[type]}: ${label}.`;
-    if(facts.completions) li.textContent+=` ${facts.completions} conclusões; ${facts.independent} sem pistas e ${facts.assisted} com apoio; ${facts.withHints} com pista solicitada. ${facts.sessions} ${facts.sessions===1?'sessão':'sessões'}, ${facts.days.length} ${facts.days.length===1?'dia local':'dias locais'} com data, ${facts.presentations.length} ${facts.presentations.length===1?'apresentação registrada':'apresentações registradas'}.${facts.undated?` ${facts.undated} ${facts.undated===1?'registro':'registros'} sem data.`:''}`;
+    if(facts.completions) li.textContent+=` ${facts.completions} conclusões; ${facts.independent} sem pistas e ${facts.assisted} com apoio; ${facts.withHints} com pista solicitada${facts.unknownHints?`; ${facts.unknownHints} sem informação sobre pistas`:""}. ${facts.sessions} ${facts.sessions===1?'sessão':'sessões'}, ${facts.days.length} ${facts.days.length===1?'dia local':'dias locais'} com data, ${facts.presentations.length} ${facts.presentations.length===1?'apresentação registrada':'apresentações registradas'}.${facts.undated?` ${facts.undated} ${facts.undated===1?'registro':'registros'} sem data.`:''}`;
     $('skill-evidence').append(li);
   }
 }
@@ -127,7 +127,7 @@ function renderAdvice() {
 function reset() {
   stop(); drag?.cancel(); completed=false; matchChoice=null; showAnswer=false; activeSlot=null;
   usedSupport=activity==='build' && mode==='model';
-  hintUsed=false;listenedBeforeAnswer=false;roundPresentation=state.settings.lowercase?'lower':'upper';adviceDismissed=false;
+  hintUsed=false;audioRequested=false;roundPresentation=state.settings.lowercase?'lower':'upper';adviceDismissed=false;
   const next=lettersRound(word.text,activity,round);
   bank=next.bank; selected=next.slots; locked=next.locked;
   $('repeat').hidden=true; $('check').disabled=false; $('hint').disabled=false;
@@ -205,7 +205,7 @@ async function check() {
   completed = true; saving = true; $('check').disabled = true; $('hint').disabled = true; renderLetters();
   // Start within the confirmation click, before asynchronous storage work.
   if (state.settings.onSuccessAudio !== false && Number($('volume').value) > 0) readWord();
-  const event = completion(word.id, sessionId, usedSupport, activity, {day:localDay(),contextId:`${activity}:${roundPresentation}:image-v1${activity==='missing'?':gap-'+locked.findIndex(value=>!value):''}`,hintUsed,modelUsed:activity==='build' && mode==='model',listenedBeforeAnswer});
+  const event = completion(word.id, sessionId, usedSupport, activity, {day:localDay(),contextId:`${activity}:${roundPresentation}:image-v1${activity==='missing'?':gap-'+locked.findIndex(value=>!value):''}`,hintUsed,modelUsed:activity==='build' && mode==='model',audioRequested});
   let saved = false;
   try {await settingsQueue; const stored = await store.record(event); state.events = stored.events; saved = true;}
   catch {storageOK = false; state.events = [...state.events, event].slice(-200);}
@@ -267,7 +267,7 @@ async function boot() {
     $('check').addEventListener('click', check); $('hint').addEventListener('click', hint);
     $('clear').addEventListener('click', () => {if (!saving) reset();}); $('repeat').addEventListener('click', () => {if (saving) return; round++; reset(); ($('letter-bank').querySelector('button:not(:disabled)') || $('match-options').querySelector('button'))?.focus();});
     for (const input of document.querySelectorAll('input[name="mode"]')) input.addEventListener('change', () => {if (saving) {document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true; return;} mode = input.value; reset();});
-    $('listen').addEventListener('click', () => {if(!completed) {listenedBeforeAnswer=true;if(activity!=='build') usedSupport=true;}readWord();});
+    $('listen').addEventListener('click', () => {if(!completed) {audioRequested=true;if(activity!=='build') usedSupport=true;}readWord();});
     $('listen-letter').addEventListener('click', () => speak(letter, $('volume').value, message => { $('letter-audio-status').textContent = message; $('audio-status').textContent = message; }, `/assets/audio/letra-${letter.toLowerCase()}.mp3`));
     $('stop-sound').addEventListener('click', () => {stop(); $('word-audio-status').textContent = 'Áudio interrompido.';});
     $('ignore-advice').addEventListener('click',()=>{adviceDismissed=true;renderAdvice();$('task-title').focus();});

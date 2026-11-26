@@ -308,7 +308,7 @@ test('completed evidence records only day and presentation; revisits preserve le
     await page.locator('input[value="memory"]').check();await construct(page,'PEIXE');
     const first=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events[0];});
     assert.match(first.day,/^\d{4}-\d{2}-\d{2}$/);assert.equal(first.contextId,'build:upper:image-v1');
-    assert.equal(first.hintUsed,false);assert.equal(first.modelUsed,false);assert.equal(first.listenedBeforeAnswer,false);
+    assert.equal(first.hintUsed,false);assert.equal(first.modelUsed,false);assert.equal(first.audioRequested,false);
     assert.ok(!('responseTime' in first) && !('timestamp' in first));
     await page.reload();await page.locator('#experience').waitFor({state:'visible'});
     await page.locator('input[value="memory"]').evaluate(n=>n.closest('details').open=true);

@@ -30,6 +30,6 @@ A ferramenta de desenvolvimento Edge TTS envia somente 33 palavras e nomes de le
 
 ## Metadados locais da versão 0.1.5
 
-Conclusões novas acrescentam o dia do calendário local (sem horário), apresentação genérica (atividade, grafia e posição da lacuna), se houve pista/modelo e se a palavra foi ouvida antes da resposta. O objetivo é distinguir observações e organizar revisitas opcionais. A data depende do relógio do dispositivo e não comprova retenção. Não salvamos datas inventadas nos registros antigos, tempo de resposta, inatividade, abandono ou gestos.
+Conclusões novas acrescentam o dia do calendário local (sem horário), apresentação genérica (atividade, grafia e posição da lacuna), se houve pista/modelo e se o áudio foi solicitado antes da resposta. O objetivo é distinguir observações e organizar revisitas opcionais. A data depende do relógio do dispositivo e não comprova retenção. Não salvamos datas inventadas nos registros antigos, tempo de resposta, inatividade, abandono ou gestos.
 
 Preferências explícitas de categoria, objetivo, atividade e intervalo também ficam somente no IndexedDB. Desativar personalização para as sugestões não apaga os registros de progresso; exclusão continua disponível. Não registramos aceitação ou recusa de recomendação nem enviamos evidências para o servidor. Exportação local passa a schemaVersion 3, preservando eventos antigos sem metadados. Cópias exportadas contêm observações de aprendizagem e precisam de proteção pelo responsável.

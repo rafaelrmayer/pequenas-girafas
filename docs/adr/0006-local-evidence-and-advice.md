@@ -6,7 +6,7 @@ Amplia as regras explicáveis sem introduzir modelo treinado, servidor de progre
 
 ## Observações
 
-Conclusões novas incluem dia local YYYY-MM-DD, apresentação fixa (atividade, maiúscula/minúscula/mista, ilustração v1 e posição da lacuna quando aplicável), uso de pista/modelo e escuta antes da resposta. Nunca incluem horário, tempo de resposta, inatividade, abandono ou dados motores. Somente conclusões são registradas; interromper ou recusar uma sugestão não cria evento.
+Conclusões novas incluem dia local YYYY-MM-DD, apresentação fixa (atividade, maiúscula/minúscula/mista, ilustração v1 e posição da lacuna quando aplicável), uso de pista/modelo e solicitação de áudio antes da resposta. Nunca incluem horário, tempo de resposta, inatividade, abandono ou dados motores. Somente conclusões são registradas; interromper ou recusar uma sugestão não cria evento.
 
 Sessões são recargas distintas; dias são valores do relógio local do dispositivo. Nenhum comprova retenção. Apresentações incluem grafia ou lacuna diferente, não imagens diferentes ou generalização. Hoje há somente uma ilustração por palavra. Registros antigos permanecem sem data/apresentação, sem migração destrutiva ou preenchimento retrospectivo. Os resumos distinguem as três atividades e informam incerteza.
 

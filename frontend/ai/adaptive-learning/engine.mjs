@@ -13,7 +13,7 @@ export function completion(wordId, sessionId, usedSupport, activity = 'build', d
   if(details) {
     if(dayIndex(details.day)!==null) event.day=details.day;
     if(typeof details.contextId==='string' && /^[a-z0-9:_-]{1,100}$/.test(details.contextId)) event.contextId=details.contextId;
-    for(const key of ['hintUsed','modelUsed','listenedBeforeAnswer']) event[key]=details[key]===true;
+    for(const key of ['hintUsed','modelUsed','audioRequested']) if(typeof details[key]==='boolean') event[key]=details[key];
   }
   return event;
 }
@@ -36,6 +36,7 @@ export function evidenceFor(events, wordId, activity='build') {
     completions:values.length, independent:independent.length,
     assisted:values.filter(e=>e.support==='assisted').length,
     withHints:values.filter(e=>e.hintUsed===true).length,
+    unknownHints:values.filter(e=>typeof e.hintUsed!=='boolean').length,
     sessions:new Set(values.map(e=>e.sessionId)).size,
     independentSessions:new Set(independent.map(e=>e.sessionId)).size,
     days, independentDays, lastDay:days.at(-1) || null,

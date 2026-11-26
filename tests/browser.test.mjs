@@ -269,6 +269,7 @@ test('optional advice preserves a round when ignored, follows explicit preferenc
   const {browser,page,failures,network} = await setup();
   try {
     assert.match(await page.locator('#adaptive-suggestions').textContent(),/Falta de registro não é dificuldade/);
+    assert.match(await page.locator('#semantic-note').textContent(),/realiza a ação NADAR/);
     await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
     await page.locator('#ignore-advice').click();
     assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');

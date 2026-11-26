@@ -29,3 +29,7 @@ Validações pedagógica/acessibilidade, segurança, privacidade, direitos de co
 ### Avanço experimental 0.1.5
 
 Planejador local por regras, preferências explícitas, revisão por intervalo escolhido e resumo de evidências separados por atividade estão implementados. Isso inicia parte da adaptação prevista para V0.2, sem tratá-la como concluída: validação pedagógica, novos temas, contextos visuais distintos e métodos de estimativa de aprendizagem continuam pendentes. Knowledge Tracing, Random Forest, redes neurais, embeddings e RAG não foram implementados.
+
+### Apresentações 0.1.6
+
+Variações visuais de três palavras e registros por imagem estão disponíveis para exploração. Isso não conclui a validação de reconhecimento em diferentes contextos; são ilustrações estáticas que ainda precisam de revisão pedagógica.

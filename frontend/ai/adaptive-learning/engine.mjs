@@ -13,6 +13,7 @@ export function completion(wordId, sessionId, usedSupport, activity = 'build', d
   if(details) {
     if(dayIndex(details.day)!==null) event.day=details.day;
     if(typeof details.contextId==='string' && /^[a-z0-9:_-]{1,100}$/.test(details.contextId)) event.contextId=details.contextId;
+    if(Array.isArray(details.visualIds)) event.visualIds=[...new Set(details.visualIds.filter(id=>typeof id==='string' && /^image-v[1-9]\d?$/.test(id)))].slice(0,3);
     for(const key of ['hintUsed','modelUsed','audioRequested']) if(typeof details[key]==='boolean') event[key]=details[key];
   }
   return event;

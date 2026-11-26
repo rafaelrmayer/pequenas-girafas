@@ -113,6 +113,19 @@ A seção “Uma próxima descoberta” oferece até duas sugestões com motivo 
 
 Na área de responsáveis, configure categoria de interesse, exploração equilibrada/revisita/novas palavras, atividade preferida e intervalo para sugerir revisita (3–30 dias). Desligar a personalização remove as sugestões individuais e a ordenação por histórico. Não há inferência automática de interesses pessoais.
 
-O resumo da palavra separa as três atividades e informa conclusões sem pistas/com apoio, uso de pistas, sessões, dias com data e apresentações. Somente conclusões novas recebem data local sem horário e metadados genéricos de apresentação. **Sessões e dias diferentes não comprovam retenção; maiúsculas/minúsculas ou outra lacuna não comprovam generalização.** Registros antigos ficam identificados como sem data. A interface hoje tem uma única ilustração por palavra.
+O resumo da palavra separa as três atividades e informa conclusões sem pistas/com apoio, uso de pistas, sessões, dias com data e apresentações. Somente conclusões novas recebem data local sem horário e metadados genéricos de apresentação. **Sessões e dias diferentes não comprovam retenção; maiúsculas/minúsculas ou outra lacuna não comprovam generalização.** Registros antigos ficam identificados como sem data. Na versão 0.1.5 havia uma única ilustração por palavra; a 0.1.6 acrescenta variações de PEIXE, POLVO e ÁGUA, sem comprovar generalização.
 
 O grafo adiciona conceitos explicativos como NADAR e FUNDO DO MAR, sem apresentá-los como atividades prontas. As sete palavras com imagem/áudio permanecem as mesmas. Tudo roda no navegador e offline; a API não recebe o histórico. Exportação schemaVersion 3 preserva eventos anteriores. Veja [ADR 0006](docs/adr/0006-local-evidence-and-advice.md).
+
+## Imagens diferentes da mesma palavra
+
+PEIXE, POLVO e ÁGUA agora têm três ilustrações cada: a original e duas novas. As demais quatro palavras mantêm a imagem original. Use “Imagem para explorar” ou “Outra imagem”; não há alternância automática, câmera ou upload. O áudio da palavra continua o mesmo e trocar a imagem não reproduz som sozinho.
+
+- Antes de interagir na rodada, a escolha define a imagem daquela tentativa.
+- Depois de começar a responder, mudar a imagem preserva as letras/opção escolhida e registra uma rodada com troca, sem atribuir a conclusão a uma imagem isolada.
+- Depois de concluir, mudar a imagem abre uma nova rodada, preservando o registro anterior.
+- Uma sugestão opcional pode propor a mesma palavra com outra ilustração, oferecendo modelo e pistas. Aceitar exige clique; não há bloqueio de imagens.
+
+A área de responsáveis mostra conclusões com cada imagem, rodadas com troca e registros sem identificação. Contextos antigos que registraram explicitamente `image-v1` continuam ligados à original; eventos sem imagem registrada permanecem desconhecidos. Isso descreve o material disponível durante as interações, não o que a pessoa olhou ou reconheceu.
+
+As seis ilustrações novas são SVGs locais originais e entram no cache offline. Não há serviço de visão, rastreamento ocular ou análise de imagem. Conclusões em imagens diferentes são observações, não prova de generalização. Exportação schemaVersion 4 inclui `visualIds`, preservando registros antigos.

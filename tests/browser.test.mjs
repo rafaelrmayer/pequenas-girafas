@@ -337,3 +337,73 @@ test('completed evidence records only day and presentation; revisits preserve le
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
 });
+
+test('visual choice preserves the word and in-progress letters, records mixed rounds and accepts optional image revisits', async () => {
+  const {browser,page,failures} = await setup();
+  try {
+    await page.evaluate(()=>{
+      window.visualPlayCount=0;const play=HTMLMediaElement.prototype.play;
+      HTMLMediaElement.prototype.play=function(){window.visualPlayCount++;return play.call(this);};
+    });
+    assert.match(await page.locator('#image-status').textContent(),/Imagem 1 de 3/);
+    await page.locator('#presentation-select').selectOption('image-v2');
+    assert.equal(await page.locator('#word').inputValue(),'peixe');
+    assert.match(await page.locator('#picture').getAttribute('src'),/peixe-azul/);
+    assert.equal(await page.evaluate(()=>window.visualPlayCount),0);
+    await construct(page,'PEIXE');
+    let record=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.at(-1);});
+    assert.deepEqual(record.visualIds,['image-v2']);assert.equal(record.contextId,'build:upper:image-v2');
+    const suggestion=page.locator('#adaptive-suggestions button[data-action="new_image"]');
+    const image=await suggestion.getAttribute('data-image-id');assert.notEqual(image,'image-v2');
+    await suggestion.focus();await page.keyboard.press('Enter');
+    assert.equal(await page.locator('#word').inputValue(),'peixe');
+    assert.equal(await page.locator('#presentation-select').inputValue(),image);
+    assert.equal(await page.evaluate(()=>window.visualPlayCount),1);
+    await page.locator('#presentation-select').selectOption('image-v3');
+    await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
+    await page.locator('#presentation-select').selectOption('image-v1');
+    assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
+    assert.equal(await page.evaluate(()=>window.visualPlayCount),1);
+    await construct(page,'EIXE');
+    record=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.at(-1);});
+    assert.deepEqual(record.visualIds,['image-v3','image-v1']);assert.match(record.contextId,/image-mixed/);
+    assert.match(await page.locator('#visual-evidence-note').textContent(),/1 rodada com troca/);
+    await page.locator('#word').selectOption('mar');
+    assert.equal(await page.locator('#presentation-select').isDisabled(),true);
+    assert.equal(await page.locator('#next-image').isDisabled(),true);
+    assert.equal(await page.locator('#adaptive-suggestions button[data-action="new_image"]').count(),0);
+    assert.deepEqual(failures,[]);
+  } finally {await browser.close();}
+});
+
+test('new illustrations decode offline and work with association and missing-letter activities', async () => {
+  const {browser,context,page,failures} = await setup({viewport:{width:390,height:844}});
+  try {
+    await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);
+    await page.locator('#word').selectOption('polvo');
+    await page.locator('#presentation-select').selectOption('image-v3');
+    await page.waitForFunction(()=>{const img=document.querySelector('#picture');return img.complete&&img.naturalWidth>0;});
+    await page.locator('input[name="activity"][value="match"]').check();
+    await page.locator('#match-options').getByRole('button',{name:'POLVO',exact:true}).click();
+    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    let record=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.at(-1);});
+    assert.equal(record.activity,'match');assert.deepEqual(record.visualIds,['image-v3']);
+    await page.locator('#word').selectOption('agua');
+    await page.locator('#presentation-select').selectOption('image-v2');
+    await page.locator('input[name="activity"][value="missing"]').check();
+    await page.getByRole('button',{name:'Adicionar U',exact:true}).click();
+    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    record=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.at(-1);});
+    assert.equal(record.contextId,'missing:upper:image-v2:gap-2');
+    for(const word of ['peixe','polvo','agua']) {
+      await page.locator('#word').selectOption(word);
+      for(const id of ['image-v1','image-v2','image-v3']) {
+        await page.locator('#presentation-select').selectOption(id);
+        await page.waitForFunction(()=>{const img=document.querySelector('#picture');return img.complete&&img.naturalWidth>0;});
+        if(id!=='image-v1') await page.locator('.picture-card').screenshot({path:`test-results/visual-${word}-${id}.png`});
+      }
+    }
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    assert.deepEqual(failures,[]);
+  } finally {await browser.close();}
+});

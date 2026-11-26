@@ -45,8 +45,10 @@ test('preferences affect ordering, without excluding or treating related complex
 test('independent observations can suggest new word and presentation, without forced transition',()=>{
   const suggestions=plan([make('peixe','a')]);
   assert.equal(suggestions[0].action,'new_word');assert.equal(suggestions[0].wordId,'mar');
-  assert.equal(suggestions[1].action,'new_presentation');assert.equal(suggestions[1].lowercase,true);
-  assert.match(suggestions[1].reason,/não comprova generalização/);
+  assert.equal(suggestions[1].action,'new_image');assert.equal(suggestions[1].imageId,'image-v2');
+  assert.match(suggestions[1].reason,/não comprova reconhecimento ou generalização/);
+  const single=plan([make('mar','a')],{wordId:'mar'});
+  assert.ok(single.some(s=>s.action==='new_presentation' && s.lowercase===true));
   const repeated=plan([make('peixe','now'),make('peixe','now'),make('peixe','now')]);
   assert.equal(repeated[0].action,'alternative');assert.match(repeated[0].reason,/não indica cansaço/);
 });

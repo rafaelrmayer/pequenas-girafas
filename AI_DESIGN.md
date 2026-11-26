@@ -39,3 +39,11 @@ Não há telemetria de arraste, duração do gesto, tentativas incorretas ou aba
 O responsável pode escolher categoria de interesse, objetivo de exploração, atividade e intervalo de revisita. Sem preferências, usamos ordenação editorial equilibrada. Ao desligar personalização, o planejador não oferece recomendações individuais e a lista de palavras usa apenas relações genéricas. A interface não oculta conteúdo por dificuldade presumida.
 
 O grafo agora diferencia palavras executáveis e conceitos não executáveis, como NADAR. Há metadados de apresentação, habilidades e pré-requisitos opcionais, com revisão marcada como pendente. Uma única ilustração por palavra continua sendo uma limitação explícita. Expansão para contextos realmente diferentes exige materiais e avaliação pedagógica adicionais.
+
+## Apresentações visuais (0.1.6)
+
+`presentations.mjs` separa a identidade da imagem, a coleção disponível por palavra e os registros por imagem. `new_image` pode sugerir outra ilustração após uma conclusão da atividade atual, com apoio disponível. Preferências explícitas e revisitas continuam prioritárias, com no máximo duas sugestões. As imagens continuam acessíveis manualmente mesmo com personalização desligada.
+
+O registro acrescenta `visualIds`, uma lista limitada a três IDs genéricos do catálogo. Quando há interação com mais de uma imagem na rodada, `contextId` usa `image-mixed`; não atribuímos uma conclusão independente a cada imagem. Trocar antes da primeira interação define o contexto inicial; trocar depois de concluir cria nova rodada, sem editar o evento salvo. Um registro antigo só é atribuído à imagem original se já continha explicitamente `image-v1`; não inferimos a imagem de eventos sem contexto.
+
+São três ilustrações para PEIXE, POLVO e ÁGUA; uma para as demais. Alterar espécie ilustrada, cor, posição ou recipiente não constitui por si só validação de reconhecimento/generalização. Não há classificação de imagem ou coleta de olhar. A escolha do adulto/criança e o contexto disponibilizado são registrados apenas localmente quando a atividade é concluída.

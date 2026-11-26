@@ -2,6 +2,7 @@ import * as store from './storage/store.mjs';
 import {recommendSupport, completion, matchesWord, evidenceFor, localDay} from './ai/adaptive-learning/engine.mjs';
 import {recommendActivities} from './ai/adaptive-learning/planner.mjs';
 import {relatedWords} from './ai/semantic-expansion/graph.mjs';
+import {presentationsFor,visualEvidence,changeRoundVisual} from './modules/presentations.mjs';
 import {ACTIVITIES, lettersRound, placeLetter, associationChoices} from './modules/activities.mjs';
 import {letterDrag} from './accessibility/letter-drag.mjs';
 import {speak, stop} from './accessibility/speech.mjs';
@@ -12,6 +13,7 @@ $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES
 let catalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
 let hintUsed=false, audioRequested=false, roundPresentation='upper', adviceDismissed=false;
+let currentImage, roundVisualIds=[], roundStarted=false;
 const text = value => state.settings.lowercase ? value.toLocaleLowerCase('pt-BR') : value;
 const announce = message => {$('feedback').textContent = message;};
 function button(label, handler, className = '') { const node = document.createElement('button'); node.type = 'button'; node.textContent = label; node.className = className; node.addEventListener('click', handler); return node; }
@@ -73,7 +75,7 @@ function chooseWord(id, options={}) {
   if (saving) { $('word').value = word.id; return; }
   stop(); drag?.cancel(); round=0; word = catalog.words.find(w => w.id === id) || catalog.words[0];
   $('word').value = word.id;
-  $('picture').src = word.image; $('picture').alt = word.alt;
+  currentImage=presentationsFor(word).find(image=>image.id===options.imageId) || presentationsFor(word)[0];renderPicture();
   const support=recommendation();mode = options.mode || support.mode;
   document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true;
   reset();
@@ -92,6 +94,28 @@ function renderRelated() {
   $('semantic-note').textContent=catalog.relations.filter(edge=>edge.from===word.id && concepts.has(edge.to)).map(edge=>`${word.text}: ${edge.label} ${concepts.get(edge.to).label}.`).join(' ');
 
 }
+function renderPicture() {
+  const images=presentationsFor(word);
+  $('picture').src=currentImage.asset;$('picture').alt=currentImage.alt;
+  $('presentation-select').replaceChildren();
+  for(const [index,image] of images.entries()) {
+    const option=document.createElement('option');option.value=image.id;option.textContent=`Imagem ${index+1}: ${image.label}`;
+    $('presentation-select').append(option);
+  }
+  $('presentation-select').value=currentImage.id;$('presentation-select').disabled=images.length<2;
+  $('next-image').disabled=images.length<2;
+  $('image-status').textContent=`Imagem ${images.findIndex(image=>image.id===currentImage.id)+1} de ${images.length}.`;
+}
+function changeVisual(id) {
+  if(saving) {$('presentation-select').value=currentImage.id;return;}
+  const next=presentationsFor(word).find(image=>image.id===id);
+  if(!next || next.id===currentImage.id) return;
+  stop();currentImage=next;renderPicture();
+  if(completed) {reset();announce('Outra imagem escolhida. Uma nova rodada está disponível.');return;}
+  roundVisualIds=changeRoundVisual(roundVisualIds,id,roundStarted);
+  renderAdvice();
+  announce(roundStarted?'Imagem alterada. Sua rodada e as letras foram preservadas; a troca será identificada no registro.':'Imagem escolhida. Explore quando quiser.');
+}
 function renderEvidence() {
   if(!word) return;
   $('evidence-word').textContent=word.text;
@@ -104,6 +128,15 @@ function renderEvidence() {
     if(facts.completions) li.textContent+=` ${facts.completions} ${facts.completions===1?'conclusão':'conclusões'}; ${facts.independent} sem pistas e ${facts.assisted} com apoio; ${facts.withHints} com pista solicitada${facts.unknownHints?`; ${facts.unknownHints} sem informação sobre pistas`:""}. ${facts.sessions} ${facts.sessions===1?'sessão':'sessões'}, ${facts.days.length} ${facts.days.length===1?'dia local':'dias locais'} com data, ${facts.presentations.length} ${facts.presentations.length===1?'apresentação registrada':'apresentações registradas'}.${facts.undated?` ${facts.undated} ${facts.undated===1?'registro':'registros'} sem data.`:''}`;
     $('skill-evidence').append(li);
   }
+  const visuals=visualEvidence(state.events,word);
+  $('visual-evidence').replaceChildren();
+  for(const row of visuals.rows) {
+    const li=document.createElement('li');li.dataset.imageId=row.id;
+    li.textContent=`${row.label}: ${row.completions} ${row.completions===1?'conclusão':'conclusões'} em atividades com esta imagem na rodada; ${row.independent} sem pistas e ${row.assisted} com apoio.`;
+    $('visual-evidence').append(li);
+  }
+  $('visual-evidence-note').textContent=`${visuals.mixed} ${visuals.mixed===1?'rodada':'rodadas'} com troca de imagem durante as interações; ${visuals.unknown} ${visuals.unknown===1?'registro':'registros'} sem identificação da imagem. Esses registros não comprovam reconhecimento ou generalização.`;
+
 }
 function renderAdvice() {
   if(!word) return;
@@ -112,7 +145,7 @@ function renderAdvice() {
   $('ignore-advice').hidden=disabled || adviceDismissed;
   $('adaptive-status').textContent=disabled?'Personalização desligada. Todas as atividades continuam disponíveis.':adviceDismissed?'Tudo bem. Continue por aqui; nenhuma escolha foi bloqueada.':'Você pode aceitar uma sugestão ou continuar na atividade atual.';
   if(disabled || adviceDismissed) return;
-  const suggestions=recommendActivities({catalog,events:state.events,wordId:word.id,activity,settings:state.settings,rules,today:localDay(),sessionId});
+  const suggestions=recommendActivities({catalog,events:state.events,wordId:word.id,activity,settings:state.settings,rules,today:localDay(),sessionId,imageId:currentImage.id});
   for(const suggestion of suggestions) {
     const card=document.createElement('article');card.className='advice-card';
     const title=document.createElement('h4');title.textContent=suggestion.label;
@@ -121,8 +154,9 @@ function renderAdvice() {
       if(saving) return;
       if(typeof suggestion.lowercase==='boolean') changeSettings({lowercase:suggestion.lowercase});
       activity=suggestion.activity;document.querySelector(`input[name="activity"][value="${activity}"]`).checked=true;
-      chooseWord(suggestion.wordId,{mode:suggestion.mode});$('task-title').focus();
+      chooseWord(suggestion.wordId,{mode:suggestion.mode,imageId:suggestion.imageId});$('task-title').focus();
     },'soft');
+    if(suggestion.imageId) accept.dataset.imageId=suggestion.imageId;
     accept.dataset.action=suggestion.action;accept.dataset.wordId=suggestion.wordId;accept.dataset.activity=suggestion.activity;
     accept.setAttribute('aria-label',`${suggestion.label}: experimentar`);
     card.append(title,why,accept);$('adaptive-suggestions').append(card);
@@ -131,7 +165,7 @@ function renderAdvice() {
 function reset() {
   stop(); drag?.cancel(); completed=false; matchChoice=null; showAnswer=false; activeSlot=null;
   usedSupport=activity==='build' && mode==='model';
-  hintUsed=false;audioRequested=false;roundPresentation=state.settings.lowercase?'lower':'upper';adviceDismissed=false;
+  hintUsed=false;audioRequested=false;roundStarted=false;roundVisualIds=[currentImage.id];roundPresentation=state.settings.lowercase?'lower':'upper';adviceDismissed=false;
   const next=lettersRound(word.text,activity,round);
   bank=next.bank; selected=next.slots; locked=next.locked;
   $('repeat').hidden=true; $('check').disabled=false; $('hint').disabled=false;
@@ -151,7 +185,7 @@ function putLetter(key,index,focus=true) {
   if(completed || saving || activity==='match') return;
   const next=placeLetter(selected,bank,key,index,locked);
   if(next===selected) return;
-  selected=next;activeSlot=null;renderLetters();
+  roundStarted=true;selected=next;activeSlot=null;renderLetters();
   announce(`Letra ${text(selected[index].value)} na posição ${index+1}.`);
   if(focus) ($('letter-bank').querySelector('button:not(:disabled)') || $('check')).focus();
 }
@@ -163,7 +197,7 @@ function renderLetters() {
     for(const option of associationChoices(catalog,word.id,round)) {
       const node=button(text(option.text),()=>{
         if(completed || saving) return;
-        matchChoice=option.id;renderLetters();
+        roundStarted=true;matchChoice=option.id;renderLetters();
         [...$('match-options').children].find(n=>n.dataset.wordId===option.id)?.focus();
       },'word-choice');
       node.dataset.wordId=option.id;node.setAttribute('aria-pressed',String(matchChoice===option.id));node.disabled=completed;
@@ -175,6 +209,7 @@ function renderLetters() {
     const entry=selected[index];
     const node=button(entry?text(entry.value):'·',()=>{
       if(completed || saving || locked[index]) return;
+      roundStarted=true;
       if(entry) {selected[index]=null;activeSlot=index;renderLetters();$('slots').children[index].focus();}
       else {activeSlot=index;renderLetters();$('letter-bank').querySelector('button:not(:disabled)')?.focus();}
     },'slot');
@@ -203,13 +238,14 @@ function readWord() {
 }
 async function check() {
   if (completed || saving) return;
+  roundStarted=true;
   if (!(activity==='match' ? matchChoice===word.id : selected.every(Boolean) && matchesWord(selected.map(e=>e.value),word.text))) {
     announce('Podemos continuar explorando. Você pode retirar letras ou pedir uma pista.'); return;
   }
   completed = true; saving = true; $('check').disabled = true; $('hint').disabled = true; renderLetters();
   // Start within the confirmation click, before asynchronous storage work.
   if (state.settings.onSuccessAudio !== false && Number($('volume').value) > 0) readWord();
-  const event = completion(word.id, sessionId, usedSupport, activity, {day:localDay(),contextId:`${activity}:${roundPresentation}:image-v1${activity==='missing'?':gap-'+locked.findIndex(value=>!value):''}`,hintUsed,modelUsed:activity==='build' && mode==='model',audioRequested});
+  const event = completion(word.id, sessionId, usedSupport, activity, {day:localDay(),contextId:`${activity}:${roundPresentation}:${roundVisualIds.length>1?'image-mixed':currentImage.id}${activity==='missing'?':gap-'+locked.findIndex(value=>!value):''}`,visualIds:roundVisualIds,hintUsed,modelUsed:activity==='build' && mode==='model',audioRequested});
   let saved = false;
   try {await settingsQueue; const stored = await store.record(event); state.events = stored.events; saved = true;}
   catch {storageOK = false; state.events = [...state.events, event].slice(-200);}
@@ -219,7 +255,7 @@ async function check() {
 }
 function hint() {
   if(completed || saving) return;
-  usedSupport=true;hintUsed=true;
+  roundStarted=true;usedSupport=true;hintUsed=true;
   if(activity==='match') {showAnswer=true;renderModel();announce('Pista: a palavra apareceu junto da imagem. Escolha a palavra correspondente.');return;}
   const target=Array.from(word.text);
   if(activity==='missing') {
@@ -260,6 +296,11 @@ async function boot() {
     try {state = await store.load();} catch {storageOK = false; state.settings = {adapt:true};}
     for (const item of catalog.words) {const option = document.createElement('option'); option.value = item.id; option.textContent = item.text; $('word').append(option);}
     $('word').addEventListener('change', event => chooseWord(event.target.value));
+    $('presentation-select').addEventListener('change',()=>changeVisual($('presentation-select').value));
+    $('next-image').addEventListener('click',()=>{
+      const images=presentationsFor(word);const index=images.findIndex(image=>image.id===currentImage.id);
+      changeVisual(images[(index+1)%images.length].id);
+    });
     for(const input of document.querySelectorAll('input[name="activity"]')) input.addEventListener('change',()=>{
       if(saving) {document.querySelector(`input[name="activity"][value="${activity}"]`).checked=true;return;}
       activity=input.value;round=0;reset();
@@ -271,7 +312,7 @@ async function boot() {
     $('check').addEventListener('click', check); $('hint').addEventListener('click', hint);
     $('clear').addEventListener('click', () => {if (!saving) reset();}); $('repeat').addEventListener('click', () => {if (saving) return; round++; reset(); ($('letter-bank').querySelector('button:not(:disabled)') || $('match-options').querySelector('button'))?.focus();});
     for (const input of document.querySelectorAll('input[name="mode"]')) input.addEventListener('change', () => {if (saving) {document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true; return;} mode = input.value; reset();});
-    $('listen').addEventListener('click', () => {if(!completed) {audioRequested=true;if(activity!=='build') usedSupport=true;}readWord();});
+    $('listen').addEventListener('click', () => {if(!completed) {roundStarted=true;audioRequested=true;if(activity!=='build') usedSupport=true;}readWord();});
     $('listen-letter').addEventListener('click', () => speak(letter, $('volume').value, message => { $('letter-audio-status').textContent = message; $('audio-status').textContent = message; }, `/assets/audio/letra-${letter.toLowerCase()}.mp3`));
     $('stop-sound').addEventListener('click', () => {stop(); $('word-audio-status').textContent = 'Áudio interrompido.';});
     $('ignore-advice').addEventListener('click',()=>{adviceDismissed=true;renderAdvice();$('task-title').focus();});
@@ -293,7 +334,7 @@ async function boot() {
       finally {saving = false;}
     });
     $('export').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify({schemaVersion:3, ...state}, null, 2)], {type:'application/json'});
+      const blob = new Blob([JSON.stringify({schemaVersion:4, ...state}, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });

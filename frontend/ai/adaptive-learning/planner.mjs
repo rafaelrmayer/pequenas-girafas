@@ -1,7 +1,8 @@
+import {nextPresentation,presentationsFor} from '../../modules/presentations.mjs';
 import {dayIndex,evidenceFor} from './engine.mjs';
 import {relatedWords} from '../semantic-expansion/graph.mjs';
 const labels={build:'Montar a palavra',missing:'Completar uma letra',match:'Associar imagem e palavra'};
-export function recommendActivities({catalog,events,wordId,activity='build',settings={},rules={},today,sessionId}) {
+export function recommendActivities({catalog,events,wordId,activity='build',settings={},rules={},today,sessionId,imageId}) {
   if(settings.adapt===false) return [];
   const current=catalog.words.find(word=>word.id===wordId);
   if(!current) return [];
@@ -9,7 +10,7 @@ export function recommendActivities({catalog,events,wordId,activity='build',sett
   const next=[];
   function add(action,id,type,label,reason,extra={}) {
     if(!catalog.words.some(word=>word.id===id) || !labels[type]) return;
-    if(next.some(item=>item.wordId===id && item.activity===type && item.lowercase===extra.lowercase)) return;
+    if(next.some(item=>item.wordId===id && item.activity===type && item.lowercase===extra.lowercase && item.imageId===extra.imageId)) return;
     next.push({id:`${action}:${id}:${type}`,action,wordId:id,activity:type,label,reason,...extra});
   }
   const preferred=labels[settings.preferredActivity]?settings.preferredActivity:null;
@@ -37,11 +38,13 @@ export function recommendActivities({catalog,events,wordId,activity='build',sett
   const repeats=events.filter(e=>e.wordId===wordId && (e.activity || 'build')===activity && e.sessionId===sessionId && e.outcome==='completed').length;
   const alternative=activity==='match'?'missing':activity==='missing'?'build':'match';
   if(repeats>=3) add('alternative',wordId,preferred || alternative,`Variar: ${labels[preferred || alternative]}`,`Há ${repeats} conclusões desta atividade nesta sessão. Variar é opcional; esse número não indica cansaço ou dificuldade.`,{mode:'model'});
+  const visual=nextPresentation(current,imageId || presentationsFor(current)[0].id,events,activity);
+  const offerVisual=()=>{if(facts.completions && visual) add('new_image',wordId,preferred || activity,`Explorar outra imagem de ${current.text}`,'Há uma conclusão registrada desta palavra. Outra ilustração é uma escolha opcional; a conclusão não comprova reconhecimento ou generalização.',{mode:'model',imageId:visual.id});};
   if(!facts.completions) add('maintain',wordId,activity,'Explorar a atividade atual','Ainda não há conclusão registrada desta palavra nesta atividade. Falta de registro não é dificuldade.',{mode:'model'});
-  else if(!facts.independent) add(facts.withHints?'reinforce':'offer_support',wordId,activity,facts.withHints?'Retomar com pistas disponíveis':'Explorar novamente com apoio',`Há ${facts.assisted} conclusões com apoio nesta atividade. O modelo e as pistas podem continuar disponíveis, sem limitar novas escolhas.`,{mode:'model'});
-  else if(activity!=='build') add('introduce_activity',wordId,preferred || alternative,`Experimentar: ${labels[preferred || alternative]}`,'Há uma conclusão sem pistas nesta atividade. Você pode experimentar outra; isso não comprova domínio da palavra.',{mode:'model'});
+  else if(!facts.independent) {add(facts.withHints?'reinforce':'offer_support',wordId,activity,facts.withHints?'Retomar com pistas disponíveis':'Explorar novamente com apoio',`Há ${facts.assisted} conclusões com apoio nesta atividade. O modelo e as pistas podem continuar disponíveis, sem limitar novas escolhas.`,{mode:'model'});offerVisual();}
+  else if(activity!=='build') {add('introduce_activity',wordId,preferred || alternative,`Experimentar: ${labels[preferred || alternative]}`,'Há uma conclusão sem pistas nesta atividade. Você pode experimentar outra; isso não comprova domínio da palavra.',{mode:'model'});offerVisual();}
   else {
-    offerWord();
+    offerWord();offerVisual();
     add('new_presentation',wordId,'build',settings.lowercase?'Explorar letras maiúsculas':'Explorar letras minúsculas','Há construção sem pistas registrada. Outra apresentação é opcional; mudar a grafia não comprova generalização.',{mode:'model',lowercase:!settings.lowercase});
   }
   if(activity==='build') offerWord();

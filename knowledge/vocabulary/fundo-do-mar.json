@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "language": "pt-BR",
   "theme": {
     "id": "fundo-do-mar",
@@ -25,7 +25,23 @@
           {
             "id": "image-v1",
             "kind": "illustration",
-            "asset": "/assets/peixe.svg"
+            "asset": "/assets/peixe.svg",
+            "label": "Imagem original",
+            "alt": "um peixe"
+          },
+          {
+            "id": "image-v2",
+            "kind": "illustration",
+            "asset": "/assets/peixe-azul.svg",
+            "label": "Peixe azul",
+            "alt": "Um peixe azul de corpo alongado, voltado para a direita"
+          },
+          {
+            "id": "image-v3",
+            "kind": "illustration",
+            "asset": "/assets/peixe-mar.svg",
+            "label": "Peixe no mar",
+            "alt": "Um peixe laranja nadando entre plantas no mar"
           }
         ],
         "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
@@ -50,7 +66,9 @@
           {
             "id": "image-v1",
             "kind": "illustration",
-            "asset": "/assets/mar.svg"
+            "asset": "/assets/mar.svg",
+            "label": "Imagem original",
+            "alt": "o mar"
           }
         ],
         "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
@@ -75,7 +93,23 @@
           {
             "id": "image-v1",
             "kind": "illustration",
-            "asset": "/assets/agua.svg"
+            "asset": "/assets/agua.svg",
+            "label": "Imagem original",
+            "alt": "água"
+          },
+          {
+            "id": "image-v2",
+            "kind": "illustration",
+            "asset": "/assets/agua-copo.svg",
+            "label": "Água no copo",
+            "alt": "Água em um copo transparente"
+          },
+          {
+            "id": "image-v3",
+            "kind": "illustration",
+            "asset": "/assets/agua-jarra.svg",
+            "label": "Água na jarra",
+            "alt": "Água em uma jarra com alça"
           }
         ],
         "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
@@ -100,7 +134,23 @@
           {
             "id": "image-v1",
             "kind": "illustration",
-            "asset": "/assets/polvo.svg"
+            "asset": "/assets/polvo.svg",
+            "label": "Imagem original",
+            "alt": "um polvo"
+          },
+          {
+            "id": "image-v2",
+            "kind": "illustration",
+            "asset": "/assets/polvo-rosa.svg",
+            "label": "Polvo rosado",
+            "alt": "Um polvo rosado com os oito braços abertos"
+          },
+          {
+            "id": "image-v3",
+            "kind": "illustration",
+            "asset": "/assets/polvo-pedras.svg",
+            "label": "Polvo entre pedras",
+            "alt": "Um polvo lilás entre pedras no fundo do mar"
           }
         ],
         "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
@@ -125,7 +175,9 @@
           {
             "id": "image-v1",
             "kind": "illustration",
-            "asset": "/assets/concha.svg"
+            "asset": "/assets/concha.svg",
+            "label": "Imagem original",
+            "alt": "uma concha"
           }
         ],
         "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
@@ -150,7 +202,9 @@
           {
             "id": "image-v1",
             "kind": "illustration",
-            "asset": "/assets/praia.svg"
+            "asset": "/assets/praia.svg",
+            "label": "Imagem original",
+            "alt": "uma praia"
           }
         ],
         "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
@@ -175,7 +229,9 @@
           {
             "id": "image-v1",
             "kind": "illustration",
-            "asset": "/assets/caranguejo.svg"
+            "asset": "/assets/caranguejo.svg",
+            "label": "Imagem original",
+            "alt": "um caranguejo"
           }
         ],
         "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."

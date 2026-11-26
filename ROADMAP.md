@@ -25,3 +25,7 @@ Knowledge Tracing, embeddings, RAG pedagógico, Random Forest, redes neurais lev
 ## V1.0 — Estável
 
 Validações pedagógica/acessibilidade, segurança, privacidade, direitos de conteúdo e licenças; documentação e publicação gratuita autorizada. Nenhuma etapa posterior é tratada como concluída nesta fundação.
+
+### Avanço experimental 0.1.5
+
+Planejador local por regras, preferências explícitas, revisão por intervalo escolhido e resumo de evidências separados por atividade estão implementados. Isso inicia parte da adaptação prevista para V0.2, sem tratá-la como concluída: validação pedagógica, novos temas, contextos visuais distintos e métodos de estimativa de aprendizagem continuam pendentes. Knowledge Tracing, Random Forest, redes neurais, embeddings e RAG não foram implementados.

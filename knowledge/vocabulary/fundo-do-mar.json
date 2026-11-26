@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "language": "pt-BR",
   "theme": {
     "id": "fundo-do-mar",
@@ -15,8 +15,21 @@
       "image": "/assets/peixe.svg",
       "skills": [
         "associar-imagem-palavra",
+        "completar-letra",
         "ordenar-letras"
-      ]
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/peixe.svg"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
     },
     {
       "id": "mar",
@@ -27,8 +40,21 @@
       "image": "/assets/mar.svg",
       "skills": [
         "associar-imagem-palavra",
+        "completar-letra",
         "ordenar-letras"
-      ]
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/mar.svg"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
     },
     {
       "id": "agua",
@@ -39,8 +65,21 @@
       "image": "/assets/agua.svg",
       "skills": [
         "associar-imagem-palavra",
+        "completar-letra",
         "ordenar-letras"
-      ]
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/agua.svg"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
     },
     {
       "id": "polvo",
@@ -51,8 +90,21 @@
       "image": "/assets/polvo.svg",
       "skills": [
         "associar-imagem-palavra",
+        "completar-letra",
         "ordenar-letras"
-      ]
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/polvo.svg"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
     },
     {
       "id": "concha",
@@ -63,8 +115,21 @@
       "image": "/assets/concha.svg",
       "skills": [
         "associar-imagem-palavra",
+        "completar-letra",
         "ordenar-letras"
-      ]
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/concha.svg"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
     },
     {
       "id": "praia",
@@ -75,8 +140,21 @@
       "image": "/assets/praia.svg",
       "skills": [
         "associar-imagem-palavra",
+        "completar-letra",
         "ordenar-letras"
-      ]
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/praia.svg"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
     },
     {
       "id": "caranguejo",
@@ -87,8 +165,21 @@
       "image": "/assets/caranguejo.svg",
       "skills": [
         "associar-imagem-palavra",
+        "completar-letra",
         "ordenar-letras"
-      ]
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/caranguejo.svg"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
     }
   ],
   "relations": [
@@ -136,6 +227,32 @@
       "from": "praia",
       "to": "caranguejo",
       "label": "relacionado a"
+    },
+    {
+      "from": "peixe",
+      "to": "nadar",
+      "label": "realiza a ação"
+    },
+    {
+      "from": "polvo",
+      "to": "fundo-do-mar",
+      "label": "pertence ao tema"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "nadar",
+      "label": "NADAR",
+      "kind": "action",
+      "playable": false,
+      "reviewed": false
+    },
+    {
+      "id": "fundo-do-mar",
+      "label": "FUNDO DO MAR",
+      "kind": "theme",
+      "playable": false,
+      "reviewed": false
     }
   ]
 }

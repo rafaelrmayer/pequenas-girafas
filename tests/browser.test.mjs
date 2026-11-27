@@ -15,9 +15,15 @@ async function setup(options = {}) {
   await page.locator('#experience').waitFor({state:'visible'});
   return {browser,context,page,failures,network};
 }
+async function go(page,area){
+ const panel={atividades:'#area-atividades',apoios:'#configuracoes',responsaveis:'#responsaveis'}[area];
+ if(await page.locator(panel).isHidden())await page.locator('#nav-'+area).click();
+}
+async function inArea(page,area,action){await go(page,area);return action();}
 async function construct(page, value) {
-  for (const char of value) await page.getByRole('button',{name:`Adicionar ${char}`,exact:true}).and(page.locator(':enabled')).first().click();
-  await page.locator('#check').click();
+  await go(page,'atividades');
+  for (const char of value) await inArea(page,'atividades',()=>page.getByRole('button',{name:`Adicionar ${char}`,exact:true}).and(page.locator(':enabled')).first().click());
+  await inArea(page,'atividades',()=>page.locator('#check').click());
   await page.locator('#repeat').waitFor({state:'visible'});
 }
 test('PEIXE with duplicate letters, hint, persistence, backup and explicit deletion', async () => {
@@ -27,12 +33,12 @@ test('PEIXE with duplicate letters, hint, persistence, backup and explicit delet
     assert.match(await page.locator('#feedback').innerText(),/Você construiu PEIXE/);
     await page.reload(); await page.locator('#experience').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/PEIXE: 1 construções/);
-    await page.locator('#adult-title').click();
-    const download = page.waitForEvent('download'); await page.locator('#export').click();
+    await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());
+    const download = page.waitForEvent('download'); await inArea(page,'responsaveis',()=>page.locator('#export').click());
     assert.equal((await download).suggestedFilename(),'pequenas-girafas-copia-local.json');
-    await page.locator('#delete').click(); await page.locator('#cancel-delete').click();
+    await inArea(page,'responsaveis',()=>page.locator('#delete').click()); await inArea(page,'responsaveis',()=>page.locator('#cancel-delete').click());
     assert.match(await page.locator('#progress').textContent(),/PEIXE: 1/);
-    await page.locator('#delete').click(); await page.locator('#confirm-delete').click();
+    await inArea(page,'responsaveis',()=>page.locator('#delete').click()); await inArea(page,'responsaveis',()=>page.locator('#confirm-delete').click());
     await page.waitForFunction(()=>document.querySelector('#data-feedback').textContent.includes('apagados'));
     await page.reload(); await page.locator('#experience').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/Ainda não há/);
@@ -44,15 +50,15 @@ test('PEIXE with duplicate letters, hint, persistence, backup and explicit delet
 test('keyboard and hint are sufficient; settings, accent and mobile layout', async () => {
   const {browser,page,failures} = await setup({viewport:{width:390,height:844}});
   try {
-    await page.locator('#word').selectOption('agua');
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption('agua'));
     await page.locator('input[value="memory"]').evaluate(n=>n.closest('details').open=true);
-    await page.locator('input[value="memory"]').check();
-    await page.locator('#hint').focus(); await page.keyboard.press('Enter');
+    await inArea(page,'atividades',()=>page.locator('input[value="memory"]').check());
+    await inArea(page,'atividades',()=>page.locator('#hint').focus()); await page.keyboard.press('Enter');
     assert.match(await page.locator('#feedback').innerText(),/letra Á/);
     for (const char of 'GUA') {
-      await page.getByRole('button',{name:`Adicionar ${char}`,exact:true}).focus(); await page.keyboard.press('Enter');
+      await inArea(page,'atividades',()=>page.getByRole('button',{name:`Adicionar ${char}`,exact:true}).focus()); await page.keyboard.press('Enter');
     }
-    await page.locator('#check').focus(); await page.keyboard.press('Enter');
+    await inArea(page,'atividades',()=>page.locator('#check').focus()); await page.keyboard.press('Enter');
     await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/ÁGUA: 1 construções; 1 com apoio/);
     for (const id of ['dark', 'reduced', 'lowercase']) {
@@ -84,14 +90,14 @@ test('independent evidence across sessions recommends optional memory mode, neve
   try {
     for(let round=0;round<2;round++) {
       await page.locator('input[value="memory"]').evaluate(n=>n.closest('details').open=true);
-      await page.locator('input[value="memory"]').check(); await construct(page,'PEIXE');
+      await inArea(page,'atividades',()=>page.locator('input[value="memory"]').check()); await construct(page,'PEIXE');
       await page.reload(); await page.locator('#experience').waitFor({state:'visible'});
     }
     assert.equal(await page.locator('input[value="memory"]').isChecked(),true);
     assert.match(await page.locator('#adapt-reason').textContent(),/2 sessões/);
     assert.equal(await page.locator('#word option').count(),7);
     assert.equal(await page.locator('#recommendations button').count(),6);
-    await page.locator('#adult-title').click(); await page.locator('#adapt').uncheck();
+    await inArea(page,'responsaveis',()=>page.locator('#adult-title').click()); await inArea(page,'responsaveis',()=>page.locator('#adapt').uncheck());
     await page.waitForFunction(()=>document.querySelector('#adapt-reason').textContent.includes('desligada'));
     await page.waitForFunction(async () => {
       const {load} = await import('/storage/store.mjs');
@@ -121,7 +127,7 @@ test('bundled audio works even when storage and browser voices are unavailable',
       Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}}});
     });
     const page = await context.newPage(); await page.goto(URL); await page.locator('#experience').waitFor({state:'visible'});
-    await page.locator('#listen').click();
+    await inArea(page,'atividades',()=>page.locator('#listen').click());
     await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
     await construct(page,'PEIXE');
     assert.match(await page.locator('#feedback').textContent(),/não pôde ser salvo/);
@@ -134,12 +140,12 @@ test('word and letter audio decode offline and zero volume gives feedback beside
   try {
     await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
     await context.setOffline(true);
-    await page.locator('#listen').click();
+    await inArea(page,'atividades',()=>page.locator('#listen').click());
     await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
-    await page.locator('#listen-letter').click();
+    await inArea(page,'atividades',()=>page.locator('#listen-letter').click());
     await page.waitForFunction(()=>document.querySelector('#letter-audio-status').textContent==='Leitura concluída.');
-    await page.locator('#volume').focus(); await page.keyboard.press('Home');
-    await page.locator('#listen').click();
+    await inArea(page,'apoios',()=>page.locator('#volume').focus()); await page.keyboard.press('Home');
+    await inArea(page,'atividades',()=>page.locator('#listen').click());
     assert.match(await page.locator('#word-audio-status').textContent(),/volume.*zero/);
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
@@ -156,12 +162,12 @@ test('confirmation reads only correct words; preference persists and manual play
     const page = await context.newPage(); await page.goto(URL);
     await page.locator('#experience').waitFor({state:'visible'});
     assert.equal(await page.evaluate(()=>window.playedAudio.length),0);
-    await page.locator('#check').click(); await page.locator('#hint').click();
+    await inArea(page,'atividades',()=>page.locator('#check').click()); await inArea(page,'atividades',()=>page.locator('#hint').click());
     assert.equal(await page.evaluate(()=>window.playedAudio.length),0);
-    await page.locator('#clear').click(); await construct(page,'PEIXE');
+    await inArea(page,'atividades',()=>page.locator('#clear').click()); await construct(page,'PEIXE');
     await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
     assert.equal(await page.evaluate(()=>window.playedAudio.length),1);
-    await page.locator('#on-success-audio').uncheck();
+    await inArea(page,'apoios',()=>page.locator('#on-success-audio').uncheck());
     await page.waitForFunction(() => new Promise(resolve => {
       const request = indexedDB.open('pequenas-girafas-v1', 1);
       request.onsuccess = () => {
@@ -174,12 +180,12 @@ test('confirmation reads only correct words; preference persists and manual play
     assert.equal(await page.locator('#on-success-audio').isChecked(),false);
     await construct(page,'PEIXE');
     assert.equal(await page.evaluate(()=>window.playedAudio.length),0);
-    await page.locator('#listen').click();
+    await inArea(page,'atividades',()=>page.locator('#listen').click());
     await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
     assert.equal(await page.evaluate(()=>window.playedAudio.length),1);
-    await page.locator('#on-success-audio').check();
-    await page.locator('#volume').focus(); await page.keyboard.press('Home');
-    await page.locator('#repeat').click(); await construct(page,'PEIXE');
+    await inArea(page,'apoios',()=>page.locator('#on-success-audio').check());
+    await inArea(page,'apoios',()=>page.locator('#volume').focus()); await page.keyboard.press('Home');
+    await inArea(page,'atividades',()=>page.locator('#repeat').click()); await construct(page,'PEIXE');
     assert.equal(await page.evaluate(()=>window.playedAudio.length),1);
   } finally {await browser.close();}
 });
@@ -187,28 +193,28 @@ test('confirmation reads only correct words; preference persists and manual play
 test('association and missing-letter activities remain freely selectable, keyboard-accessible and separately recorded', async () => {
   const {browser,page,failures,network} = await setup();
   try {
-    await page.locator('input[name="activity"][value="match"]').check();
+    await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="match"]').check());
     assert.equal(await page.locator('#match-options button').count(),3);
     assert.ok(!(await page.locator('#word-model').textContent()).includes('PEIXE'));
-    await page.locator('#match-options button').filter({hasText:'MAR'}).click();
-    await page.locator('#check').click();
+    await inArea(page,'atividades',()=>page.locator('#match-options button').filter({hasText:'MAR'}).click());
+    await inArea(page,'atividades',()=>page.locator('#check').click());
     assert.equal(await page.locator('#repeat').isVisible(),false);
     assert.match(await page.locator('#progress').textContent(),/Ainda não há/);
-    await page.locator('#hint').click();
+    await inArea(page,'atividades',()=>page.locator('#hint').click());
     assert.equal(await page.locator('#word-model').textContent(),'PEIXE');
-    await page.locator('#match-options button').filter({hasText:'PEIXE'}).focus(); await page.keyboard.press('Enter');
-    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    await inArea(page,'atividades',()=>page.locator('#match-options button').filter({hasText:'PEIXE'}).focus()); await page.keyboard.press('Enter');
+    await inArea(page,'atividades',()=>page.locator('#check').click());await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/Associar imagem e palavra: 1/);
     assert.ok(!(await page.locator('#progress').textContent()).includes('1 construções'));
     const missing = page.locator('input[name="activity"][value="missing"]');
     await missing.press('Space');
     assert.equal(await missing.isChecked(), true);
-    await page.locator('#word').selectOption('agua');
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption('agua'));
     assert.equal(await page.locator('#slots .fixed').count(),3);
-    await page.getByRole('button',{name:'Adicionar A',exact:true}).click();
-    await page.locator('#check').click();assert.equal(await page.locator('#repeat').isVisible(),false);
-    await page.getByRole('button',{name:'Adicionar U',exact:true}).focus();await page.keyboard.press('Enter');
-    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar A',exact:true}).click());
+    await inArea(page,'atividades',()=>page.locator('#check').click());assert.equal(await page.locator('#repeat').isVisible(),false);
+    await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar U',exact:true}).focus());await page.keyboard.press('Enter');
+    await inArea(page,'atividades',()=>page.locator('#check').click());await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#feedback').textContent(),/Você completou ÁGUA/);
     assert.match(await page.locator('#progress').textContent(),/Completar uma letra: 1/);
     await page.reload();await page.locator('#experience').waitFor({state:'visible'});
@@ -235,14 +241,14 @@ test('desktop drag places letters out of order, swaps occupied spaces and leaves
     await slot(0).dragTo(slot(2));
     for(const index of [1,3,4]) await tile(String(index)).dragTo(slot(index));
     assert.equal((await page.locator('#slots').textContent()).trim(),'PEIXE');
-    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    await inArea(page,'atividades',()=>page.locator('#check').click());await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#feedback').textContent(),/Você construiu PEIXE/);
-    await page.locator('input[name="activity"][value="missing"]').check();
+    await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="missing"]').check());
     const wrong = page.getByRole('button',{name:'Adicionar A',exact:true});
     await wrong.dragTo(slot(0));assert.equal(await slot(0).textContent(),'P');
     const right = page.getByRole('button',{name:'Adicionar I',exact:true});
     await right.dragTo(slot(2));
-    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    await inArea(page,'atividades',()=>page.locator('#check').click());await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#feedback').textContent(),/Você completou PEIXE/);
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
@@ -251,7 +257,7 @@ test('desktop drag places letters out of order, swaps occupied spaces and leaves
 test('touch adds and removes letters, and drag starts without waiting on mobile', async () => {
   const {browser,context,page,failures} = await setup({viewport:{width:390,height:844}, hasTouch:true});
   try {
-    await page.locator('#word').selectOption('agua');
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption('agua'));
     const source = page.getByRole('button',{name:'Adicionar Á',exact:true});
     const target = page.locator('#slots [data-slot="0"]');
     await page.locator('#letter-play').evaluate(node => node.scrollIntoView({block:'center'}));
@@ -294,14 +300,14 @@ test('touch adds and removes letters, and drag starts without waiting on mobile'
     }
     assert.equal(await source.isDisabled(),true);
     for (const [index, letter] of [...'GUA'].entries()) {
-      await page.getByRole('button',{name:`Adicionar ${letter}`,exact:true}).tap();
+      await inArea(page,'atividades',()=>page.getByRole('button',{name:`Adicionar ${letter}`,exact:true}).tap());
       await page.waitForFunction(([slot, value]) =>
         document.querySelector(`#slots [data-slot="${slot}"]`).textContent === value,
       [index + 1, letter], {timeout:2000});
     }
-    await page.locator('#check').tap();
+    await inArea(page,'atividades',()=>page.locator('#check').tap());
     await page.locator('#repeat').waitFor({state:'visible'});
-    await page.locator('#word').selectOption('caranguejo');
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption('caranguejo'));
     await page.setViewportSize({width:320,height:700});
     await page.locator('.activity-grid').scrollIntoViewIfNeeded();
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth));
@@ -318,23 +324,23 @@ test('optional advice preserves a round when ignored, follows explicit preferenc
   try {
     assert.match(await page.locator('#adaptive-suggestions').textContent(),/Falta de registro não é dificuldade/);
     assert.match(await page.locator('#semantic-note').textContent(),/realiza a ação NADAR/);
-    await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
-    await page.locator('#ignore-advice').click();
+    await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar P',exact:true}).click());
+    await inArea(page,'atividades',()=>page.locator('#ignore-advice').click());
     assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
     assert.equal(await page.locator('#adaptive-suggestions button').count(),0);
     assert.match(await page.locator('#adaptive-status').textContent(),/Continue por aqui/);
-    await page.locator('#adult-title').click();
-    await page.locator('#category-interest').selectOption('animal');
-    await page.locator('#exploration-goal').selectOption('new');
-    await page.locator('#preferred-activity').selectOption('missing');
+    await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());
+    await inArea(page,'responsaveis',()=>page.locator('#category-interest').selectOption('animal'));
+    await inArea(page,'responsaveis',()=>page.locator('#exploration-goal').selectOption('new'));
+    await inArea(page,'responsaveis',()=>page.locator('#preferred-activity').selectOption('missing'));
     assert.equal(await page.locator('#recommendations button').first().locator('strong').textContent(),'POLVO');
     const suggestion=page.locator('#adaptive-suggestions button[data-action="new_word"]');
     assert.equal(await suggestion.getAttribute('data-word-id'),'polvo');
-    await suggestion.click();
+    await inArea(page,'atividades',()=>suggestion.click());
     assert.equal(await page.locator('#word').inputValue(),'polvo');
     assert.equal(await page.locator('input[name="activity"][value="missing"]').isChecked(),true);
     assert.match(await page.locator('#progress').textContent(),/Ainda não há/);
-    await page.locator('#adapt').uncheck();
+    await inArea(page,'responsaveis',()=>page.locator('#adapt').uncheck());
     assert.equal(await page.locator('#adaptive-suggestions button').count(),0);
     assert.equal(await page.locator('#word option').count(),7);
     assert.equal(await page.locator('#recommendations button').count(),6);
@@ -354,14 +360,14 @@ test('completed evidence records only day and presentation; revisits preserve le
   const {browser,page,failures} = await setup();
   try {
     await page.locator('input[value="memory"]').evaluate(n=>n.closest('details').open=true);
-    await page.locator('input[value="memory"]').check();await construct(page,'PEIXE');
+    await inArea(page,'atividades',()=>page.locator('input[value="memory"]').check());await construct(page,'PEIXE');
     const first=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events[0];});
     assert.match(first.day,/^\d{4}-\d{2}-\d{2}$/);assert.equal(first.contextId,'build:upper:image-v1');
     assert.equal(first.hintUsed,false);assert.equal(first.modelUsed,false);assert.equal(first.audioRequested,false);
     assert.ok(!('responseTime' in first) && !('timestamp' in first));
     await page.reload();await page.locator('#experience').waitFor({state:'visible'});
     await page.locator('input[value="memory"]').evaluate(n=>n.closest('details').open=true);
-    await page.locator('input[value="memory"]').check();await construct(page,'PEIXE');
+    await inArea(page,'atividades',()=>page.locator('input[value="memory"]').check());await construct(page,'PEIXE');
     assert.match(await page.locator('#skill-evidence [data-activity="build"]').textContent(),/2 sessões, 1 dia local/);
     assert.match(await page.locator('#adapt-reason').textContent(),/não comprova retenção/);
     await page.evaluate(async()=>{
@@ -373,14 +379,14 @@ test('completed evidence records only day and presentation; revisits preserve le
     const review=page.locator('#adaptive-suggestions button[data-action="review"]');
     assert.equal(await review.getAttribute('data-word-id'),'agua');
     assert.match(await review.locator('..').textContent(),/não significa.*esquecimento/);
-    await review.focus();await page.keyboard.press('Enter');
+    await inArea(page,'atividades',()=>review.focus());await page.keyboard.press('Enter');
     assert.equal(await page.locator('#word').inputValue(),'agua');
     assert.equal(await page.locator('input[name="activity"][value="match"]').isChecked(),true);
-    await page.locator('#word').selectOption('mar');
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption('mar'));
     assert.match(await page.locator('#skill-evidence [data-activity="build"]').textContent(),/1 registro sem data/);
     const legacy=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.find(e=>e.sessionId==='legacy');});
     assert.equal(legacy.day,undefined);
-    await page.locator('#adult-title').click();
+    await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());
     await page.screenshot({path:'test-results/adaptive-evidence.png',fullPage:true});
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
@@ -389,7 +395,7 @@ test('completed evidence records only day and presentation; revisits preserve le
 async function selectImage(page, id) {
   const options = page.locator('#picture-options');
   if (await options.getAttribute('open') === null) await options.locator('summary').click();
-  await page.locator('#presentation-select').selectOption(id);
+  await inArea(page,'atividades',()=>page.locator('#presentation-select').selectOption(id));
 }
 
 test('mobile illustrations stay with the letters and rotate between visits', async () => {
@@ -412,7 +418,7 @@ test('mobile illustrations stay with the letters and rotate between visits', asy
     const letters = await page.locator('#letter-bank').boundingBox();
     assert.ok(picture.y >= 0 && picture.width >= 112);
     assert.ok(picture.y + picture.height < letters.y && letters.y + letters.height < 740);
-    await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
+    await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar P',exact:true}).click());
     assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
     assert.equal(await currentImage(), 'image-v1');
 
@@ -429,9 +435,9 @@ test('mobile illustrations stay with the letters and rotate between visits', asy
     assert.equal(await currentImage(), 'image-v2');
     assert.match(await page.locator('#progress').textContent(), /Ainda não há/);
 
-    await page.locator('#adult-title').click();
-    await page.locator('#delete').click();
-    await page.locator('#confirm-delete').click();
+    await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());
+    await inArea(page,'responsaveis',()=>page.locator('#delete').click());
+    await inArea(page,'responsaveis',()=>page.locator('#confirm-delete').click());
     await page.waitForFunction(() => document.querySelector('#data-feedback').textContent.includes('apagados'));
     assert.equal(await word.inputValue(), 'peixe');
     assert.equal(await currentImage(), 'image-v1');
@@ -458,12 +464,12 @@ test('visual choice preserves the word and in-progress letters, records mixed ro
     assert.deepEqual(record.visualIds,['image-v2']);assert.equal(record.contextId,'build:upper:image-v2');
     const suggestion=page.locator('#adaptive-suggestions button[data-action="new_image"]');
     const image=await suggestion.getAttribute('data-image-id');assert.notEqual(image,'image-v2');
-    await suggestion.focus();await page.keyboard.press('Enter');
+    await inArea(page,'atividades',()=>suggestion.focus());await page.keyboard.press('Enter');
     assert.equal(await page.locator('#word').inputValue(),'peixe');
     assert.equal(await page.locator('#presentation-select').inputValue(),image);
     assert.equal(await page.evaluate(()=>window.visualPlayCount),1);
     await selectImage(page, 'image-v3');
-    await page.getByRole('button',{name:'Adicionar P',exact:true}).click();
+    await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar P',exact:true}).click());
     await selectImage(page, 'image-v1');
     assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
     assert.equal(await page.evaluate(()=>window.visualPlayCount),1);
@@ -471,7 +477,7 @@ test('visual choice preserves the word and in-progress letters, records mixed ro
     record=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.at(-1);});
     assert.deepEqual(record.visualIds,['image-v3','image-v1']);assert.match(record.contextId,/image-mixed/);
     assert.match(await page.locator('#visual-evidence-note').textContent(),/1 rodada com troca/);
-    await page.locator('#word').selectOption('mar');
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption('mar'));
     assert.equal(await page.locator('#presentation-select').isDisabled(),true);
     assert.equal(await page.locator('#next-image').isDisabled(),true);
     assert.equal(await page.locator('#adaptive-suggestions button[data-action="new_image"]').count(),0);
@@ -483,27 +489,27 @@ test('new illustrations decode offline and work with association and missing-let
   const {browser,context,page,failures} = await setup({viewport:{width:390,height:844}});
   try {
     await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);
-    await page.locator('#word').selectOption('polvo');
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption('polvo'));
     await selectImage(page, 'image-v3');
     await page.waitForFunction(()=>{const img=document.querySelector('#picture');return img.complete&&img.naturalWidth>0;});
-    await page.locator('input[name="activity"][value="match"]').check();
-    await page.locator('#match-options').getByRole('button',{name:'POLVO',exact:true}).click();
-    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="match"]').check());
+    await inArea(page,'atividades',()=>page.locator('#match-options').getByRole('button',{name:'POLVO',exact:true}).click());
+    await inArea(page,'atividades',()=>page.locator('#check').click());await page.locator('#repeat').waitFor({state:'visible'});
     let record=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.at(-1);});
     assert.equal(record.activity,'match');assert.deepEqual(record.visualIds,['image-v3']);
-    await page.locator('#word').selectOption('agua');
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption('agua'));
     await selectImage(page, 'image-v2');
-    await page.locator('input[name="activity"][value="missing"]').check();
-    await page.getByRole('button',{name:'Adicionar U',exact:true}).click();
-    await page.locator('#check').click();await page.locator('#repeat').waitFor({state:'visible'});
+    await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="missing"]').check());
+    await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar U',exact:true}).click());
+    await inArea(page,'atividades',()=>page.locator('#check').click());await page.locator('#repeat').waitFor({state:'visible'});
     record=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.at(-1);});
     assert.equal(record.contextId,'missing:upper:image-v2:gap-2');
     for(const word of ['peixe','polvo','agua']) {
-      await page.locator('#word').selectOption(word);
+      await inArea(page,'atividades',()=>page.locator('#word').selectOption(word));
       for(const id of ['image-v1','image-v2','image-v3']) {
         await selectImage(page, id);
         await page.waitForFunction(()=>{const img=document.querySelector('#picture');return img.complete&&img.naturalWidth>0;});
-        if(id!=='image-v1') await page.locator('.picture-card').screenshot({path:`test-results/visual-${word}-${id}.png`});
+        if(id!=='image-v1') await inArea(page,'atividades',()=>page.locator('.picture-card').screenshot({path:`test-results/visual-${word}-${id}.png`}));
       }
     }
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
@@ -516,7 +522,7 @@ test('astronomy is freely selected, keeps both themes records and works offline 
  try{
   await construct(page,'PEIXE');
   await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('PEIXE:'));
-  await page.locator('#theme').selectOption('astronomia');
+  await inArea(page,'atividades',()=>page.locator('#theme').selectOption('astronomia'));
   assert.equal(await page.locator('#activity-title').textContent(),'Astronomia');
   assert.equal(await page.locator('#word option').count(),5);
   assert.equal(await page.locator('#word').inputValue(),'lua');
@@ -527,14 +533,14 @@ test('astronomy is freely selected, keeps both themes records and works offline 
   await construct(page,'LUA');
   await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('LUA:'));
   assert.match(await page.locator('#progress').textContent(),/PEIXE:/);
-  await page.locator('#word').selectOption('ceu');
-  await page.locator('input[name="activity"][value="missing"]').check();
-  await page.getByRole('button',{name:'Adicionar É',exact:true}).click();await page.locator('#check').click();
+  await inArea(page,'atividades',()=>page.locator('#word').selectOption('ceu'));
+  await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="missing"]').check());
+  await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar É',exact:true}).click());await inArea(page,'atividades',()=>page.locator('#check').click());
   await page.locator('#repeat').waitFor({state:'visible'});
   assert.match(await page.locator('#feedback').textContent(),/CÉU/);
   await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('CÉU:'));
-  await page.locator('#word').selectOption('planeta');await page.locator('input[name="activity"][value="match"]').check();
-  await page.locator('#match-options button').filter({hasText:'PLANETA'}).click();await page.locator('#check').click();
+  await inArea(page,'atividades',()=>page.locator('#word').selectOption('planeta'));await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="match"]').check());
+  await inArea(page,'atividades',()=>page.locator('#match-options button').filter({hasText:'PLANETA'}).click());await inArea(page,'atividades',()=>page.locator('#check').click());
   await page.locator('#repeat').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('PLANETA:'));
   assert.equal(await page.evaluate(async()=>{
@@ -548,11 +554,11 @@ test('astronomy is freely selected, keeps both themes records and works offline 
   await page.screenshot({path:'test-results/astronomia-desktop.png',fullPage:true});
   await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
   for(const id of ['lua','sol','estrela','ceu','planeta']){
-    await page.locator('#word').selectOption(id);await page.locator('#listen').click();
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption(id));await inArea(page,'atividades',()=>page.locator('#listen').click());
     await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
-    await page.locator('#picture').screenshot({path:'test-results/astronomia-'+id+'.png'});
+    await inArea(page,'atividades',()=>page.locator('#picture').screenshot({path:'test-results/astronomia-'+id+'.png'}));
   }
-  await page.locator('#theme').selectOption('fundo-do-mar');
+  await inArea(page,'atividades',()=>page.locator('#theme').selectOption('fundo-do-mar'));
   assert.equal(await page.locator('#word option').count(),7);
   assert.match(await page.locator('#progress').textContent(),/LUA:/);
   assert.equal(network.filter(request=>request.method!=='GET').length,0);
@@ -564,21 +570,21 @@ test('astronomy is freely selected, keeps both themes records and works offline 
 test('next word cycles within the selected theme by click and keyboard without recording skipped rounds',async()=>{
  const {browser,page,failures}=await setup({viewport:{width:390,height:844}});
  try{
-  await page.locator('#theme').selectOption('astronomia');
-  await page.getByRole('button',{name:'Adicionar L',exact:true}).click();
-  await page.getByRole('button',{name:'Próxima palavra',exact:true}).click();
+  await inArea(page,'atividades',()=>page.locator('#theme').selectOption('astronomia'));
+  await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar L',exact:true}).click());
+  await inArea(page,'atividades',()=>page.getByRole('button',{name:'Próxima palavra',exact:true}).click());
   assert.equal(await page.locator('#word').inputValue(),'sol');
   assert.match(await page.locator('#feedback').textContent(),/Próxima palavra: SOL/);
   assert.match(await page.locator('#progress').textContent(),/Ainda não há/);
   await page.keyboard.press('Enter');assert.equal(await page.locator('#word').inputValue(),'estrela');
-  await page.locator('input[name="activity"][value="match"]').check();
-  await page.locator('#word').selectOption('planeta');await page.locator('#next-word').click();
+  await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="match"]').check());
+  await inArea(page,'atividades',()=>page.locator('#word').selectOption('planeta'));await inArea(page,'atividades',()=>page.locator('#next-word').click());
   assert.equal(await page.locator('#word').inputValue(),'lua');
   assert.equal(await page.locator('input[name="activity"][value="match"]').isChecked(),true);
-  await page.locator('#match-options button').filter({hasText:'LUA'}).click();await page.locator('#check').click();
+  await inArea(page,'atividades',()=>page.locator('#match-options button').filter({hasText:'LUA'}).click());await inArea(page,'atividades',()=>page.locator('#check').click());
   await page.locator('#repeat').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('LUA:'));
-  await page.locator('#next-word').click();assert.equal(await page.locator('#word').inputValue(),'sol');
+  await inArea(page,'atividades',()=>page.locator('#next-word').click());assert.equal(await page.locator('#word').inputValue(),'sol');
   assert.match(await page.locator('#progress').textContent(),/Associar imagem e palavra: 1/);
   assert.ok(!(await page.locator('#progress').textContent()).includes('SOL:'));
   const events=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events;});
@@ -595,26 +601,26 @@ test('Nature and Fruits preserve accents, records and next-word cycles with all 
  try{
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
   await context.setOffline(true);
-  await page.locator('#theme').selectOption('natureza');
+  await inArea(page,'atividades',()=>page.locator('#theme').selectOption('natureza'));
   assert.equal(await page.locator('#word option').count(),6);
   await construct(page,'FLOR');await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('FLOR:'));
-  await page.locator('#word').selectOption('arvore');
-  await page.locator('input[name="activity"][value="missing"]').check();
+  await inArea(page,'atividades',()=>page.locator('#word').selectOption('arvore'));
+  await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="missing"]').check());
   // ÁRVORE has gap index 3 in the first round.
-  await page.getByRole('button',{name:'Adicionar O',exact:true}).click();await page.locator('#check').click();
+  await inArea(page,'atividades',()=>page.getByRole('button',{name:'Adicionar O',exact:true}).click());await inArea(page,'atividades',()=>page.locator('#check').click());
   await page.locator('#repeat').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('ÁRVORE:'));
-  await page.locator('#word').selectOption('jardim');await page.locator('#next-word').click();
+  await inArea(page,'atividades',()=>page.locator('#word').selectOption('jardim'));await inArea(page,'atividades',()=>page.locator('#next-word').click());
   assert.equal(await page.locator('#word').inputValue(),'flor');
-  await page.locator('#theme').selectOption('frutas');assert.equal(await page.locator('#word option').count(),6);
-  await page.locator('input[name="activity"][value="build"]').check();
+  await inArea(page,'atividades',()=>page.locator('#theme').selectOption('frutas'));assert.equal(await page.locator('#word option').count(),6);
+  await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="build"]').check());
   await construct(page,'MAÇÃ');await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('MAÇÃ:'));
-  await page.locator('#word').selectOption('pessego');await page.locator('input[name="activity"][value="match"]').check();
-  await page.locator('#match-options button').filter({hasText:'PÊSSEGO'}).click();await page.locator('#check').click();
+  await inArea(page,'atividades',()=>page.locator('#word').selectOption('pessego'));await inArea(page,'atividades',()=>page.locator('input[name="activity"][value="match"]').check());
+  await inArea(page,'atividades',()=>page.locator('#match-options button').filter({hasText:'PÊSSEGO'}).click());await inArea(page,'atividades',()=>page.locator('#check').click());
   await page.locator('#repeat').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('PÊSSEGO:'));
   assert.match(await page.locator('#progress').textContent(),/ÁRVORE:/);
-  await page.locator('#next-word').click();assert.equal(await page.locator('#word').inputValue(),'maca');
+  await inArea(page,'atividades',()=>page.locator('#next-word').click());assert.equal(await page.locator('#word').inputValue(),'maca');
   await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
   await page.evaluate(()=>{
    const AudioOriginal=window.Audio;window.audioDiagnostics=[];
@@ -626,13 +632,13 @@ test('Nature and Fruits preserve accents, records and next-word cycles with all 
    };
   });
   for(const [theme,words] of [['natureza',['flor','grama','folha','arvore','semente','jardim']],['frutas',['maca','pera','laranja','abacaxi','manga','pessego']]]){
-   await page.locator('#theme').selectOption(theme);
+   await inArea(page,'atividades',()=>page.locator('#theme').selectOption(theme));
    for(const id of words){
-    await page.locator('#word').selectOption(id);await page.locator('#listen').click();
+    await inArea(page,'atividades',()=>page.locator('#word').selectOption(id));await inArea(page,'atividades',()=>page.locator('#listen').click());
     try {await page.waitForFunction(()=>{const status=document.querySelector('#word-audio-status').textContent;return status==='Leitura concluída.'||status.includes('Não foi possível');});}
     catch(error){throw new Error('Áudio '+id+': '+await page.locator('#word-audio-status').textContent(),{cause:error});}
     assert.equal(await page.locator('#word-audio-status').textContent(),'Leitura concluída.','Áudio '+id+' '+JSON.stringify(await page.evaluate(()=>window.audioDiagnostics)));
-    await page.locator('#picture').screenshot({path:'test-results/'+theme+'-'+id+'.png'});
+    await inArea(page,'atividades',()=>page.locator('#picture').screenshot({path:'test-results/'+theme+'-'+id+'.png'}));
    }
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
    await page.screenshot({path:'test-results/'+theme+'-mobile.png',fullPage:true});
@@ -654,21 +660,21 @@ test('optional review list preserves original activities, separates dates and up
     {wordId:'polvo',sessionId:'future',activity:'missing',outcome:'completed',support:'independent',day:localDay(future)}]}));
   });
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);
-  await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#adult-title').click();
+  await page.reload();await page.locator('#experience').waitFor({state:'visible'});await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());
   assert.match(await page.locator('#review-status').textContent(),/Opções com intervalo atingido: 1/);
   assert.match(await page.locator('#review-status').textContent(),/Sem data para calcular intervalo: 1/);assert.match(await page.locator('#review-status').textContent(),/Com data a conferir: 1/);
   assert.equal(await page.locator('#review-list button').count(),1);
   assert.equal(await page.locator('#review-list button').getAttribute('data-activity'),'match');
-  await page.locator('#theme').selectOption('astronomia');assert.equal(await page.locator('#review-list button').count(),0);
+  await inArea(page,'atividades',()=>page.locator('#theme').selectOption('astronomia'));assert.equal(await page.locator('#review-list button').count(),0);
   assert.match(await page.locator('#review-status').textContent(),/falta de registro não é dificuldade/);
-  await page.locator('#theme').selectOption('fundo-do-mar');
-  await page.locator('#adapt').uncheck();assert.equal(await page.locator('#review-list button').count(),0);
+  await inArea(page,'atividades',()=>page.locator('#theme').selectOption('fundo-do-mar'));
+  await inArea(page,'responsaveis',()=>page.locator('#adapt').uncheck());assert.equal(await page.locator('#review-list button').count(),0);
   assert.equal(await page.locator('#word option').count(),7);
-  await page.locator('#adapt').check();await page.locator('#review-list button').click();
+  await inArea(page,'responsaveis',()=>page.locator('#adapt').check());await inArea(page,'responsaveis',()=>page.locator('#review-list button').click());
   assert.equal(await page.locator('#word').inputValue(),'mar');
   assert.equal(await page.locator('input[name="activity"][value="match"]').isChecked(),true);
   const before=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.length;});assert.equal(before,3);
-  await page.locator('#match-options button').filter({hasText:'MAR'}).click();await page.locator('#check').click();
+  await inArea(page,'atividades',()=>page.locator('#match-options button').filter({hasText:'MAR'}).click());await inArea(page,'atividades',()=>page.locator('#check').click());
   await page.locator('#repeat').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelectorAll('#review-list button').length===0);
   assert.match(await page.locator('#review-status').textContent(),/Atividades com registro datado mais recente: 1/);
@@ -691,19 +697,19 @@ test('local report filters offline records, prints a checked snapshot and blocks
     {wordId:'mar',activity:'build',outcome:'completed',day:localDay(old)},
     {wordId:'sol',activity:'build',outcome:'completed',day:localDay(future)}]}));return {today};
   });
-  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#adult-title').click();
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());
   const records=()=>page.evaluate(async()=>JSON.stringify((await (await import('/storage/store.mjs')).load()).events));const before=await records();
-  await page.locator('#report-theme').selectOption('frutas');await page.locator('#report-period').selectOption('range');await page.locator('#report-from').fill(dates.today);await page.locator('#report-to').fill(dates.today);
-  await page.locator('#generate-report').focus();await page.keyboard.press('Enter');await page.locator('#report-preview').waitFor({state:'visible'});
+  await inArea(page,'responsaveis',()=>page.locator('#report-theme').selectOption('frutas'));await inArea(page,'responsaveis',()=>page.locator('#report-period').selectOption('range'));await inArea(page,'responsaveis',()=>page.locator('#report-from').fill(dates.today));await inArea(page,'responsaveis',()=>page.locator('#report-to').fill(dates.today));
+  await inArea(page,'responsaveis',()=>page.locator('#generate-report').focus());await page.keyboard.press('Enter');await page.locator('#report-preview').waitFor({state:'visible'});
   assert.match(await page.locator('#report-preview').textContent(),/2 conclusões datadas/);assert.match(await page.locator('#report-preview').textContent(),/1 conclusões sem data/);
   assert.equal(await page.locator('#report-preview .report-row').count(),3);assert.match(await page.locator('#report-preview').textContent(),/PÊSSEGO/);assert.doesNotMatch(await page.locator('#report-preview').textContent(),/private-session/);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.screenshot({path:'test-results/relatorio-mobile.png',fullPage:true});
   await page.evaluate(()=>{window.print=()=>{window.printedReport=document.querySelector('#report-print-root').textContent;window.dispatchEvent(new Event('afterprint'));};});
-  await page.locator('#print-report').click();await page.waitForFunction(()=>Boolean(window.printedReport));assert.match(await page.evaluate(()=>window.printedReport),/MAÇÃ/);assert.equal(await page.locator('#report-print-root').count(),0);assert.equal(await records(),before);
-  await page.locator('#report-undated').uncheck();assert.equal(await page.locator('#print-report').isDisabled(),true);await page.locator('#generate-report').click();await page.locator('#report-preview').waitFor({state:'visible'});assert.equal(await page.locator('#report-preview .report-row').count(),2);
-  await page.evaluate(async()=>{window.printedReport=null;await (await import('/storage/store.mjs')).erase();});await page.locator('#print-report').click();await page.waitForFunction(()=>document.querySelector('#report-preview').hidden);assert.equal(await page.evaluate(()=>window.printedReport),null);assert.match(await page.locator('#report-status').textContent(),/registros mudaram/);
-  await page.locator('#generate-report').click();await page.locator('#report-preview').waitFor({state:'visible'});assert.match(await page.locator('#report-preview').textContent(),/0 conclusões datadas/);await page.locator('#clear-report').click();assert.equal(await page.locator('#report-preview').isHidden(),true);
+  await inArea(page,'responsaveis',()=>page.locator('#print-report').click());await page.waitForFunction(()=>Boolean(window.printedReport));assert.match(await page.evaluate(()=>window.printedReport),/MAÇÃ/);assert.equal(await page.locator('#report-print-root').count(),0);assert.equal(await records(),before);
+  await inArea(page,'responsaveis',()=>page.locator('#report-undated').uncheck());assert.equal(await page.locator('#print-report').isDisabled(),true);await inArea(page,'responsaveis',()=>page.locator('#generate-report').click());await page.locator('#report-preview').waitFor({state:'visible'});assert.equal(await page.locator('#report-preview .report-row').count(),2);
+  await page.evaluate(async()=>{window.printedReport=null;await (await import('/storage/store.mjs')).erase();});await inArea(page,'responsaveis',()=>page.locator('#print-report').click());await page.waitForFunction(()=>document.querySelector('#report-preview').hidden);assert.equal(await page.evaluate(()=>window.printedReport),null);assert.match(await page.locator('#report-status').textContent(),/registros mudaram/);
+  await inArea(page,'responsaveis',()=>page.locator('#generate-report').click());await page.locator('#report-preview').waitFor({state:'visible'});assert.match(await page.locator('#report-preview').textContent(),/0 conclusões datadas/);await inArea(page,'responsaveis',()=>page.locator('#clear-report').click());assert.equal(await page.locator('#report-preview').isHidden(),true);
   assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
@@ -713,20 +719,20 @@ test('phrases work by keyboard offline, preserve duplicate words and never mix w
  try{
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});
   const events=()=>page.evaluate(async()=>JSON.stringify((await (await import('/storage/store.mjs')).load()).events));const before=await events();
-  await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Vamos explorar/);
-  await page.locator('#phrase-bank button[data-token-key="2"]').focus();await page.keyboard.press('Enter');
-  await page.locator('#phrase-hint').click();assert.match(await page.locator('#phrase-feedback').textContent(),/posição 1, use O/);assert.equal(await page.locator('#phrase-slots button').count(),1);
-  await page.locator('#phrase-slots button').focus();await page.keyboard.press('Enter');assert.equal(await page.locator('#phrase-slots button').count(),0);
-  await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE NADA.');
-  await page.locator('#on-success-audio').uncheck();
-  for(const key of ['0','1','2']){await page.locator(`#phrase-bank button[data-token-key="${key}"]`).focus();await page.keyboard.press('Enter');}
-  await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);assert.equal(await page.locator('#phrase-audio-status').textContent(),'');
-  await page.locator('#phrase-next').click();assert.equal(await page.locator('#phrase-choice').inputValue(),'frase-polvo');assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await page.locator('#phrase-model').isHidden(),true);
-  await page.locator('#phrase-theme').selectOption('frutas');await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'A MAÇÃ É UMA FRUTA.');
-  for(const key of ['4','1','2','3','0'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Vamos explorar/);
-  await page.locator('#phrase-reset').click();for(const key of ['0','1','2','3','4'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);
-  await page.locator('#lowercase').check();assert.equal(await page.locator('#phrase-slots button').first().textContent(),'a');assert.equal(await events(),before);
-  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.locator('#frases').screenshot({path:'test-results/frases-mobile.png'});await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await inArea(page,'atividades',()=>page.locator('#phrase-check').click());assert.match(await page.locator('#phrase-feedback').textContent(),/Vamos explorar/);
+  await inArea(page,'atividades',()=>page.locator('#phrase-bank button[data-token-key="2"]').focus());await page.keyboard.press('Enter');
+  await inArea(page,'atividades',()=>page.locator('#phrase-hint').click());assert.match(await page.locator('#phrase-feedback').textContent(),/posição 1, use O/);assert.equal(await page.locator('#phrase-slots button').count(),1);
+  await inArea(page,'atividades',()=>page.locator('#phrase-slots button').focus());await page.keyboard.press('Enter');assert.equal(await page.locator('#phrase-slots button').count(),0);
+  await inArea(page,'atividades',()=>page.locator('#phrase-show-model').check());assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE NADA.');
+  await inArea(page,'apoios',()=>page.locator('#on-success-audio').uncheck());
+  for(const key of ['0','1','2']){await inArea(page,'atividades',()=>page.locator(`#phrase-bank button[data-token-key="${key}"]`).focus());await page.keyboard.press('Enter');}
+  await inArea(page,'atividades',()=>page.locator('#phrase-check').click());assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);assert.equal(await page.locator('#phrase-audio-status').textContent(),'');
+  await inArea(page,'atividades',()=>page.locator('#phrase-next').click());assert.equal(await page.locator('#phrase-choice').inputValue(),'frase-polvo');assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await page.locator('#phrase-model').isHidden(),true);
+  await inArea(page,'atividades',()=>page.locator('#phrase-theme').selectOption('frutas'));await inArea(page,'atividades',()=>page.locator('#phrase-show-model').check());assert.equal(await page.locator('#phrase-model').textContent(),'A MAÇÃ É UMA FRUTA.');
+  for(const key of ['4','1','2','3','0'])await inArea(page,'atividades',()=>page.locator(`#phrase-bank button[data-token-key="${key}"]`).click());await inArea(page,'atividades',()=>page.locator('#phrase-check').click());assert.match(await page.locator('#phrase-feedback').textContent(),/Vamos explorar/);
+  await inArea(page,'atividades',()=>page.locator('#phrase-reset').click());for(const key of ['0','1','2','3','4'])await inArea(page,'atividades',()=>page.locator(`#phrase-bank button[data-token-key="${key}"]`).click());await inArea(page,'atividades',()=>page.locator('#phrase-check').click());assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);
+  await inArea(page,'apoios',()=>page.locator('#lowercase').check());assert.equal(await page.locator('#phrase-slots button').first().textContent(),'a');assert.equal(await events(),before);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await inArea(page,'atividades',()=>page.locator('#frases').screenshot({path:'test-results/frases-mobile.png'}));await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.reload();await page.locator('#experience').waitFor({state:'visible'});assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await events(),before);
   assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
  }finally{await browser.close();}
@@ -737,12 +743,12 @@ test('all eight fixed phrases play app audio without browser voices and honor ze
  try{
   await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
   for(const [theme,ids] of [['fundo-do-mar',['frase-peixe','frase-polvo']],['astronomia',['frase-lua','frase-sol']],['natureza',['frase-flor','frase-arvore']],['frutas',['frase-maca','frase-pera']]]){
-   await page.locator('#phrase-theme').selectOption(theme);
-   for(const id of ids){await page.locator('#phrase-choice').selectOption(id);await page.locator('#phrase-listen').click();await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');}
+   await inArea(page,'atividades',()=>page.locator('#phrase-theme').selectOption(theme));
+   for(const id of ids){await inArea(page,'atividades',()=>page.locator('#phrase-choice').selectOption(id));await inArea(page,'atividades',()=>page.locator('#phrase-listen').click());await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');}
   }
-  for(const key of ['0','1','2','3','4'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');
-  await page.locator('#volume').fill('0');await page.locator('#volume').dispatchEvent('change');await page.locator('#phrase-listen').click();assert.match(await page.locator('#phrase-audio-status').textContent(),/volume da leitura está em zero/);
-  await page.locator('#phrase-stop').click();assert.equal(await page.locator('#phrase-audio-status').textContent(),'Leitura interrompida.');assert.deepEqual(failures,[]);
+  for(const key of ['0','1','2','3','4'])await inArea(page,'atividades',()=>page.locator(`#phrase-bank button[data-token-key="${key}"]`).click());await inArea(page,'atividades',()=>page.locator('#phrase-check').click());await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');
+  await inArea(page,'apoios',()=>page.locator('#volume').fill('0'));await page.locator('#volume').dispatchEvent('change');await inArea(page,'atividades',()=>page.locator('#phrase-listen').click());assert.match(await page.locator('#phrase-audio-status').textContent(),/volume da leitura está em zero/);
+  await inArea(page,'atividades',()=>page.locator('#phrase-stop').click());assert.equal(await page.locator('#phrase-audio-status').textContent(),'Leitura interrompida.');assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
 
@@ -751,17 +757,17 @@ test('optional continuations preserve an unfinished phrase until explicit choice
  try{
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});
   const records=()=>page.evaluate(async()=>JSON.stringify((await (await import('/storage/store.mjs')).load()).events));const before=await records();
-  await page.locator('#phrase-bank button[data-token-key="0"]').click();await page.locator('#phrase-continuations summary').click();assert.equal(await page.locator('#phrase-use-continuation').isDisabled(),true);
-  await page.locator('#phrase-complement').selectOption('frase-peixe-1');assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'O PEIXE NADA NO MAR.');assert.equal(await page.locator('#phrase-slots button').count(),1);assert.equal(await page.locator('#phrase-bank button').count(),3);
-  await page.locator('#phrase-action').selectOption('viver');assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'O PEIXE VIVE NA ÁGUA.');assert.equal(await page.locator('#phrase-slots button').count(),1);
-  await page.locator('#phrase-use-continuation').focus();await page.keyboard.press('Enter');assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await page.locator('#phrase-bank button').count(),5);assert.equal(await page.locator('#phrase-use-continuation').isDisabled(),true);
-  await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE VIVE NA ÁGUA.');await page.locator('#on-success-audio').uncheck();
-  for(const key of ['0','1','2','3','4']){await page.locator(`#phrase-bank button[data-token-key="${key}"]`).focus();await page.keyboard.press('Enter');}await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);
-  await page.locator('#phrase-action').selectOption('nadar');assert.equal(await page.locator('#phrase-slots button').count(),5);await page.locator('#phrase-reset').click();await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE VIVE NA ÁGUA.');
-  await page.locator('#lowercase').check();assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'o peixe nada.');assert.equal(await records(),before);
-  await page.locator('#frases').screenshot({path:'test-results/continuacoes-mobile.png'});await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-  await page.locator('#phrase-next').click();assert.equal(await page.locator('#phrase-choice').inputValue(),'frase-polvo');assert.equal(await page.locator('#phrase-continuations').getAttribute('open'),null);await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'o polvo vive no mar.');
-  await page.locator('#phrase-theme').selectOption('frutas');await page.locator('#phrase-continuations summary').click();await page.locator('#phrase-action').selectOption('ter');assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'a maçã tem sementes.');await page.locator('#phrase-use-continuation').click();await page.locator('#phrase-hint').click();assert.match(await page.locator('#phrase-feedback').textContent(),/posição 1, use a/);
+  await inArea(page,'atividades',()=>page.locator('#phrase-bank button[data-token-key="0"]').click());await inArea(page,'atividades',()=>page.locator('#phrase-continuations summary').click());assert.equal(await page.locator('#phrase-use-continuation').isDisabled(),true);
+  await inArea(page,'atividades',()=>page.locator('#phrase-complement').selectOption('frase-peixe-1'));assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'O PEIXE NADA NO MAR.');assert.equal(await page.locator('#phrase-slots button').count(),1);assert.equal(await page.locator('#phrase-bank button').count(),3);
+  await inArea(page,'atividades',()=>page.locator('#phrase-action').selectOption('viver'));assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'O PEIXE VIVE NA ÁGUA.');assert.equal(await page.locator('#phrase-slots button').count(),1);
+  await inArea(page,'atividades',()=>page.locator('#phrase-use-continuation').focus());await page.keyboard.press('Enter');assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await page.locator('#phrase-bank button').count(),5);assert.equal(await page.locator('#phrase-use-continuation').isDisabled(),true);
+  await inArea(page,'atividades',()=>page.locator('#phrase-show-model').check());assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE VIVE NA ÁGUA.');await inArea(page,'apoios',()=>page.locator('#on-success-audio').uncheck());
+  for(const key of ['0','1','2','3','4']){await inArea(page,'atividades',()=>page.locator(`#phrase-bank button[data-token-key="${key}"]`).focus());await page.keyboard.press('Enter');}await inArea(page,'atividades',()=>page.locator('#phrase-check').click());assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);
+  await inArea(page,'atividades',()=>page.locator('#phrase-action').selectOption('nadar'));assert.equal(await page.locator('#phrase-slots button').count(),5);await inArea(page,'atividades',()=>page.locator('#phrase-reset').click());await inArea(page,'atividades',()=>page.locator('#phrase-show-model').check());assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE VIVE NA ÁGUA.');
+  await inArea(page,'apoios',()=>page.locator('#lowercase').check());assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'o peixe nada.');assert.equal(await records(),before);
+  await inArea(page,'atividades',()=>page.locator('#frases').screenshot({path:'test-results/continuacoes-mobile.png'}));await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await inArea(page,'atividades',()=>page.locator('#phrase-next').click());assert.equal(await page.locator('#phrase-choice').inputValue(),'frase-polvo');assert.equal(await page.locator('#phrase-continuations').getAttribute('open'),null);await inArea(page,'atividades',()=>page.locator('#phrase-show-model').check());assert.equal(await page.locator('#phrase-model').textContent(),'o polvo vive no mar.');
+  await inArea(page,'atividades',()=>page.locator('#phrase-theme').selectOption('frutas'));await inArea(page,'atividades',()=>page.locator('#phrase-continuations summary').click());await inArea(page,'atividades',()=>page.locator('#phrase-action').selectOption('ter'));assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'a maçã tem sementes.');await inArea(page,'atividades',()=>page.locator('#phrase-use-continuation').click());await inArea(page,'atividades',()=>page.locator('#phrase-hint').click());assert.match(await page.locator('#phrase-feedback').textContent(),/posição 1, use a/);
   assert.equal(await records(),before);assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
@@ -773,8 +779,8 @@ test('all sixteen continuation recordings play locally without browser voices',a
   await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
   const groups=await page.evaluate(async()=>await (await fetch('/phrases/continuations.json')).json());
   for(const group of groups){const theme=group.exampleId.includes('peixe')||group.exampleId.includes('polvo')?'fundo-do-mar':group.exampleId.includes('lua')||group.exampleId.includes('sol')?'astronomia':group.exampleId.includes('flor')||group.exampleId.includes('arvore')?'natureza':'frutas';
-   await page.locator('#phrase-theme').selectOption(theme);await page.locator('#phrase-choice').selectOption(group.exampleId);await page.locator('#phrase-continuations summary').click();
-   for(const action of group.actions)for(const choice of action.complements){if(choice.audioId===group.exampleId)continue;await page.locator('#phrase-action').selectOption(action.id);await page.locator('#phrase-complement').selectOption(choice.id);await page.locator('#phrase-use-continuation').click();await page.locator('#phrase-listen').click();await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');}
+   await inArea(page,'atividades',()=>page.locator('#phrase-theme').selectOption(theme));await inArea(page,'atividades',()=>page.locator('#phrase-choice').selectOption(group.exampleId));await inArea(page,'atividades',()=>page.locator('#phrase-continuations summary').click());
+   for(const action of group.actions)for(const choice of action.complements){if(choice.audioId===group.exampleId)continue;await inArea(page,'atividades',()=>page.locator('#phrase-action').selectOption(action.id));await inArea(page,'atividades',()=>page.locator('#phrase-complement').selectOption(choice.id));await inArea(page,'atividades',()=>page.locator('#phrase-use-continuation').click());await inArea(page,'atividades',()=>page.locator('#phrase-listen').click());await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');}
   }assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
@@ -784,19 +790,19 @@ test('phrase conclusions persist separately offline, track support conservativel
  try{
   await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});
   const snapshot=()=>page.evaluate(async()=>await (await import('/storage/store.mjs')).load());
-  await page.locator('#phrase-check').click();assert.equal((await snapshot()).phraseEvents.length,0);
-  for(const key of ['0','1','2'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();
+  await inArea(page,'atividades',()=>page.locator('#phrase-check').click());assert.equal((await snapshot()).phraseEvents.length,0);
+  for(const key of ['0','1','2'])await inArea(page,'atividades',()=>page.locator(`#phrase-bank button[data-token-key="${key}"]`).click());
   await page.evaluate(()=>{document.querySelector('#phrase-check').click();document.querySelector('#phrase-check').click();});await page.waitForFunction(()=>document.querySelector('#phrase-feedback').textContent.includes('Registro salvo'));
   let state=await snapshot();assert.equal(state.phraseEvents.length,1);assert.equal(state.events.length,0);assert.deepEqual([state.phraseEvents[0].modelUsed,state.phraseEvents[0].hintUsed,state.phraseEvents[0].audioRequested],[false,false,false]);
-  await page.locator('#on-success-audio').uncheck();await page.locator('#phrase-continuations summary').click();await page.locator('#phrase-action').selectOption('viver');await page.locator('#phrase-use-continuation').click();await page.locator('#phrase-continuations summary').click();
-  await page.locator('#phrase-hint').click();await page.locator('#phrase-listen').click();await page.locator('#phrase-stop').click();
-  for(const key of ['0','1','2','3','4'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();await page.waitForFunction(()=>document.querySelector('#phrase-feedback').textContent.includes('Registro salvo'));
+  await inArea(page,'apoios',()=>page.locator('#on-success-audio').uncheck());await inArea(page,'atividades',()=>page.locator('#phrase-continuations summary').click());await inArea(page,'atividades',()=>page.locator('#phrase-action').selectOption('viver'));await inArea(page,'atividades',()=>page.locator('#phrase-use-continuation').click());await inArea(page,'atividades',()=>page.locator('#phrase-continuations summary').click());
+  await inArea(page,'atividades',()=>page.locator('#phrase-hint').click());await inArea(page,'atividades',()=>page.locator('#phrase-listen').click());await inArea(page,'atividades',()=>page.locator('#phrase-stop').click());
+  for(const key of ['0','1','2','3','4'])await inArea(page,'atividades',()=>page.locator(`#phrase-bank button[data-token-key="${key}"]`).click());await inArea(page,'atividades',()=>page.locator('#phrase-check').click());await page.waitForFunction(()=>document.querySelector('#phrase-feedback').textContent.includes('Registro salvo'));
   state=await snapshot();assert.equal(state.phraseEvents.length,2);assert.equal(state.phraseEvents[1].phraseId,'frase-peixe-2');assert.deepEqual([state.phraseEvents[1].modelUsed,state.phraseEvents[1].hintUsed,state.phraseEvents[1].audioRequested],[true,true,true]);
-  await page.locator('#phrase-slots button').last().click();await page.locator('#phrase-bank button[data-token-key="4"]').click();await page.locator('#phrase-check').click();assert.equal((await snapshot()).phraseEvents.length,2);
-  await construct(page,'PEIXE');await page.locator('#adult-title').click();assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE VIVE NA ÁGUA: 1/);assert.match(await page.locator('#progress').textContent(),/PEIXE: 1/);
-  const download=page.waitForEvent('download');await page.locator('#export').click();const file=await download;const {readFile}=await import('node:fs/promises');const backup=JSON.parse(await readFile(await file.path(),'utf8'));assert.equal(backup.schemaVersion,5);assert.equal(backup.phraseEvents.length,2);assert.equal(backup.events.length,1);
-  await page.locator('#phrase-progress').screenshot({path:'test-results/registros-frases-mobile.png'});await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#adult-title').click();assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE VIVE NA ÁGUA: 1/);
-  await page.locator('#delete').click();await page.locator('#confirm-delete').click();await page.waitForFunction(()=>document.querySelector('#data-feedback').textContent.includes('apagados'));assert.equal((await snapshot()).phraseEvents.length,0);assert.equal((await snapshot()).events.length,0);assert.match(await page.locator('#phrase-progress').textContent(),/Ainda não há/);
+  await inArea(page,'atividades',()=>page.locator('#phrase-slots button').last().click());await inArea(page,'atividades',()=>page.locator('#phrase-bank button[data-token-key="4"]').click());await inArea(page,'atividades',()=>page.locator('#phrase-check').click());assert.equal((await snapshot()).phraseEvents.length,2);
+  await construct(page,'PEIXE');await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE VIVE NA ÁGUA: 1/);assert.match(await page.locator('#progress').textContent(),/PEIXE: 1/);
+  const download=page.waitForEvent('download');await inArea(page,'responsaveis',()=>page.locator('#export').click());const file=await download;const {readFile}=await import('node:fs/promises');const backup=JSON.parse(await readFile(await file.path(),'utf8'));assert.equal(backup.schemaVersion,5);assert.equal(backup.phraseEvents.length,2);assert.equal(backup.events.length,1);
+  await inArea(page,'responsaveis',()=>page.locator('#phrase-progress').screenshot({path:'test-results/registros-frases-mobile.png'}));await page.reload();await page.locator('#experience').waitFor({state:'visible'});await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE VIVE NA ÁGUA: 1/);
+  await inArea(page,'responsaveis',()=>page.locator('#delete').click());await inArea(page,'responsaveis',()=>page.locator('#confirm-delete').click());await page.waitForFunction(()=>document.querySelector('#data-feedback').textContent.includes('apagados'));assert.equal((await snapshot()).phraseEvents.length,0);assert.equal((await snapshot()).events.length,0);assert.match(await page.locator('#phrase-progress').textContent(),/Ainda não há/);
   assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
@@ -804,9 +810,41 @@ test('phrase conclusions persist separately offline, track support conservativel
 test('unavailable storage keeps phrase conclusions only in memory with an explicit warning',async()=>{
  const {browser,context,page,failures,network}=await setup();
  try{
-  await context.addInitScript(()=>Object.defineProperty(window,'indexedDB',{get(){throw new Error('unavailable');}}));await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#on-success-audio').uncheck();
-  await page.locator('#phrase-show-model').check();await page.locator('#phrase-show-model').uncheck();for(const key of ['0','1','2'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();await page.waitForFunction(()=>document.querySelector('#phrase-feedback').textContent.includes('apenas na memória'));
-  await page.locator('#adult-title').click();assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE NADA: 1/);assert.match(await page.locator('#phrase-progress').textContent(),/1 com modelo ou pista/);assert.match(await page.locator('#storage-status').textContent(),/apenas na memória/);
-  await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#adult-title').click();assert.match(await page.locator('#phrase-progress').textContent(),/Ainda não há/);assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
+  await context.addInitScript(()=>Object.defineProperty(window,'indexedDB',{get(){throw new Error('unavailable');}}));await page.reload();await page.locator('#experience').waitFor({state:'visible'});await inArea(page,'apoios',()=>page.locator('#on-success-audio').uncheck());
+  await inArea(page,'atividades',()=>page.locator('#phrase-show-model').check());await inArea(page,'atividades',()=>page.locator('#phrase-show-model').uncheck());for(const key of ['0','1','2'])await inArea(page,'atividades',()=>page.locator(`#phrase-bank button[data-token-key="${key}"]`).click());await inArea(page,'atividades',()=>page.locator('#phrase-check').click());await page.waitForFunction(()=>document.querySelector('#phrase-feedback').textContent.includes('apenas na memória'));
+  await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE NADA: 1/);assert.match(await page.locator('#phrase-progress').textContent(),/1 com modelo ou pista/);assert.match(await page.locator('#storage-status').textContent(),/apenas na memória/);
+  await page.reload();await page.locator('#experience').waitFor({state:'visible'});await inArea(page,'responsaveis',()=>page.locator('#adult-title').click());assert.match(await page.locator('#phrase-progress').textContent(),/Ainda não há/);assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});
+
+test('bottom navigation opens separate areas by keyboard, preserves rounds and supports history offline',async()=>{
+ const {browser,context,page,failures}=await setup({viewport:{width:390,height:844}});
+ try{
+  assert.equal(await page.locator('#configuracoes').isHidden(),true);assert.equal(await page.locator('#responsaveis').isHidden(),true);
+  await page.getByRole('button',{name:'Adicionar P',exact:true}).click();const selected=await page.locator('#slots').textContent();
+  await page.locator('#nav-apoios').focus();await page.keyboard.press('Enter');assert.equal(await page.locator('#configuracoes').isVisible(),true);assert.equal(await page.locator('#area-atividades').isHidden(),true);assert.equal(await page.locator('#settings-title').evaluate(node=>node===document.activeElement),true);assert.equal(await page.locator('#nav-apoios').getAttribute('aria-current'),'page');
+  await page.locator('#dark').check();await page.screenshot({path:'test-results/apoios-mobile-dark.png',fullPage:true});await page.locator('#dark').uncheck();
+  await page.locator('#nav-responsaveis').click();assert.equal(await page.locator('#responsaveis').isVisible(),true);assert.equal(await page.locator('#configuracoes').isHidden(),true);assert.equal(await page.locator('#adult-title').evaluate(node=>node===document.activeElement),true);
+  await page.goBack();assert.equal(await page.locator('#configuracoes').isVisible(),true);await page.goForward();assert.equal(await page.locator('#responsaveis').isVisible(),true);
+  await page.locator('#nav-atividades').click();assert.equal(await page.locator('#slots').textContent(),selected);assert.equal(await page.locator('#responsaveis').isHidden(),true);
+  await page.locator('.top a[href="#frases"]').click();assert.equal(await page.locator('#frases').evaluate(node=>node===document.activeElement),true);await page.locator('#phrase-bank button[data-token-key="0"]').click();const phrase=await page.locator('#phrase-slots').textContent();
+  await page.locator('#nav-apoios').click();await page.locator('#nav-atividades').click();assert.equal(await page.locator('#phrase-slots').textContent(),phrase);
+  const box=await page.locator('#bottom-nav').boundingBox();assert.ok(box.y>=0&&box.y+box.height<=845);await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.screenshot({path:'test-results/navegacao-mobile.png',fullPage:true});
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.locator('#nav-responsaveis').click();await page.reload();await page.locator('#experience').waitFor({state:'visible'});assert.equal(await page.locator('#responsaveis').isVisible(),true);await page.locator('#nav-apoios').click();assert.equal(await page.locator('#configuracoes').isVisible(),true);assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});
+
+test('report keeps phrase evidence separate, filters both histories and rejects stale phrase printing',async()=>{
+ const {browser,context,page,failures,network}=await setup({viewport:{width:390,height:844}});
+ try{
+  const today=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');const {localDay}=await import('/ai/adaptive-learning/engine.mjs');const day=localDay();await store.mutate(state=>({...state,events:[{wordId:'maca',activity:'build',outcome:'completed',day,support:'independent'}],phraseEvents:[{phraseId:'frase-maca-2',outcome:'completed',day,modelUsed:true,hintUsed:false,audioRequested:true},{phraseId:'frase-pera',outcome:'completed'}]}));return day;});
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#nav-responsaveis').click();
+  await page.locator('#report-theme').selectOption('frutas');await page.locator('#report-period').selectOption('range');await page.locator('#report-from').fill(today);await page.locator('#report-to').fill(today);await page.locator('#generate-report').click();await page.locator('#report-preview').waitFor({state:'visible'});
+  assert.equal(await page.locator('#report-preview .report-row').count(),1);assert.equal(await page.locator('#report-preview .report-phrase-row').count(),2);assert.match(await page.locator('#report-preview').textContent(),/A MAÇÃ TEM SEMENTES/);assert.match(await page.locator('#report-preview').textContent(),/Frases: 1 conclusões datadas/);
+  await page.evaluate(()=>{window.print=()=>{window.printed=document.querySelector('#report-print-root').textContent;window.dispatchEvent(new Event('afterprint'));};});await page.locator('#print-report').click();await page.waitForFunction(()=>Boolean(window.printed));assert.match(await page.evaluate(()=>window.printed),/A MAÇÃ TEM SEMENTES/);
+  await page.locator('#report-undated').uncheck();await page.locator('#generate-report').click();await page.locator('#report-preview').waitFor({state:'visible'});assert.equal(await page.locator('#report-preview .report-phrase-row').count(),1);await page.locator('#report-preview').screenshot({path:'test-results/relatorio-palavras-frases.png'});
+  await page.evaluate(async()=>{window.printed=null;const store=await import('/storage/store.mjs');await store.mutate(state=>({...state,phraseEvents:[]}));});await page.locator('#print-report').click();await page.waitForFunction(()=>document.querySelector('#report-preview').hidden);assert.equal(await page.evaluate(()=>window.printed),null);
+  await page.locator('#report-theme').selectOption('astronomia');await page.locator('#generate-report').click();await page.locator('#report-preview').waitFor({state:'visible'});assert.equal(await page.locator('#report-preview .report-row,.report-phrase-row').count(),0);
+  assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });

@@ -1,9 +1,10 @@
+import {buildPhraseReport} from './phrases.mjs';
 import {buildReport} from './summary.mjs';
 import {localDay} from '../ai/adaptive-learning/engine.mjs';
-export function setupReport({catalog,readSnapshot,stopAudio}){
+export function setupReport({catalog,phraseEntries,readSnapshot,stopAudio}){
  const el=id=>document.getElementById(id);let epoch=0,previewSnapshot=null;
  const text=(tag,value,className='')=>{const node=document.createElement(tag);node.textContent=value;if(className)node.className=className;return node;};
- const fingerprint=snapshot=>JSON.stringify({events:snapshot.events,persisted:snapshot.persisted});
+ const fingerprint=snapshot=>JSON.stringify({events:snapshot.events,phraseEvents:snapshot.phraseEvents||[],persisted:snapshot.persisted});
  const status=message=>{if(el('report-status').textContent!==message)el('report-status').textContent=message;};
  function cleanPrint(){document.getElementById('report-print-root')?.remove();document.body.classList.remove('printing-report');}
  function invalidate(message){
@@ -28,21 +29,38 @@ export function setupReport({catalog,readSnapshot,stopAudio}){
    article.append(list,text('p',undated?'Sem data válida. Estes registros não são atribuídos ao período escolhido.':`Primeiro registro datado: ${row.firstDay}. Último: ${row.lastDay}. Dias locais com conclusões: ${row.days.length}.`));section.append(article);
   }return section;
  }
+ function phraseRows(title,values,undated){
+  const section=document.createElement('section');section.append(text('h4',title));
+  if(!values.length){section.append(text('p','Nenhuma conclusão de frase incluída nesta seção. Ausência de registro não é dificuldade.'));return section;}
+  for(const row of values){
+   const article=document.createElement('article');article.className='report-phrase-row';article.dataset.phraseId=row.id;
+   article.append(text('h5',row.text),text('p',catalog.themes.find(theme=>theme.id===row.themeId)?.label||'Tema não informado'));
+   const list=document.createElement('dl');list.className='report-measures';
+   for(const [label,value] of [['Conclusões de frase',row.total],['Com modelo ou pista',row.withSupport],['Sem modelo/pista registrados',row.withoutSupport],['Apoio não informado',row.unknownSupport],['Modelo utilizado',row.model],['Modelo não informado',row.unknownModel],['Pista solicitada',row.hints],['Pistas não informadas',row.unknownHints],['Áudio solicitado antes da conclusão',row.audio],['Áudio não informado',row.unknownAudio]]){const pair=document.createElement('div');pair.append(text('dt',label),text('dd',String(value)));list.append(pair);}
+   article.append(list,text('p',undated?'Sem data válida. Estes registros não são atribuídos ao período escolhido.':`Primeiro registro datado: ${row.firstDay}. Último: ${row.lastDay}. Dias locais com conclusões: ${row.days.length}.`));section.append(article);
+  }return section;
+ }
  async function generate(event){
   event.preventDefault();invalidate();const token=epoch;el('generate-report').disabled=true;status('Preparando a prévia neste dispositivo…');
   try{
    const snapshot=await readSnapshot();if(token!==epoch)return;
-   const report=buildReport({catalog,events:snapshot.events,today:localDay(),...filters()});
+   const options={catalog,today:localDay(),...filters()};
+   const report=buildReport({...options,events:snapshot.events});
+   const phraseReport=buildPhraseReport({...options,entries:phraseEntries,events:snapshot.phraseEvents||[]});
    const title=text('h3','Pequenas Girafas — Relatório local de exploração');title.id='report-preview-title';
    el('report-preview').append(title,text('p','Gerado em '+report.generatedOn+'. Tema: '+report.theme+'. Período: '+report.period+'.'),
-    text('p',`${report.datedCount} conclusões datadas no período; ${report.days.length} dias locais com registros. ${report.undatedCount} conclusões sem data exibidas separadamente.`),
+    text('p',`Palavras: ${report.datedCount} conclusões datadas no período; ${report.days.length} dias locais com registros. ${report.undatedCount} conclusões sem data exibidas separadamente.`),
+    text('p',`Frases: ${phraseReport.datedCount} conclusões datadas no período; ${phraseReport.undatedCount} conclusões sem data exibidas separadamente.`),
     text('p',snapshot.persisted?'Prévia dos registros disponíveis neste navegador.':'Armazenamento indisponível: esta prévia inclui registros que estão apenas na memória da sessão.'),
-    text('p','O aplicativo mantém até 200 registros recentes neste perfil de navegador. Não há identificação individual; se o perfil for compartilhado, os registros podem reunir mais de uma pessoa.'),
-    rows('Registros datados no período',report.datedRows,false));
-   if(report.includeUndated)el('report-preview').append(rows('Registros sem data válida — fora da atribuição de período',report.undatedRows,true));
-   const omitted=report.excluded;
+    text('p','O aplicativo mantém até 200 registros de palavras e 200 de frases recentes neste perfil de navegador. Não há identificação individual; se o perfil for compartilhado, os registros podem reunir mais de uma pessoa.'),
+    rows('Palavras — registros datados no período',report.datedRows,false));
+   if(report.includeUndated)el('report-preview').append(rows('Palavras — registros sem data válida, fora da atribuição de período',report.undatedRows,true));
+   el('report-preview').append(phraseRows('Frases — registros datados no período',phraseReport.datedRows,false));
+   if(phraseReport.includeUndated)el('report-preview').append(phraseRows('Frases — registros sem data válida, fora da atribuição de período',phraseReport.undatedRows,true));
+   const omitted=report.excluded,phraseOmitted=phraseReport.excluded;
+   el('report-preview').append(text('p',`Frases não incluídas: ${phraseOmitted.future} com data futura; ${phraseOmitted.outsidePeriod} fora do período; ${phraseOmitted.undated} sem data omitidas; ${phraseOmitted.unrecognized} sem frase reconhecida no catálogo.`));
    el('report-preview').append(text('h4','Informações não incluídas'),text('p',`${omitted.future} registros com data posterior à geração; ${omitted.outsidePeriod} fora do período; ${omitted.undated} sem data omitidos pela seleção; ${omitted.unrecognized} conclusões sem palavra ou atividade reconhecida no catálogo.`),
-    text('h4','Como interpretar'),text('p','Contagens descrevem registros, não domínio, retenção, inteligência ou capacidade. As três atividades são distintas. Registros sem informação sobre apoio, pistas ou áudio não são tratados como ausência de apoio.'),
+    text('h4','Como interpretar'),text('p','Contagens descrevem registros, não domínio, retenção, inteligência ou capacidade. As três atividades de palavras e a montagem de frases são distintas. Ver a prévia completa de uma frase conta como modelo. O áudio automático após concluir não conta como solicitação anterior. Registros sem informação sobre apoio, pistas ou áudio não são tratados como ausência de apoio.'),
     text('p','Dias diferentes não comprovam aprendizagem ou generalização. Não registramos se uma conclusão veio do botão Revisitar; este documento não identifica revisitas realizadas nem contém notas ou comparação entre crianças.'),
     text('p','As imagens, atividades e regras são experimentais e aguardam revisão pedagógica. Documento gerado localmente, sem envio ao servidor. Cópias impressas ou PDFs ficam sob seu controle e não são apagados pelo aplicativo.'));
    previewSnapshot=fingerprint(snapshot);el('report-preview').hidden=false;el('print-report').disabled=false;status('Prévia pronta. Confira o conteúdo antes de imprimir ou salvar em PDF.');el('report-preview').focus();

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.14 — 2026-11-27
+
+- Menu inferior fixo com Atividades, Apoios e Responsáveis em áreas separadas, preservando montagens.
+- Relatório com seções distintas para palavras e frases, filtros comuns e validação de ambas as listas antes de imprimir.
+- Navegação por teclado, histórico e links diretos; cache v21.
+
 ## 0.1.13 — 2026-11-27
 
 - Registros próprios de conclusões de frases, separados de palavras, com modelo, pistas e áudio solicitado antes da conclusão.

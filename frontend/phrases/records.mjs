@@ -17,7 +17,7 @@ export function phraseOverview(entries,events){
   return [{...entry,total:selected.length,withSupport:selected.filter(e=>e.modelUsed===true||e.hintUsed===true).length,
    withoutSupport:selected.filter(e=>e.modelUsed===false&&e.hintUsed===false).length,
    unknownSupport:selected.filter(e=>e.modelUsed!==true&&e.hintUsed!==true&&(typeof e.modelUsed!=='boolean'||typeof e.hintUsed!=='boolean')).length,
-   model:selected.filter(e=>e.modelUsed===true).length,hints:selected.filter(e=>e.hintUsed===true).length,
+   model:selected.filter(e=>e.modelUsed===true).length,unknownModel:selected.filter(e=>typeof e.modelUsed!=='boolean').length,unknownHints:selected.filter(e=>typeof e.hintUsed!=='boolean').length,hints:selected.filter(e=>e.hintUsed===true).length,
    audio:selected.filter(e=>e.audioRequested===true).length,unknownAudio:selected.filter(e=>typeof e.audioRequested!=='boolean').length}];
  });
 }

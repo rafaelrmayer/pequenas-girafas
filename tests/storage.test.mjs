@@ -30,3 +30,10 @@ test('legacy states gain an independent phrase history without losing words or p
  const reopened=await import('../frontend/storage/store.mjs?phrases-reopen=1');const after=await reopened.load();assert.equal(after.phraseEvents.length,200);assert.equal(new Set(after.phraseEvents.map(e=>e.serial)).size,200);assert.equal(after.events.length,2);assert.equal(after.settings.dark,true);assert.equal(after.settings.volume,.3);
  await store.erase();const erased=await reopened.load();assert.deepEqual(erased.phraseEvents,[]);assert.deepEqual(erased.events,[]);assert.equal(erased.settings.dark,false);
 });
+
+test('one story draft survives concurrent updates and erase without replacing learning records',async()=>{
+ await store.erase();const draft={version:1,pages:[{characterId:'peixe',sceneId:'mar',phraseId:'frase-peixe'}]};
+ await Promise.all([store.saveStory(draft),store.record({wordId:'mar'}),store.recordPhrase({phraseId:'frase-peixe'}),store.settings({dark:true})]);draft.pages=[];
+ const reopened=await import('../frontend/storage/store.mjs?story-reopen=1');const state=await reopened.load();assert.equal(state.storyDraft.pages.length,1);assert.equal(state.events.length,1);assert.equal(state.phraseEvents.length,1);assert.equal(state.settings.dark,true);
+ await store.erase();assert.equal((await reopened.load()).storyDraft,null);
+});

@@ -1,0 +1,11 @@
+# Primeiras histórias com recursos existentes
+
+O módulo `frontend/stories` permite criar uma sequência livre de até seis páginas, escolhendo oito personagens/elementos, seis cenários e as 24 frases/continuações existentes. Os IDs são validados pelo catálogo; frases devem pertencer ao personagem/elemento escolhido. Cenários podem ser combinados livremente. As imagens são referências separadas, sem representar toda a ação ou impor coerência narrativa.
+
+Adicionar/atualizar confirma a página. Até seis páginas podem repetir escolhas, ser editadas, reordenadas ou removidas. Desfazer mantém até dez estados na memória. Recomeçar limpa a edição com possibilidade de desfazer, sem alterar o rascunho salvo até novo salvamento. Durante edição, ações que alterariam outras páginas e o salvamento ficam indisponíveis até atualizar ou cancelar. Leitura possui anterior/próxima e áudio por página usando os MP3 existentes; avançar não inicia som. Volume, minúsculas e navegação entre áreas são respeitados.
+
+Um rascunho é salvo explicitamente em storyDraft `{version:1,pages:[{characterId,sceneId,phraseId}]}`. Não há texto livre, identificação, horários ou gravações. Estados legados recebem null. Carregamento valida formato, limite e referências; rascunho inválido não é renderizado nem apagado silenciosamente. A edição pendente fica só na memória e não entra na cópia local. Salvar substitui a versão anterior. Falha de escrita é avisada e não troca o último rascunho usado pela cópia.
+
+Salvamento transacional compartilha a proteção contra concorrência com palavras, frases, exclusão e cópia. A cópia JSON passa a schemaVersion 6; exclusão em Responsáveis limpa rascunho salvo, edição, desfazer e conteúdo do leitor. Histórias não são eventos de aprendizagem e não alteram planejadores, contagens ou relatórios de palavras/frases.
+
+A seção começa recolhida e o atalho Histórias abre e foca a área; links diretos e cache v23 funcionam offline. Sem chamadas a provedores, geração de recursos, modelos treinados ou transferência entre projetos. Biblioteca de múltiplas histórias, texto livre, desenho, impressão e narração contínua ficam para etapas posteriores. Conteúdo e interface ainda exigem validação pedagógica e com o público-alvo.

@@ -49,3 +49,11 @@ Para alternar as ilustrações entre visitas, o navegador guarda somente o últi
 Frases aparecem em resumo separado e na cópia JSON schemaVersion 5; entram no relatório em seção separada das palavras e não entram no planejador adaptativo. Ausência de metadados não é interpretada como ausência de apoio. Excluir registros limpa ambas as listas. Falha de armazenamento mantém a conclusão somente na memória com aviso. Pessoas no mesmo perfil podem acessar esses registros; sem identificação individual ou sincronização.
 
 Sugestões de frases (V0.1.15) usam apenas phraseEvents e preferências já existentes, localmente. Não geram registros antes da conclusão nem novas categorias de dados. Ver um cartão com a frase atual completa também conta como modelo no registro já existente. Ignorar não envia informação nem cria evento; desligar personalização remove essas sugestões.
+
+## Rascunho de história (V0.1.16)
+
+Um rascunho de até seis páginas pode ser salvo explicitamente em storyDraft, no IndexedDB. Contém somente versão do formato e IDs de personagem/elemento, cenário e frase existente por página. Não contém texto livre, nome, título pessoal, imagem capturada, áudio gravado, data ou métricas de uso. As escolhas podem revelar interesses e devem ser protegidas como os demais dados locais; não são utilizadas para inferir interesses ou capacidade.
+
+A edição e até dez estados de desfazer ficam apenas na memória. Salvar substitui a versão anterior. A cópia JSON schemaVersion 6 inclui a última versão salva, não as alterações pendentes ou tentativas de salvar que falharam. Não há restauração de cópias nesta etapa. Apagar registros, história e preferências limpa o rascunho salvo e a edição atual. Cópias baixadas precisam ser apagadas separadamente.
+
+Histórias não geram eventos de palavras/frases, não entram nos relatórios de aprendizagem nem no planejador. Imagens e narrações são arquivos genéricos existentes; nenhum histórico ou escolha de página é enviado a provedores. Quem compartilha este perfil pode abrir o rascunho. Em falha de armazenamento, a interface avisa e conserva a edição apenas na memória da página.

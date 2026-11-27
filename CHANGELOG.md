@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.16 — 2026-11-27
+
+- Histórias simples com até seis páginas, personagens/elementos, cenários e frases existentes.
+- Edição, reordenação, remoção, desfazer e leitura manual por página, sem registros de aprendizagem.
+- Um rascunho local salvo explicitamente, cópia schemaVersion 6 e exclusão conjunta. Cache v23.
+
 ## 0.1.15 — 2026-11-27
 
 - Sugestões opcionais e explicáveis de frases, baseadas em registros locais e preferências explícitas, dentro do tema atual.

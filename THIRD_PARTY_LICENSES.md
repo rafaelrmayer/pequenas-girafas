@@ -37,3 +37,5 @@ As seis variações SVG de PEIXE, POLVO e ÁGUA da versão 0.1.6 foram desenhada
 A V0.1.7 acrescenta cinco SVGs originais de Astronomia sob a licença do código próprio e cinco MP3 gerados com a mesma voz e ferramenta Edge TTS. O catálogo passa a 38 gravações; os 33 arquivos anteriores permanecem inalterados. Os direitos e condições do serviço de voz continuam separados da licença do software.
 
 A V0.1.8 acrescenta 12 SVGs originais de Natureza e Frutas sob a licença do código próprio e 12 gravações com Edge TTS/Francisca pt-BR a -15%. São 50 gravações no catálogo; as 38 anteriores foram preservadas. Condições do serviço e da voz continuam separadas da licença do código.
+
+A V0.1.11 acrescenta oito gravações de frases genéricas com a mesma voz Francisca pt-BR, taxa -15% e edge-tts 7.3.1. Catálogo total: 58 gravações, com hashes e textos no manifesto. As 50 anteriores foram preservadas. Sem texto de usuários enviado ao serviço. Condições do serviço/voz permanecem separadas da licença do código.

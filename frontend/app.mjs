@@ -1,3 +1,4 @@
+import {setupPhrases} from './phrases/view.mjs';
 import {setupReport} from './reports/view.mjs';
 import {reviewOverview} from './ai/adaptive-learning/reviews.mjs';
 import * as store from './storage/store.mjs';
@@ -12,7 +13,7 @@ const $ = id => document.getElementById(id);
 const sessionId = crypto.randomUUID();
 const environment = document.body.dataset.environment;
 $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
-let report, catalog, fullCatalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
+let phraseView, report, catalog, fullCatalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
 let hintUsed=false, audioRequested=false, roundPresentation='upper', adviceDismissed=false;
 let currentImage, roundVisualIds=[], roundStarted=false;
@@ -41,6 +42,7 @@ function summary() {
   if (!$('progress').children.length) {const li = document.createElement('li'); li.textContent = 'Ainda não há construções registradas. Explore no seu tempo.'; $('progress').append(li);}
 }
 function applySettings() {
+  phraseView?.refresh();
   document.body.classList.toggle('reduced', Boolean(state.settings.reduced));
   document.body.classList.toggle('dark', Boolean(state.settings.dark));
   for (const id of ['reduced','dark','lowercase','adapt']) $(id).checked = Boolean(state.settings[id]);
@@ -332,9 +334,10 @@ function renderAlphabet() {
 }
 async function boot() {
   try {
-    const responses = await Promise.all(['/api/v1/catalog','/api/v1/rules'].map(url => fetch(url, {signal: AbortSignal.timeout(15000)})));
+    const responses = await Promise.all(['/api/v1/catalog','/api/v1/rules','/phrases/catalog.json'].map(url => fetch(url, {signal: AbortSignal.timeout(15000)})));
     if (responses.some(response => !response.ok)) throw new Error('Catálogo indisponível');
-    [fullCatalog, rules] = await Promise.all(responses.map(response => response.json()));
+    const loaded = await Promise.all(responses.map(response => response.json()));
+    [fullCatalog, rules] = loaded;
     catalog=fullCatalog;
     try {state = await store.load();} catch {storageOK = false; state.settings = {adapt:true};}
     for(const theme of fullCatalog.themes) $('theme').add(new Option(theme.label,theme.id));
@@ -379,7 +382,7 @@ async function boot() {
     $('cancel-delete').addEventListener('click', () => {$('delete-confirm').hidden = true; $('delete').focus();});
     $('confirm-delete').addEventListener('click', async () => {
       if (saving) return; saving = true; stop();
-      try {await settingsQueue; state = await store.erase(); clearIllustrationRotation(); saving = false; storageOK = true; applySettings(); chooseTheme('fundo-do-mar'); summary(); $('data-feedback').textContent = 'Registros e preferências apagados deste navegador.'; $('delete-confirm').hidden = true; $('delete').focus();}
+      try {await settingsQueue; state = await store.erase(); clearIllustrationRotation(); phraseView?.reset(); saving = false; storageOK = true; applySettings(); chooseTheme('fundo-do-mar'); summary(); $('data-feedback').textContent = 'Registros e preferências apagados deste navegador.'; $('delete-confirm').hidden = true; $('delete').focus();}
       catch {$('data-feedback').textContent = 'Não foi possível apagar os registros. Tente novamente ou limpe os dados deste site nas configurações do navegador.';}
       finally {saving = false;}
     });
@@ -388,6 +391,7 @@ async function boot() {
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });
+    phraseView=setupPhrases({catalog:fullCatalog,phrases:loaded[2],settings:()=>({...state.settings,volume:state.settings.volume??0.7})});
     report=setupReport({catalog:fullCatalog,stopAudio:stop,readSnapshot:async()=>{
       await settingsQueue;
       if(saving) throw new Error('Aguarde a conclusão da atividade ou da exclusão antes de gerar o relatório.');

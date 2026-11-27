@@ -72,7 +72,7 @@ O código público GIRAF-ai foi analisado em commit fixado, assim como a alterna
 - [Privacidade](PRIVACY.md), [segurança](SECURITY.md), [acessibilidade](ACCESSIBILITY.md).
 - [Diretrizes pedagógicas](PEDAGOGICAL_GUIDELINES.md) e [histórico](CHANGELOG.md).
 
-V0.2–V1.0 não estão implementadas: frases, desenho, histórias, relatórios avançados, restauração de backup, reconhecimento de escrita, embeddings, RAG e modelos treinados ficam fora desta entrega. A Jornada de Bia e as outras APIs não foram modificadas.
+Etapas posteriores ainda estão em desenvolvimento: desenho, histórias, frases livres, relatórios avançados, restauração de backup, reconhecimento de escrita, embeddings, RAG e modelos treinados ficam fora desta entrega. A Jornada de Bia e as outras APIs não foram modificadas.
 
 ## Ambientes separados
 
@@ -89,7 +89,7 @@ python -m pip install -r requirements-audio.txt
 python scripts/generate_audio.py
 ```
 
-Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 50 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
+Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 58 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
 
 `frontend/assets/audio/manifest.json` registra provedor, versão, voz, taxa, transcrições e hashes de cada MP3. `scripts/generate_audio_espeak.py` preserva a alternativa antiga, de qualidade mais robótica; não é o padrão. Edge TTS usa um serviço online do Edge, não a API contratada do Azure Speech, e sua disponibilidade pode variar. Biblioteca e serviço têm condições próprias; ver [licenças](THIRD_PARTY_LICENSES.md).
 
@@ -192,3 +192,11 @@ O intervalo de 3 a 30 dias (padrão 7) é uma preferência de organização, nã
 ## Relatório local de exploração
 
 Na área de responsáveis, filtre tema e período, gere e confira a prévia e use Imprimir / salvar PDF. O documento separa atividades, apoio e informações desconhecidas; registros sem data têm seção própria. Não gera notas nem comprova aprendizagem. Funciona no dispositivo, inclusive offline após atualizar o cache v17. PDFs salvos não são apagados ao excluir registros no aplicativo. Veja [funcionamento e limites](docs/LOCAL_REPORT.md).
+
+## Construindo frases — primeira etapa
+
+Oito frases fixas (duas por tema) podem ser organizadas por cartões de palavras, usando toque, mouse ou teclado. Modelo e pista são opcionais, a ordem pode ser corrigida removendo cartões e não há trilha obrigatória, tempo ou pontuação. Ouvir reproduz a frase de exemplo completa, com MP3 local; a preferência de áudio ao conferir também se aplica às frases corretas.
+
+Esta etapa não avalia expressão livre, não salva as escolhas e não as inclui em recomendações ou relatórios de palavras. As imagens existentes são referências ao substantivo principal, sem representar toda a ação. O catálogo contém palavras funcionais e verbos adicionais para essas frases, sem ampliar as atividades de palavras isoladas.
+
+Cache v18 inclui catálogo, módulos e oito gravações novas, totalizando 58. As 50 anteriores foram preservadas. Conteúdo experimental, pendente de revisão pedagógica. Veja [decisão de arquitetura](docs/adr/0008-frases-simples.md).

@@ -106,3 +106,5 @@
     scroll-margin-block-start: 13rem;
   }
 }
+
+.phrase-reference{display:flex;align-items:center;flex-wrap:wrap;gap:1rem;margin:1rem 0}.phrase-reference img{max-width:100%;object-fit:contain}.phrase-reference>div{flex:1;min-width:180px}.phrase-tokens{display:flex;flex-wrap:wrap;gap:.7rem;min-height:3rem;margin:1rem 0}.phrase-tokens button{font-size:1.15rem;overflow-wrap:anywhere;max-width:100%}#phrase-slots{padding:1rem;border:2px dashed var(--line);border-radius:12px}nav{flex-wrap:wrap}

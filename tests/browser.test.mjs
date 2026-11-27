@@ -707,3 +707,40 @@ test('local report filters offline records, prints a checked snapshot and blocks
   assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
+
+test('phrases work by keyboard offline, preserve duplicate words and never mix with word records',async()=>{
+ const {browser,context,page,failures,network}=await setup({viewport:{width:390,height:844}});
+ try{
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+  const events=()=>page.evaluate(async()=>JSON.stringify((await (await import('/storage/store.mjs')).load()).events));const before=await events();
+  await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Vamos explorar/);
+  await page.locator('#phrase-bank button[data-token-key="2"]').focus();await page.keyboard.press('Enter');
+  await page.locator('#phrase-hint').click();assert.match(await page.locator('#phrase-feedback').textContent(),/posição 1, use O/);assert.equal(await page.locator('#phrase-slots button').count(),1);
+  await page.locator('#phrase-slots button').focus();await page.keyboard.press('Enter');assert.equal(await page.locator('#phrase-slots button').count(),0);
+  await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE NADA.');
+  await page.locator('#on-success-audio').uncheck();
+  for(const key of ['0','1','2']){await page.locator(`#phrase-bank button[data-token-key="${key}"]`).focus();await page.keyboard.press('Enter');}
+  await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);assert.equal(await page.locator('#phrase-audio-status').textContent(),'');
+  await page.locator('#phrase-next').click();assert.equal(await page.locator('#phrase-choice').inputValue(),'frase-polvo');assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await page.locator('#phrase-model').isHidden(),true);
+  await page.locator('#phrase-theme').selectOption('frutas');await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'A MAÇÃ É UMA FRUTA.');
+  for(const key of ['4','1','2','3','0'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Vamos explorar/);
+  await page.locator('#phrase-reset').click();for(const key of ['0','1','2','3','4'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);
+  await page.locator('#lowercase').check();assert.equal(await page.locator('#phrase-slots button').first().textContent(),'a');assert.equal(await events(),before);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.locator('#frases').screenshot({path:'test-results/frases-mobile.png'});
+  await page.reload();await page.locator('#experience').waitFor({state:'visible'});assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await events(),before);
+  assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});
+
+test('all eight fixed phrases play app audio without browser voices and honor zero volume',async()=>{
+ const {browser,page,failures}=await setup();
+ try{
+  await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
+  for(const [theme,ids] of [['fundo-do-mar',['frase-peixe','frase-polvo']],['astronomia',['frase-lua','frase-sol']],['natureza',['frase-flor','frase-arvore']],['frutas',['frase-maca','frase-pera']]]){
+   await page.locator('#phrase-theme').selectOption(theme);
+   for(const id of ids){await page.locator('#phrase-choice').selectOption(id);await page.locator('#phrase-listen').click();await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');}
+  }
+  await page.locator('#volume').fill('0');await page.locator('#volume').dispatchEvent('change');await page.locator('#phrase-listen').click();assert.match(await page.locator('#phrase-audio-status').textContent(),/volume da leitura está em zero/);
+  await page.locator('#phrase-stop').click();assert.equal(await page.locator('#phrase-audio-status').textContent(),'Leitura interrompida.');assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});

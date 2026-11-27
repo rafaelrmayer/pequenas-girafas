@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.12 — 2026-11-27
+
+- Continuações opcionais por ações e complementos: 24 frases preparadas em quatro temas.
+- Prévia preserva os cartões atuais; troca da frase exige escolha explícita.
+- 16 gravações locais adicionais, cache v19, sem persistência de escolhas ou modelos treinados.
+
 ## 0.1.11 — 2026-11-27
 
 - Construção de oito frases de exemplo em quatro temas, com cartões por toque ou teclado, modelo, pistas e correção livre.

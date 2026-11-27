@@ -353,6 +353,102 @@
       "text": "a pera é uma fruta.",
       "file": "frase-pera.mp3",
       "sha256": "5abcadbc05d59c3eadf841664317612ac2666c67fadf9a0b3821f04302a11d47"
+    },
+    {
+      "id": "frase-peixe-1",
+      "text": "o peixe nada no mar.",
+      "file": "frase-peixe-1.mp3",
+      "sha256": "011b051000d7efa07bb22b5fb7629e21de859225fd1c22e65e584900b897080f"
+    },
+    {
+      "id": "frase-peixe-2",
+      "text": "o peixe vive na água.",
+      "file": "frase-peixe-2.mp3",
+      "sha256": "ef186112e66238ac66ca7135c3c272f773d4a380a75a8ab250f0589deda6c3a1"
+    },
+    {
+      "id": "frase-polvo-1",
+      "text": "o polvo vive na água.",
+      "file": "frase-polvo-1.mp3",
+      "sha256": "2928b9c40d79a53b854f9e7d968a71b0c708adb95735b46b168d8b98a867334c"
+    },
+    {
+      "id": "frase-polvo-2",
+      "text": "o polvo nada no mar.",
+      "file": "frase-polvo-2.mp3",
+      "sha256": "679b7d2f6c7d92c878b05a3727e59bb2596e4cfd8f35d5fa38ae914bc35d59cf"
+    },
+    {
+      "id": "frase-lua-1",
+      "text": "a lua está sobre o mar.",
+      "file": "frase-lua-1.mp3",
+      "sha256": "7652670cc894dce1477b9bab695f5237bd4eff90ca7943936d300dddce4a3961"
+    },
+    {
+      "id": "frase-lua-2",
+      "text": "a lua brilha no céu.",
+      "file": "frase-lua-2.mp3",
+      "sha256": "deb916e01697cb93e037653f5c4d66a9d6451f0db39d9e8be815f431e34a4939"
+    },
+    {
+      "id": "frase-sol-1",
+      "text": "o sol brilha no céu.",
+      "file": "frase-sol-1.mp3",
+      "sha256": "36b8534fd9671d74107d2c0b82f41becac0f89160289b247a28f8ffecf51760f"
+    },
+    {
+      "id": "frase-sol-2",
+      "text": "o sol ilumina o jardim.",
+      "file": "frase-sol-2.mp3",
+      "sha256": "e8655694481969e68c8dfc55eb1ca13aa710771276752278c48bcbdd956b5434"
+    },
+    {
+      "id": "frase-flor-1",
+      "text": "a flor está perto da árvore.",
+      "file": "frase-flor-1.mp3",
+      "sha256": "27cd6a290b104f8484cd8b0acd19ab4fcedc445875372bc7224c9824fbb853d1"
+    },
+    {
+      "id": "frase-flor-2",
+      "text": "a flor cresce no jardim.",
+      "file": "frase-flor-2.mp3",
+      "sha256": "1b4dbdc28491dc83e46420dbe67f9f99d9b8bbaf37a12d926cc2e19bc85677ef"
+    },
+    {
+      "id": "frase-arvore-1",
+      "text": "a árvore tem flores.",
+      "file": "frase-arvore-1.mp3",
+      "sha256": "a6d067015d97ce8bedfbbd16806d7945cc6b2234338964d96a2eef9b38f9f13b"
+    },
+    {
+      "id": "frase-arvore-2",
+      "text": "a árvore cresce no jardim.",
+      "file": "frase-arvore-2.mp3",
+      "sha256": "6463854d5fc2b02cf628b12a05700170609c2abe841e56733bff09cd42b6ce31"
+    },
+    {
+      "id": "frase-maca-1",
+      "text": "a maçã é um alimento.",
+      "file": "frase-maca-1.mp3",
+      "sha256": "b58ec1cc84acfa0699b5c696fa5415a4c3a10584acf57d298b439470b683bd79"
+    },
+    {
+      "id": "frase-maca-2",
+      "text": "a maçã tem sementes.",
+      "file": "frase-maca-2.mp3",
+      "sha256": "474b796d786e24368dc78efedcd2029482086d65323e947696d9dd88d1babaa8"
+    },
+    {
+      "id": "frase-pera-1",
+      "text": "a pera é um alimento.",
+      "file": "frase-pera-1.mp3",
+      "sha256": "69d89207e48b592735aea28e2d0a9e5ca5c3cad1a86fedab778c0ecd77f91855"
+    },
+    {
+      "id": "frase-pera-2",
+      "text": "a pera tem sementes.",
+      "file": "frase-pera-2.mp3",
+      "sha256": "296f5bcd9ad0e81e8afec19c92992bf047e74595cbf62e2dc11cf2247adcb442"
     }
   ]
 }

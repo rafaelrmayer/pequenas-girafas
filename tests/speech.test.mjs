@@ -49,7 +49,7 @@ test('bundled audio plays without any browser voices, honors volume and stops', 
   assert.equal(players[0].volume,.6);
   stop(); assert.equal(players[0].paused,true);
   players[0].onended(); assert.match(status,/áudio do aplicativo/);
-  for(const id of ['frase-peixe','frase-polvo','frase-lua','frase-sol','frase-flor','frase-arvore','frase-maca','frase-pera','lua','sol','estrela','ceu','planeta','flor','grama','folha','arvore','semente','jardim','maca','pera','laranja','abacaxi','manga','pessego']) {
+  for(const id of ['frase-peixe-1','frase-peixe-2','frase-polvo-1','frase-polvo-2','frase-lua-1','frase-lua-2','frase-sol-1','frase-sol-2','frase-flor-1','frase-flor-2','frase-arvore-1','frase-arvore-2','frase-maca-1','frase-maca-2','frase-pera-1','frase-pera-2','frase-peixe','frase-polvo','frase-lua','frase-sol','frase-flor','frase-arvore','frase-maca','frase-pera','lua','sol','estrela','ceu','planeta','flor','grama','folha','arvore','semente','jardim','maca','pera','laranja','abacaxi','manga','pessego']) {
     speak(id,.6,s=>status=s,'/assets/audio/'+id+'.mp3');
     assert.equal(players.at(-1).src,'/assets/audio/'+id+'.mp3');
     assert.match(status,/áudio do aplicativo/);

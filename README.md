@@ -89,7 +89,7 @@ python -m pip install -r requirements-audio.txt
 python scripts/generate_audio.py
 ```
 
-Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 58 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
+Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 74 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
 
 `frontend/assets/audio/manifest.json` registra provedor, versão, voz, taxa, transcrições e hashes de cada MP3. `scripts/generate_audio_espeak.py` preserva a alternativa antiga, de qualidade mais robótica; não é o padrão. Edge TTS usa um serviço online do Edge, não a API contratada do Azure Speech, e sua disponibilidade pode variar. Biblioteca e serviço têm condições próprias; ver [licenças](THIRD_PARTY_LICENSES.md).
 
@@ -200,3 +200,9 @@ Oito frases fixas (duas por tema) podem ser organizadas por cartões de palavras
 Esta etapa não avalia expressão livre, não salva as escolhas e não as inclui em recomendações ou relatórios de palavras. As imagens existentes são referências ao substantivo principal, sem representar toda a ação. O catálogo contém palavras funcionais e verbos adicionais para essas frases, sem ampliar as atividades de palavras isoladas.
 
 Cache v18 inclui catálogo, módulos e oito gravações novas, totalizando 58. As 50 anteriores foram preservadas. Conteúdo experimental, pendente de revisão pedagógica. Veja [decisão de arquitetura](docs/adr/0008-frases-simples.md).
+
+## Continuações de frases
+
+Em cada exemplo, abra **Explorar ações e complementos**, escolha uma ação/relação e um complemento e confira a prévia. **Montar esta frase** reinicia os cartões com a opção escolhida; apenas mudar os seletores preserva a montagem atual. Recomeçar mantém a continuação ativa.
+
+São 24 combinações preparadas (8 originais e 16 continuações), com áudio completo local. Não há geração livre, modelo treinado ou armazenamento de escolhas. Cache v19, catálogo de 74 gravações; as 58 anteriores foram preservadas. Conteúdo aguarda revisão pedagógica. Veja [decisão e limites](docs/adr/0009-continuacoes-frases.md).

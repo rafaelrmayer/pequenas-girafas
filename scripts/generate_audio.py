@@ -13,7 +13,8 @@ WORDS = {'peixe': 'peixe', 'mar': 'mar', 'agua': 'água', 'polvo': 'polvo', 'con
 LETTERS = dict(zip('abcdefghijklmnopqrstuvwxyz', ['á','bê','cê','dê','é','éfe','gê','agá','i','jóta','cá','éle','ême','êne','ó','pê','quê','érre','ésse','tê','u','vê','dáblio','xis','ípsilon','zê']))
 ROOT = Path(__file__).resolve().parents[1]
 PHRASES = {item['id']:item['text'].lower()+'.' for item in json.loads((ROOT/'frontend/phrases/catalog.json').read_text())}
-CATALOG = {**WORDS, **{'letra-'+key:value for key,value in LETTERS.items()}, **PHRASES}
+CONTINUATIONS = {choice['audioId']:choice['text'].lower()+'.' for group in json.loads((ROOT/'frontend/phrases/continuations.json').read_text()) for action in group['actions'] for choice in action['complements']}
+CATALOG = {**WORDS, **{'letra-'+key:value for key,value in LETTERS.items()}, **PHRASES, **CONTINUATIONS}
 VOICES = ('pt-BR-FranciscaNeural','pt-BR-AntonioNeural','pt-BR-ThalitaMultilingualNeural')
 
 async def generate(output, synthesize, *, voice, version, rate='-15%', only=None):

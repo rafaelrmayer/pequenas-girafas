@@ -32,7 +32,7 @@ export function speak(text, volume, report, source) {
   const id = sequence;
   const level = Math.max(0,Math.min(1,Number(volume) || 0));
   if (!level) {report('O volume da leitura está em zero. Aumente-o em Apoios e preferências.'); return;}
-  if (source && /^\/assets\/audio\/(?:peixe|mar|agua|polvo|concha|praia|caranguejo|lua|sol|estrela|ceu|planeta|flor|grama|folha|arvore|semente|jardim|maca|pera|laranja|abacaxi|manga|pessego|letra-[a-z]|frase-(?:peixe|polvo|lua|sol|flor|arvore|maca|pera))\.mp3$/.test(source) && globalThis.Audio) {
+  if (source && /^\/assets\/audio\/(?:peixe|mar|agua|polvo|concha|praia|caranguejo|lua|sol|estrela|ceu|planeta|flor|grama|folha|arvore|semente|jardim|maca|pera|laranja|abacaxi|manga|pessego|letra-[a-z]|frase-(?:peixe|polvo|lua|sol|flor|arvore|maca|pera)(?:-[12])?)\.mp3$/.test(source) && globalThis.Audio) {
     const audio = new Audio(source); player = audio; audio.volume = level;
     let failed = false;
     const fallback = () => {

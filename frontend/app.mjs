@@ -334,7 +334,7 @@ function renderAlphabet() {
 }
 async function boot() {
   try {
-    const responses = await Promise.all(['/api/v1/catalog','/api/v1/rules','/phrases/catalog.json'].map(url => fetch(url, {signal: AbortSignal.timeout(15000)})));
+    const responses = await Promise.all(['/api/v1/catalog','/api/v1/rules','/phrases/catalog.json','/phrases/continuations.json'].map(url => fetch(url, {signal: AbortSignal.timeout(15000)})));
     if (responses.some(response => !response.ok)) throw new Error('Catálogo indisponível');
     const loaded = await Promise.all(responses.map(response => response.json()));
     [fullCatalog, rules] = loaded;
@@ -391,7 +391,7 @@ async function boot() {
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });
-    phraseView=setupPhrases({catalog:fullCatalog,phrases:loaded[2],settings:()=>({...state.settings,volume:state.settings.volume??0.7})});
+    phraseView=setupPhrases({catalog:fullCatalog,phrases:loaded[2],continuations:loaded[3],settings:()=>({...state.settings,volume:state.settings.volume??0.7})});
     report=setupReport({catalog:fullCatalog,stopAudio:stop,readSnapshot:async()=>{
       await settingsQueue;
       if(saving) throw new Error('Aguarde a conclusão da atividade ou da exclusão antes de gerar o relatório.');

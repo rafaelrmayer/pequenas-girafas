@@ -745,3 +745,36 @@ test('all eight fixed phrases play app audio without browser voices and honor ze
   await page.locator('#phrase-stop').click();assert.equal(await page.locator('#phrase-audio-status').textContent(),'Leitura interrompida.');assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
+
+test('optional continuations preserve an unfinished phrase until explicit choice and work offline by keyboard',async()=>{
+ const {browser,context,page,failures,network}=await setup({viewport:{width:390,height:844}});
+ try{
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+  const records=()=>page.evaluate(async()=>JSON.stringify((await (await import('/storage/store.mjs')).load()).events));const before=await records();
+  await page.locator('#phrase-bank button[data-token-key="0"]').click();await page.locator('#phrase-continuations summary').click();assert.equal(await page.locator('#phrase-use-continuation').isDisabled(),true);
+  await page.locator('#phrase-complement').selectOption('frase-peixe-1');assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'O PEIXE NADA NO MAR.');assert.equal(await page.locator('#phrase-slots button').count(),1);assert.equal(await page.locator('#phrase-bank button').count(),3);
+  await page.locator('#phrase-action').selectOption('viver');assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'O PEIXE VIVE NA ÁGUA.');assert.equal(await page.locator('#phrase-slots button').count(),1);
+  await page.locator('#phrase-use-continuation').focus();await page.keyboard.press('Enter');assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await page.locator('#phrase-bank button').count(),5);assert.equal(await page.locator('#phrase-use-continuation').isDisabled(),true);
+  await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE VIVE NA ÁGUA.');await page.locator('#on-success-audio').uncheck();
+  for(const key of ['0','1','2','3','4']){await page.locator(`#phrase-bank button[data-token-key="${key}"]`).focus();await page.keyboard.press('Enter');}await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);
+  await page.locator('#phrase-action').selectOption('nadar');assert.equal(await page.locator('#phrase-slots button').count(),5);await page.locator('#phrase-reset').click();await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'O PEIXE VIVE NA ÁGUA.');
+  await page.locator('#lowercase').check();assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'o peixe nada.');assert.equal(await records(),before);
+  await page.locator('#frases').screenshot({path:'test-results/continuacoes-mobile.png'});await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.locator('#phrase-next').click();assert.equal(await page.locator('#phrase-choice').inputValue(),'frase-polvo');assert.equal(await page.locator('#phrase-continuations').getAttribute('open'),null);await page.locator('#phrase-show-model').check();assert.equal(await page.locator('#phrase-model').textContent(),'o polvo vive no mar.');
+  await page.locator('#phrase-theme').selectOption('frutas');await page.locator('#phrase-continuations summary').click();await page.locator('#phrase-action').selectOption('ter');assert.equal(await page.locator('#phrase-continuation-preview').textContent(),'a maçã tem sementes.');await page.locator('#phrase-use-continuation').click();await page.locator('#phrase-hint').click();assert.match(await page.locator('#phrase-feedback').textContent(),/posição 1, use a/);
+  assert.equal(await records(),before);assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});
+
+test('all sixteen continuation recordings play locally without browser voices',async()=>{
+ const {browser,context,page,failures}=await setup();
+ try{
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+  await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
+  const groups=await page.evaluate(async()=>await (await fetch('/phrases/continuations.json')).json());
+  for(const group of groups){const theme=group.exampleId.includes('peixe')||group.exampleId.includes('polvo')?'fundo-do-mar':group.exampleId.includes('lua')||group.exampleId.includes('sol')?'astronomia':group.exampleId.includes('flor')||group.exampleId.includes('arvore')?'natureza':'frutas';
+   await page.locator('#phrase-theme').selectOption(theme);await page.locator('#phrase-choice').selectOption(group.exampleId);await page.locator('#phrase-continuations summary').click();
+   for(const action of group.actions)for(const choice of action.complements){if(choice.audioId===group.exampleId)continue;await page.locator('#phrase-action').selectOption(action.id);await page.locator('#phrase-complement').selectOption(choice.id);await page.locator('#phrase-use-continuation').click();await page.locator('#phrase-listen').click();await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');}
+  }assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});

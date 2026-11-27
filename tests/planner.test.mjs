@@ -69,3 +69,17 @@ test('astronomy recommendations remain in selected theme and preserve accented w
   assert.ok(advice.length>0 && advice.every(item=>themed.words.some(word=>word.id===item.wordId)));
   assert.equal(themed.words.find(word=>word.id==='ceu').text,'CÉU');
 });
+
+
+test('nature and fruit graphs offer only words from their selected theme',()=>{
+ for(const name of ['natureza','frutas']){
+  const theme=JSON.parse(fs.readFileSync(new URL('../knowledge/vocabulary/'+name+'.json',import.meta.url)));
+  const selected={...theme,words:theme.words.map(word=>({...word,themeId:name}))};
+  const mixed={...selected,words:[...selected.words,...catalog.words.map(word=>({...word,themeId:'fundo-do-mar'}))],relations:[...selected.relations,...catalog.relations]};
+  for(const word of selected.words){
+   assert.ok(relatedWords(mixed,word.id).every(candidate=>candidate.themeId===name));
+   const advice=recommendActivities({catalog:selected,wordId:word.id,events:[],settings:{adapt:true,exploration:'new'},rules:{},today:'2026-11-27'});
+   assert.ok(advice.every(suggestion=>selected.words.some(candidate=>candidate.id===suggestion.wordId)));
+  }
+ }
+});

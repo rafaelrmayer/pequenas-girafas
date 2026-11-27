@@ -1,0 +1,213 @@
+{
+  "version": 1,
+  "language": "pt-BR",
+  "theme": {
+    "id": "natureza",
+    "label": "Natureza"
+  },
+  "words": [
+    {
+      "id": "flor",
+      "text": "FLOR",
+      "alt": "uma flor",
+      "category": "planta",
+      "complexity": 2,
+      "image": "/assets/flor.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/flor.svg",
+            "label": "Ilustração original",
+            "alt": "uma flor"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "grama",
+      "text": "GRAMA",
+      "alt": "grama",
+      "category": "planta",
+      "complexity": 2,
+      "image": "/assets/grama.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/grama.svg",
+            "label": "Ilustração original",
+            "alt": "grama"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "folha",
+      "text": "FOLHA",
+      "alt": "uma folha",
+      "category": "planta",
+      "complexity": 2,
+      "image": "/assets/folha.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/folha.svg",
+            "label": "Ilustração original",
+            "alt": "uma folha"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "arvore",
+      "text": "ÁRVORE",
+      "alt": "uma árvore",
+      "category": "planta",
+      "complexity": 3,
+      "image": "/assets/arvore.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/arvore.svg",
+            "label": "Ilustração original",
+            "alt": "uma árvore"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "semente",
+      "text": "SEMENTE",
+      "alt": "sementes",
+      "category": "elemento",
+      "complexity": 3,
+      "image": "/assets/semente.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/semente.svg",
+            "label": "Ilustração original",
+            "alt": "sementes"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "jardim",
+      "text": "JARDIM",
+      "alt": "um jardim",
+      "category": "ambiente",
+      "complexity": 3,
+      "image": "/assets/jardim.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/jardim.svg",
+            "label": "Ilustração original",
+            "alt": "um jardim"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    }
+  ],
+  "relations": [
+    {
+      "from": "folha",
+      "to": "arvore",
+      "label": "faz parte de"
+    },
+    {
+      "from": "flor",
+      "to": "jardim",
+      "label": "pode ser encontrada em"
+    },
+    {
+      "from": "grama",
+      "to": "jardim",
+      "label": "pode ser encontrada em"
+    },
+    {
+      "from": "semente",
+      "to": "arvore",
+      "label": "pode dar origem a"
+    },
+    {
+      "from": "arvore",
+      "to": "jardim",
+      "label": "pode ser encontrada em"
+    },
+    {
+      "from": "jardim",
+      "to": "natureza",
+      "label": "pertence ao tema"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "natureza",
+      "label": "NATUREZA",
+      "kind": "theme",
+      "playable": false,
+      "reviewed": false
+    }
+  ]
+}

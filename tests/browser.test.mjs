@@ -588,3 +588,44 @@ test('next word cycles within the selected theme by click and keyboard without r
   await page.screenshot({path:'test-results/proxima-palavra-mobile.png',fullPage:true});
  }finally{await browser.close();}
 });
+
+
+test('Nature and Fruits preserve accents, records and next-word cycles with all new audio offline',async()=>{
+ const {browser,context,page,failures,network}=await setup({viewport:{width:390,height:844}});
+ try{
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
+  await context.setOffline(true);
+  await page.locator('#theme').selectOption('natureza');
+  assert.equal(await page.locator('#word option').count(),6);
+  await construct(page,'FLOR');await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('FLOR:'));
+  await page.locator('#word').selectOption('arvore');
+  await page.locator('input[name="activity"][value="missing"]').check();
+  // ÁRVORE has gap index 3 in the first round.
+  await page.getByRole('button',{name:'Adicionar O',exact:true}).click();await page.locator('#check').click();
+  await page.locator('#repeat').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('ÁRVORE:'));
+  await page.locator('#word').selectOption('jardim');await page.locator('#next-word').click();
+  assert.equal(await page.locator('#word').inputValue(),'flor');
+  await page.locator('#theme').selectOption('frutas');assert.equal(await page.locator('#word option').count(),6);
+  await page.locator('input[name="activity"][value="build"]').check();
+  await construct(page,'MAÇÃ');await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('MAÇÃ:'));
+  await page.locator('#word').selectOption('pessego');await page.locator('input[name="activity"][value="match"]').check();
+  await page.locator('#match-options button').filter({hasText:'PÊSSEGO'}).click();await page.locator('#check').click();
+  await page.locator('#repeat').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('PÊSSEGO:'));
+  assert.match(await page.locator('#progress').textContent(),/ÁRVORE:/);
+  await page.locator('#next-word').click();assert.equal(await page.locator('#word').inputValue(),'maca');
+  await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
+  for(const [theme,words] of [['natureza',['flor','grama','folha','arvore','semente','jardim']],['frutas',['maca','pera','laranja','abacaxi','manga','pessego']]]){
+   await page.locator('#theme').selectOption(theme);
+   for(const id of words){
+    await page.locator('#word').selectOption(id);await page.locator('#listen').click();
+    await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
+    await page.locator('#picture').screenshot({path:'test-results/'+theme+'-'+id+'.png'});
+   }
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   await page.screenshot({path:'test-results/'+theme+'-mobile.png',fullPage:true});
+  }
+  assert.equal(network.filter(request=>request.method!=='GET').length,0);assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.7 — 2026-11-27
+
+- Tema Astronomia com cinco palavras, imagens originais e áudios locais.
+- Seleção explícita de tema, sugestões no tema atual e resumo dos registros de ambos os temas.
+- Preserva os registros locais, as mídias anteriores e o tema Fundo do mar. Cache offline v13.
+- Geração incremental dos áudios com manifesto e hashes; sem síntese em runtime.
+
 ## 0.1.6 — 2026-11-26
 
 Três apresentações visuais para PEIXE, POLVO e ÁGUA, com escolha livre e novas sugestões opcionais. Trocar durante a rodada preserva a resposta e registra contexto misto; registros antigos sem imagem identificada continuam desconhecidos. Seis SVGs locais adicionais, cache offline e exportação schemaVersion 4. Sem análise de imagem ou inferência de generalização.

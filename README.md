@@ -89,7 +89,7 @@ python -m pip install -r requirements-audio.txt
 python scripts/generate_audio.py
 ```
 
-Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 33 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
+Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 38 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
 
 `frontend/assets/audio/manifest.json` registra provedor, versão, voz, taxa, transcrições e hashes de cada MP3. `scripts/generate_audio_espeak.py` preserva a alternativa antiga, de qualidade mais robótica; não é o padrão. Edge TTS usa um serviço online do Edge, não a API contratada do Azure Speech, e sua disponibilidade pode variar. Biblioteca e serviço têm condições próprias; ver [licenças](THIRD_PARTY_LICENSES.md).
 
@@ -140,3 +140,20 @@ A licença permite fins não comerciais e contempla expressamente usos por insti
 Descrição pública: **código disponível para reutilização não comercial**. A restrição comercial impede apresentá-lo como software livre ou open source. Este resumo não substitui a licença integral.
 
 Dependências, ferramentas de geração e áudios de fornecedores têm condições próprias; esta licença não substitui nem amplia direitos sobre componentes de terceiros. Consulte [Componentes e licenças](THIRD_PARTY_LICENSES.md), especialmente os termos do serviço de voz. A demonstração atual permanece experimental, sem validação pedagógica.
+
+
+## Astronomia — V0.1.7
+
+O seletor **Escolha um tema** permite alternar entre Fundo do mar (sete palavras) e Astronomia (**LUA, SOL, ESTRELA, CÉU e PLANETA**). A escolha é explícita e fica nas preferências locais. Cada palavra nova tem uma ilustração SVG original e áudio pt-BR local, com as três atividades já existentes. ESTRELA começa no singular; o desenho de cinco pontas é uma representação simbólica.
+
+A seleção muda palavras, sugestões e exemplos do alfabeto. As recomendações ficam no tema escolhido; não há migração automática entre temas. O resumo e a exportação preservam os registros dos dois temas, usando IDs distintos. Apagar dados retorna ao Fundo do mar e mantém a exclusão explícita já existente. O banco local e os registros antigos não são substituídos.
+
+O grafo inclui relações como SOL → é uma → ESTRELA e LUA → pode ser vista no → CÉU. A complexidade continua editorial e provisória; sem novas inferências sobre aprendizagem. São regras locais, não um modelo treinado ou conteúdo validado pedagogicamente.
+
+Os cinco MP3 novos usam a mesma voz Francisca e taxa -15%; os 33 arquivos anteriores foram preservados. Para gerar somente os novos áudios sem substituir os existentes:
+
+```bash
+python scripts/generate_audio.py --only lua sol estrela ceu planeta
+```
+
+A geração parcial exige manifesto anterior compatível e verifica seus hashes. O comando envia somente esses textos genéricos ao serviço, não registros de aprendizagem. O cache v13 inclui todas as palavras e mídias para uso offline após sua atualização. A publicação continua em `develop` no ambiente de testes; não promove a versão principal.

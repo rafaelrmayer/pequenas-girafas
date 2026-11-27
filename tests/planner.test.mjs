@@ -59,3 +59,13 @@ test('disabled adaptation returns no personalized plan; details whitelist exclud
   assert.equal(record.hintUsed,true);
   assert.equal(completion('peixe','a',false,'build',{day:'invalid'}).day,undefined);
 });
+
+test('astronomy recommendations remain in selected theme and preserve accented words',()=>{
+  const astro=JSON.parse(fs.readFileSync(new URL('../knowledge/vocabulary/astronomia.json',import.meta.url)));
+  const themed={...astro,words:astro.words.map(word=>({...word,themeId:'astronomia'}))};
+  const mixed={...themed,words:[...themed.words,...catalog.words.map(word=>({...word,themeId:'fundo-do-mar'}))],relations:[...themed.relations,...catalog.relations]};
+  assert.ok(relatedWords(mixed,'lua').every(word=>word.themeId==='astronomia'));
+  const advice=recommendActivities({catalog:themed,events:[],wordId:'lua',activity:'build',settings:{adapt:true,exploration:'new'},today:'2026-11-27',rules:{}});
+  assert.ok(advice.length>0 && advice.every(item=>themed.words.some(word=>word.id===item.wordId)));
+  assert.equal(themed.words.find(word=>word.id==='ceu').text,'CÉU');
+});

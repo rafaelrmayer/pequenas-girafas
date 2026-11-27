@@ -10,7 +10,7 @@ const $ = id => document.getElementById(id);
 const sessionId = crypto.randomUUID();
 const environment = document.body.dataset.environment;
 $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
-let catalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
+let catalog, fullCatalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
 let hintUsed=false, audioRequested=false, roundPresentation='upper', adviceDismissed=false;
 let currentImage, roundVisualIds=[], roundStarted=false;
@@ -20,7 +20,7 @@ function button(label, handler, className = '') { const node = document.createEl
 function summary() {
   $('storage-status').textContent = storageOK ? 'Os registros ficam somente neste navegador.' : 'Armazenamento indisponível. As descobertas desta sessão ficarão apenas na memória; não foram salvas.';
   $('progress').replaceChildren();
-  for (const item of catalog.words) {
+  for (const item of fullCatalog.words) {
     const events = state.events.filter(e => e.wordId === item.id && e.outcome === 'completed');
     const builds=events.filter(e=>(e.activity || 'build')==='build');
     if (!events.length) continue;
@@ -70,6 +70,15 @@ function recommendation() {
   const suggestion = recommendSupport(state.events, word.id, {...rules, minIndependentSessions: state.settings.minIndependentSessions || rules.minIndependentSessions}, state.settings.adapt);
   $('adapt-reason').textContent = suggestion.reason;
   return suggestion;
+}
+function chooseTheme(id, persist=false) {
+  if(saving) {$('theme').value=catalog.theme.id;return;}
+  const theme=fullCatalog.themes.find(item=>item.id===id) || fullCatalog.themes[0];
+  catalog={...fullCatalog,theme,words:fullCatalog.words.filter(item=>item.themeId===theme.id)};
+  $('theme').value=theme.id;$('activity-title').textContent=theme.label;
+  $('word').replaceChildren(...catalog.words.map(item=>new Option(item.text,item.id)));
+  chooseWord(catalog.words[0].id);renderAlphabet();summary();
+  if(persist) changeSettings({themeId:theme.id});
 }
 function chooseWord(id, options={}) {
   if (saving) { $('word').value = word.id; return; }
@@ -297,9 +306,11 @@ async function boot() {
   try {
     const responses = await Promise.all(['/api/v1/catalog','/api/v1/rules'].map(url => fetch(url, {signal: AbortSignal.timeout(15000)})));
     if (responses.some(response => !response.ok)) throw new Error('Catálogo indisponível');
-    [catalog, rules] = await Promise.all(responses.map(response => response.json()));
+    [fullCatalog, rules] = await Promise.all(responses.map(response => response.json()));
+    catalog=fullCatalog;
     try {state = await store.load();} catch {storageOK = false; state.settings = {adapt:true};}
-    for (const item of catalog.words) {const option = document.createElement('option'); option.value = item.id; option.textContent = item.text; $('word').append(option);}
+    for(const theme of fullCatalog.themes) $('theme').add(new Option(theme.label,theme.id));
+    $('theme').addEventListener('change',()=>chooseTheme($('theme').value,true));
     $('word').addEventListener('change', event => chooseWord(event.target.value));
     $('presentation-select').addEventListener('change',()=>changeVisual($('presentation-select').value));
     $('next-image').addEventListener('click',()=>{
@@ -334,7 +345,7 @@ async function boot() {
     $('cancel-delete').addEventListener('click', () => {$('delete-confirm').hidden = true; $('delete').focus();});
     $('confirm-delete').addEventListener('click', async () => {
       if (saving) return; saving = true; stop();
-      try {await settingsQueue; state = await store.erase(); clearIllustrationRotation(); saving = false; storageOK = true; applySettings(); chooseWord('peixe'); summary(); $('data-feedback').textContent = 'Registros e preferências apagados deste navegador.'; $('delete-confirm').hidden = true; $('delete').focus();}
+      try {await settingsQueue; state = await store.erase(); clearIllustrationRotation(); saving = false; storageOK = true; applySettings(); chooseTheme('fundo-do-mar'); summary(); $('data-feedback').textContent = 'Registros e preferências apagados deste navegador.'; $('delete-confirm').hidden = true; $('delete').focus();}
       catch {$('data-feedback').textContent = 'Não foi possível apagar os registros. Tente novamente ou limpe os dados deste site nas configurações do navegador.';}
       finally {saving = false;}
     });
@@ -343,7 +354,7 @@ async function boot() {
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });
-    applySettings(); alphabet(); chooseWord('peixe'); summary(); $('experience').hidden = false; $('boot').hidden = true;
+    applySettings(); alphabet(); chooseTheme(state.settings.themeId || 'fundo-do-mar'); summary(); $('experience').hidden = false; $('boot').hidden = true;
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(() => {
         const ready = () => {$('offline-status').textContent = 'Atividades essenciais disponíveis offline neste navegador. Os áudios do catálogo estão incluídos.';};

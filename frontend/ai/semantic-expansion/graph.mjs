@@ -10,7 +10,7 @@ export function relatedWords(catalog, wordId, events = [], options = {}) {
   const activity=['build','missing','match'].includes(options.preferredActivity)?options.preferredActivity:'build';
   const today=dayIndex(options.today);
   const goal=options.exploration || 'balanced';
-  return catalog.words.filter(w=>w.id!==wordId).map(w=>{
+  return catalog.words.filter(w=>w.id!==wordId && (!start.themeId || !w.themeId || w.themeId===start.themeId)).map(w=>{
     const facts=evidenceFor(events,w.id,activity);
     const explored=events.some(e=>e.wordId===w.id && e.outcome==='completed');
     const related=direct.has(w.id);

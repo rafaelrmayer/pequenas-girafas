@@ -1,0 +1,290 @@
+[
+  {
+    "exampleId": "frase-peixe",
+    "subject": "O PEIXE",
+    "actions": [
+      {
+        "id": "nadar",
+        "label": "NADA",
+        "complements": [
+          {
+            "id": "frase-peixe",
+            "label": "Sem complemento",
+            "text": "O PEIXE NADA",
+            "audioId": "frase-peixe"
+          },
+          {
+            "id": "frase-peixe-1",
+            "label": "NO MAR",
+            "text": "O PEIXE NADA NO MAR",
+            "audioId": "frase-peixe-1"
+          }
+        ]
+      },
+      {
+        "id": "viver",
+        "label": "VIVE",
+        "complements": [
+          {
+            "id": "frase-peixe-2",
+            "label": "NA ÁGUA",
+            "text": "O PEIXE VIVE NA ÁGUA",
+            "audioId": "frase-peixe-2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "exampleId": "frase-polvo",
+    "subject": "O POLVO",
+    "actions": [
+      {
+        "id": "viver",
+        "label": "VIVE",
+        "complements": [
+          {
+            "id": "frase-polvo",
+            "label": "NO MAR",
+            "text": "O POLVO VIVE NO MAR",
+            "audioId": "frase-polvo"
+          },
+          {
+            "id": "frase-polvo-1",
+            "label": "NA ÁGUA",
+            "text": "O POLVO VIVE NA ÁGUA",
+            "audioId": "frase-polvo-1"
+          }
+        ]
+      },
+      {
+        "id": "nadar",
+        "label": "NADA",
+        "complements": [
+          {
+            "id": "frase-polvo-2",
+            "label": "NO MAR",
+            "text": "O POLVO NADA NO MAR",
+            "audioId": "frase-polvo-2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "exampleId": "frase-lua",
+    "subject": "A LUA",
+    "actions": [
+      {
+        "id": "estar",
+        "label": "ESTÁ",
+        "complements": [
+          {
+            "id": "frase-lua",
+            "label": "NO CÉU",
+            "text": "A LUA ESTÁ NO CÉU",
+            "audioId": "frase-lua"
+          },
+          {
+            "id": "frase-lua-1",
+            "label": "SOBRE O MAR",
+            "text": "A LUA ESTÁ SOBRE O MAR",
+            "audioId": "frase-lua-1"
+          }
+        ]
+      },
+      {
+        "id": "brilhar",
+        "label": "BRILHA",
+        "complements": [
+          {
+            "id": "frase-lua-2",
+            "label": "NO CÉU",
+            "text": "A LUA BRILHA NO CÉU",
+            "audioId": "frase-lua-2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "exampleId": "frase-sol",
+    "subject": "O SOL",
+    "actions": [
+      {
+        "id": "brilhar",
+        "label": "BRILHA",
+        "complements": [
+          {
+            "id": "frase-sol",
+            "label": "Sem complemento",
+            "text": "O SOL BRILHA",
+            "audioId": "frase-sol"
+          },
+          {
+            "id": "frase-sol-1",
+            "label": "NO CÉU",
+            "text": "O SOL BRILHA NO CÉU",
+            "audioId": "frase-sol-1"
+          }
+        ]
+      },
+      {
+        "id": "iluminar",
+        "label": "ILUMINA",
+        "complements": [
+          {
+            "id": "frase-sol-2",
+            "label": "O JARDIM",
+            "text": "O SOL ILUMINA O JARDIM",
+            "audioId": "frase-sol-2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "exampleId": "frase-flor",
+    "subject": "A FLOR",
+    "actions": [
+      {
+        "id": "estar",
+        "label": "ESTÁ",
+        "complements": [
+          {
+            "id": "frase-flor",
+            "label": "NO JARDIM",
+            "text": "A FLOR ESTÁ NO JARDIM",
+            "audioId": "frase-flor"
+          },
+          {
+            "id": "frase-flor-1",
+            "label": "PERTO DA ÁRVORE",
+            "text": "A FLOR ESTÁ PERTO DA ÁRVORE",
+            "audioId": "frase-flor-1"
+          }
+        ]
+      },
+      {
+        "id": "crescer",
+        "label": "CRESCE",
+        "complements": [
+          {
+            "id": "frase-flor-2",
+            "label": "NO JARDIM",
+            "text": "A FLOR CRESCE NO JARDIM",
+            "audioId": "frase-flor-2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "exampleId": "frase-arvore",
+    "subject": "A ÁRVORE",
+    "actions": [
+      {
+        "id": "ter",
+        "label": "TEM",
+        "complements": [
+          {
+            "id": "frase-arvore",
+            "label": "FOLHAS",
+            "text": "A ÁRVORE TEM FOLHAS",
+            "audioId": "frase-arvore"
+          },
+          {
+            "id": "frase-arvore-1",
+            "label": "FLORES",
+            "text": "A ÁRVORE TEM FLORES",
+            "audioId": "frase-arvore-1"
+          }
+        ]
+      },
+      {
+        "id": "crescer",
+        "label": "CRESCE",
+        "complements": [
+          {
+            "id": "frase-arvore-2",
+            "label": "NO JARDIM",
+            "text": "A ÁRVORE CRESCE NO JARDIM",
+            "audioId": "frase-arvore-2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "exampleId": "frase-maca",
+    "subject": "A MAÇÃ",
+    "actions": [
+      {
+        "id": "ser",
+        "label": "É",
+        "complements": [
+          {
+            "id": "frase-maca",
+            "label": "UMA FRUTA",
+            "text": "A MAÇÃ É UMA FRUTA",
+            "audioId": "frase-maca"
+          },
+          {
+            "id": "frase-maca-1",
+            "label": "UM ALIMENTO",
+            "text": "A MAÇÃ É UM ALIMENTO",
+            "audioId": "frase-maca-1"
+          }
+        ]
+      },
+      {
+        "id": "ter",
+        "label": "TEM",
+        "complements": [
+          {
+            "id": "frase-maca-2",
+            "label": "SEMENTES",
+            "text": "A MAÇÃ TEM SEMENTES",
+            "audioId": "frase-maca-2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "exampleId": "frase-pera",
+    "subject": "A PERA",
+    "actions": [
+      {
+        "id": "ser",
+        "label": "É",
+        "complements": [
+          {
+            "id": "frase-pera",
+            "label": "UMA FRUTA",
+            "text": "A PERA É UMA FRUTA",
+            "audioId": "frase-pera"
+          },
+          {
+            "id": "frase-pera-1",
+            "label": "UM ALIMENTO",
+            "text": "A PERA É UM ALIMENTO",
+            "audioId": "frase-pera-1"
+          }
+        ]
+      },
+      {
+        "id": "ter",
+        "label": "TEM",
+        "complements": [
+          {
+            "id": "frase-pera-2",
+            "label": "SEMENTES",
+            "text": "A PERA TEM SEMENTES",
+            "audioId": "frase-pera-2"
+          }
+        ]
+      }
+    ]
+  }
+]

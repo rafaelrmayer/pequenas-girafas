@@ -616,13 +616,22 @@ test('Nature and Fruits preserve accents, records and next-word cycles with all 
   assert.match(await page.locator('#progress').textContent(),/ÁRVORE:/);
   await page.locator('#next-word').click();assert.equal(await page.locator('#word').inputValue(),'maca');
   await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
+  await page.evaluate(()=>{
+   const AudioOriginal=window.Audio;window.audioDiagnostics=[];
+   window.Audio=function(source){
+    const audio=new AudioOriginal(source),play=audio.play.bind(audio);
+    audio.play=()=>play().catch(error=>{window.audioDiagnostics.push({source,name:error.name,message:error.message});throw error;});
+    audio.addEventListener('error',()=>{if(audio.error)window.audioDiagnostics.push({source,code:audio.error.code,message:audio.error.message});});
+    return audio;
+   };
+  });
   for(const [theme,words] of [['natureza',['flor','grama','folha','arvore','semente','jardim']],['frutas',['maca','pera','laranja','abacaxi','manga','pessego']]]){
    await page.locator('#theme').selectOption(theme);
    for(const id of words){
     await page.locator('#word').selectOption(id);await page.locator('#listen').click();
     try {await page.waitForFunction(()=>{const status=document.querySelector('#word-audio-status').textContent;return status==='Leitura concluída.'||status.includes('Não foi possível');});}
     catch(error){throw new Error('Áudio '+id+': '+await page.locator('#word-audio-status').textContent(),{cause:error});}
-    assert.equal(await page.locator('#word-audio-status').textContent(),'Leitura concluída.','Áudio '+id);
+    assert.equal(await page.locator('#word-audio-status').textContent(),'Leitura concluída.','Áudio '+id+' '+JSON.stringify(await page.evaluate(()=>window.audioDiagnostics)));
     await page.locator('#picture').screenshot({path:'test-results/'+theme+'-'+id+'.png'});
    }
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);

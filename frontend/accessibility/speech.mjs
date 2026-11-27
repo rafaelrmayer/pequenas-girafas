@@ -1,7 +1,10 @@
 let sequence = 0, player, utterance;
+function releaseAudio(audio) {
+  audio.pause();audio.removeAttribute?.('src');audio.load?.();
+}
 export function stop() {
   sequence++;
-  if (player) {player.pause(); player.removeAttribute?.('src'); player.load?.(); player = undefined;}
+  if (player) {releaseAudio(player); player = undefined;}
   utterance = undefined;
   globalThis.speechSynthesis?.cancel();
 }
@@ -34,11 +37,11 @@ export function speak(text, volume, report, source) {
     let failed = false;
     const fallback = () => {
       if (failed || id !== sequence) return;
-      failed = true; audio.pause(); player = undefined;
+      failed = true; releaseAudio(audio); player = undefined;
       localVoice(text, level, report, id);
     };
     audio.onplaying = () => {if (id === sequence) report(`Reproduzindo ${text} com áudio do aplicativo.`);};
-    audio.onended = () => {if (id === sequence) {report('Leitura concluída.'); player = undefined;}};
+    audio.onended = () => {if (id === sequence) {failed = true;releaseAudio(audio);player = undefined;report('Leitura concluída.');}};
     audio.onerror = fallback;
     report('Preparando áudio…');
     try {Promise.resolve(audio.play()).catch(fallback);} catch {fallback();}

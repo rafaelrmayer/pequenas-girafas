@@ -68,3 +68,22 @@ test('zero volume is explicit and a failed audio file produces an actionable mes
   assert.match(status,/Não foi possível reproduzir/);
   delete globalThis.Audio;
 });
+
+
+test('finished recordings release media resources before another word plays',()=>{
+ const players=[];let status='';
+ globalThis.Audio=class{
+  constructor(src){this.src=src;players.push(this);}
+  play(){this.onplaying();return Promise.resolve();}
+  pause(){this.paused=true;}
+  removeAttribute(name){if(name==='src')this.src='';}
+  load(){this.unloaded=true;}
+ };
+ for(const id of ['flor','grama','folha','arvore','semente','jardim']){
+  speak(id,.6,s=>status=s,'/assets/audio/'+id+'.mp3');
+  const audio=players.at(-1);audio.onended();
+  assert.equal(status,'Leitura concluída.');assert.equal(audio.src,'');assert.ok(audio.unloaded);
+  audio.onerror();assert.equal(status,'Leitura concluída.');
+ }
+ stop();delete globalThis.Audio;
+});

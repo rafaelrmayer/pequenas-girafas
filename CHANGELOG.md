@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.13 — 2026-11-27
+
+- Registros próprios de conclusões de frases, separados de palavras, com modelo, pistas e áudio solicitado antes da conclusão.
+- Resumo local, limite independente de 200, exclusão conjunta e cópia JSON schemaVersion 5.
+- Preserva estados antigos, evita duplicação por rodada e avisa quando apenas em memória. Cache v20.
+
 ## 0.1.12 — 2026-11-27
 
 - Continuações opcionais por ações e complementos: 24 frases preparadas em quatro temas.

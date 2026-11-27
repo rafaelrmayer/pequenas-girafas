@@ -35,7 +35,7 @@ A demonstração inclui sete palavras (PEIXE, MAR, ÁGUA, POLVO, CONCHA, PRAIA, 
 
 ## Dados e funcionamento offline
 
-IndexedDB mantém até 200 construções recentes e preferências somente neste perfil de navegador. Não há nomes, diagnósticos, fotos, telemetria ou treinamento com registros dos usuários. O servidor recebe pedidos dos arquivos genéricos; nunca recebe o progresso. O Service Worker guarda uma lista explícita de arquivos e catálogo, sem dados pessoais. Registros locais não são criptografados; outras pessoas no mesmo perfil podem acessá-los. Não há múltiplos perfis nesta versão.
+IndexedDB mantém até 200 conclusões de palavras, 200 conclusões de frases e preferências somente neste perfil de navegador. Não há nomes, diagnósticos, fotos, telemetria ou treinamento com registros dos usuários. O servidor recebe pedidos dos arquivos genéricos; nunca recebe o progresso. O Service Worker guarda uma lista explícita de arquivos e catálogo, sem dados pessoais. Registros locais não são criptografados; outras pessoas no mesmo perfil podem acessá-los. Não há múltiplos perfis nesta versão.
 
 Para usar offline, aguarde o aviso no rodapé depois do primeiro carregamento. Os áudios do catálogo também ficam disponíveis offline. Para atualizar o cache numa próxima versão, alterar o identificador de cache em `frontend/sw.js`; esta fundação usa cache versionado para impedir atualização parcial do catálogo durante uma sessão.
 
@@ -197,7 +197,7 @@ Na área de responsáveis, filtre tema e período, gere e confira a prévia e us
 
 Oito frases fixas (duas por tema) podem ser organizadas por cartões de palavras, usando toque, mouse ou teclado. Modelo e pista são opcionais, a ordem pode ser corrigida removendo cartões e não há trilha obrigatória, tempo ou pontuação. Ouvir reproduz a frase de exemplo completa, com MP3 local; a preferência de áudio ao conferir também se aplica às frases corretas.
 
-Esta etapa não avalia expressão livre, não salva as escolhas e não as inclui em recomendações ou relatórios de palavras. As imagens existentes são referências ao substantivo principal, sem representar toda a ação. O catálogo contém palavras funcionais e verbos adicionais para essas frases, sem ampliar as atividades de palavras isoladas.
+Esta etapa não avalia expressão livre. Desde V0.1.13, somente conclusões são salvas em registros de frases separados; elas não entram nas recomendações ou relatórios de palavras. As imagens existentes são referências ao substantivo principal, sem representar toda a ação. O catálogo contém palavras funcionais e verbos adicionais para essas frases, sem ampliar as atividades de palavras isoladas.
 
 Cache v18 inclui catálogo, módulos e oito gravações novas, totalizando 58. As 50 anteriores foram preservadas. Conteúdo experimental, pendente de revisão pedagógica. Veja [decisão de arquitetura](docs/adr/0008-frases-simples.md).
 
@@ -205,4 +205,10 @@ Cache v18 inclui catálogo, módulos e oito gravações novas, totalizando 58. A
 
 Em cada exemplo, abra **Explorar ações e complementos**, escolha uma ação/relação e um complemento e confira a prévia. **Montar esta frase** reinicia os cartões com a opção escolhida; apenas mudar os seletores preserva a montagem atual. Recomeçar mantém a continuação ativa.
 
-São 24 combinações preparadas (8 originais e 16 continuações), com áudio completo local. Não há geração livre, modelo treinado ou armazenamento de escolhas. Cache v19, catálogo de 74 gravações; as 58 anteriores foram preservadas. Conteúdo aguarda revisão pedagógica. Veja [decisão e limites](docs/adr/0009-continuacoes-frases.md).
+São 24 combinações preparadas (8 originais e 16 continuações), com áudio completo local. Não há geração livre nem modelo treinado. Somente conclusões são registradas desde V0.1.13. Cache v19, catálogo de 74 gravações; as 58 anteriores foram preservadas. Conteúdo aguarda revisão pedagógica. Veja [decisão e limites](docs/adr/0009-continuacoes-frases.md).
+
+## Registros próprios de frases
+
+A área de responsáveis mostra conclusões por frase e continuação, com uso de modelo/pista, áudio solicitado antes da conclusão e campos não informados. Ver a prévia completa também conta como modelo. Não há notas, comparação ou avaliação de capacidade. Apenas uma conclusão por rodada é salva; recomeçar permite nova exploração.
+
+São mantidos até 200 registros de frases, separados dos até 200 de palavras. Interromper, errar ou trocar sem concluir não cria registro. A cópia local schemaVersion 5 inclui as duas listas; Apagar registros e preferências limpa ambas. Os registros de frases ainda não entram no relatório de palavras. Em falha do armazenamento ficam apenas na memória, com aviso. Cache v20. Veja [decisão e campos](docs/adr/0010-registros-frases.md).

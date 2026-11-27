@@ -1,3 +1,4 @@
+import {phraseEntries,phraseOverview} from './phrases/records.mjs';
 import {setupPhrases} from './phrases/view.mjs';
 import {setupReport} from './reports/view.mjs';
 import {reviewOverview} from './ai/adaptive-learning/reviews.mjs';
@@ -13,7 +14,7 @@ const $ = id => document.getElementById(id);
 const sessionId = crypto.randomUUID();
 const environment = document.body.dataset.environment;
 $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
-let phraseView, report, catalog, fullCatalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
+let phraseCatalog=[], phraseView, report, catalog, fullCatalog, rules, state = {events: [], phraseEvents: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
 let hintUsed=false, audioRequested=false, roundPresentation='upper', adviceDismissed=false;
 let currentImage, roundVisualIds=[], roundStarted=false;
@@ -23,6 +24,9 @@ function button(label, handler, className = '') { const node = document.createEl
 function summary() {
   report?.invalidate();
   $('storage-status').textContent = storageOK ? 'Os registros ficam somente neste navegador.' : 'Armazenamento indisponível. As descobertas desta sessão ficarão apenas na memória; não foram salvas.';
+  $('phrase-progress').replaceChildren();
+  for(const row of phraseOverview(phraseCatalog,state.phraseEvents||[])){const li=document.createElement('li');li.textContent=`${row.text}: ${row.total} conclusões; ${row.withSupport} com modelo ou pista; ${row.withoutSupport} sem modelo/pista registrados; ${row.unknownSupport} com apoio não informado. Modelo: ${row.model}; pistas: ${row.hints}; áudio solicitado antes da conclusão: ${row.audio}; áudio não informado: ${row.unknownAudio}.`; $('phrase-progress').append(li);}
+  if(!$('phrase-progress').children.length){const li=document.createElement('li');li.textContent='Ainda não há frases concluídas registradas.';$('phrase-progress').append(li);}
   $('progress').replaceChildren();
   for (const item of fullCatalog.words) {
     const events = state.events.filter(e => e.wordId === item.id && e.outcome === 'completed');
@@ -387,11 +391,17 @@ async function boot() {
       finally {saving = false;}
     });
     $('export').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify({schemaVersion:4, ...state}, null, 2)], {type:'application/json'});
+      if(saving){$('data-feedback').textContent='Aguarde a conclusão do registro antes de baixar a cópia.';return;}
+      const blob = new Blob([JSON.stringify({schemaVersion:5, ...state}, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });
-    phraseView=setupPhrases({catalog:fullCatalog,phrases:loaded[2],continuations:loaded[3],settings:()=>({...state.settings,volume:state.settings.volume??0.7})});
+    phraseCatalog=phraseEntries(loaded[2],loaded[3]);
+    phraseView=setupPhrases({catalog:fullCatalog,phrases:loaded[2],continuations:loaded[3],isBusy:()=>saving,recordCompletion:async event=>{
+      saving=true;let saved=false;try{await settingsQueue;const stored=await store.recordPhrase(event);state.phraseEvents=stored.phraseEvents;saved=true;}
+      catch{storageOK=false;state.phraseEvents=[...(state.phraseEvents||[]),event].slice(-200);}
+      finally{saving=false;}summary();return saved;
+    },settings:()=>({...state.settings,volume:state.settings.volume??0.7})});
     report=setupReport({catalog:fullCatalog,stopAudio:stop,readSnapshot:async()=>{
       await settingsQueue;
       if(saving) throw new Error('Aguarde a conclusão da atividade ou da exclusão antes de gerar o relatório.');

@@ -22,12 +22,12 @@ export function recommendPhrases({entries,events,phraseId,settings={},today}){
  };
  const newPhrase=()=>{
   const unseen=facts.filter(f=>!f.all.length&&f.entry.id!==current.id).sort((a,b)=>Number(b.entry.exampleId===current.exampleId)-Number(a.entry.exampleId===current.exampleId)||a.entry.text.split(' ').length-b.entry.text.split(' ').length||a.entry.id.localeCompare(b.entry.id))[0];
-  if(unseen)add('new_phrase',unseen,unseen.entry.exampleId===current.exampleId?'Esta continuação pertence ao mesmo exemplo e ainda não tem conclusão registrada. A relação foi preparada no catálogo; não indica dificuldade adequada ou domínio.':'Outra frase do tema escolhido, ainda sem conclusão registrada. A escolha é livre e não depende de concluir a frase atual.');
+  if(unseen)add('new_phrase',unseen,unseen.entry.exampleId===current.exampleId?'Esta continuação pertence ao mesmo exemplo e ainda não tem conclusão registrada. Você pode escolhê-la ou continuar na frase atual.':'Outra frase do tema escolhido, ainda sem conclusão registrada. A escolha é livre e não depende de concluir a frase atual.');
  };
  if(settings.exploration==='new')newPhrase();else review();
  const fact=facts.find(f=>f.entry.id===current.id);
  const support=fact.records.filter(event=>event.modelUsed===true||event.hintUsed===true).length;
- if(support)add('support',fact,`Há ${support} conclusões desta frase com modelo ou pista registrados. Você pode explorar novamente com os apoios disponíveis; isso não indica dificuldade nem limita outras escolhas.`);
+ if(support)add('support',fact,`Há ${support} ${support===1?'conclusão':'conclusões'} desta frase com modelo ou pista registrados. Você pode explorar novamente com os apoios disponíveis; isso não indica dificuldade nem limita outras escolhas.`);
  else if(!fact.records.length)add('maintain',fact,fact.future?'Há registros desta frase com data futura. Confira a data do dispositivo; eles não foram usados para organizar revisitas. Você pode continuar explorando livremente.':'Não há conclusão utilizável desta frase nos registros locais. Falta de registro não é dificuldade. Modelo e pistas continuam opcionais.');
  else add('maintain',fact,fact.records.some(event=>typeof event.modelUsed!=='boolean'||typeof event.hintUsed!=='boolean')?'Há conclusões com informações de apoio ausentes. Isso não significa ausência de apoio. Continuar ou variar é uma escolha livre.':'Há conclusões desta frase registradas. Repetir é opcional; esses registros não comprovam domínio, retenção ou capacidade.');
  newPhrase();if(settings.exploration==='new')review();

@@ -1,5 +1,5 @@
 const NAME = 'pequenas-girafas-v1';
-const defaults = () => ({events: [], settings: {adapt: true, reduced: false, dark: false, lowercase: false, volume: 0.7, onSuccessAudio: true, minIndependentSessions: 2, categoryInterest: 'all', exploration: 'balanced', preferredActivity: 'any', reviewAfterDays: 7}});
+const defaults = () => ({events: [], phraseEvents: [], settings: {adapt: true, reduced: false, dark: false, lowercase: false, volume: 0.7, onSuccessAudio: true, minIndependentSessions: 2, categoryInterest: 'all', exploration: 'balanced', preferredActivity: 'any', reviewAfterDays: 7}});
 let db;
 function open() {
   if (db) return Promise.resolve(db);
@@ -27,12 +27,13 @@ export async function mutate(update) {
     const store = tx.objectStore('local');
     const req = store.get('state');
     let next;
-    req.onsuccess = () => { next = update(req.result || defaults()); next.events = next.events.slice(-200); store.put(next, 'state'); };
+    req.onsuccess = () => { next = update({...defaults(), ...req.result}); next.events = next.events.slice(-200); next.phraseEvents = (next.phraseEvents || []).slice(-200); store.put(next, 'state'); };
     tx.oncomplete = () => resolve(next);
     tx.onerror = () => reject(tx.error);
     tx.onabort = () => reject(tx.error || new Error('Registro não salvo'));
   });
 }
 export function record(event) { return mutate(state => ({...state, events: [...state.events, event]})); }
+export function recordPhrase(event) { return mutate(state => ({...state, phraseEvents: [...(state.phraseEvents || []), event]})); }
 export function settings(patch) { return mutate(state => ({...state, settings: {...state.settings, ...patch}})); }
 export function erase() { return mutate(() => defaults()); }

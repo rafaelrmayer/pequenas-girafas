@@ -4,7 +4,7 @@ Projetado para minimizar dados. Não é uma declaração de conformidade jurídi
 
 ## Dados locais
 
-IndexedDB guarda até 200 atividades concluídas: identificador da palavra do catálogo, identificador aleatório de sessão, apoio utilizado, conclusão e tipo de atividade; também preferências de apresentação e adaptação. A sessão é recriada ao recarregar a página. Mesmo sem nome, esse histórico pode revelar informações sobre aprendizagem; é tratado como privado e não enviado ao servidor.
+IndexedDB guarda até 200 atividades de palavras concluídas: identificador da palavra do catálogo, identificador aleatório de sessão, apoio utilizado, conclusão e tipo de atividade; também preferências de apresentação e adaptação. A sessão é recriada ao recarregar a página. Mesmo sem nome, esse histórico pode revelar informações sobre aprendizagem; é tratado como privado e não enviado ao servidor.
 
 Sem banco central de crianças/familiares, nome, diagnóstico, foto, áudio, geolocalização, conta, telemetria pessoal, publicidade ou cookies. Nenhum uso para treinamento global, pesquisa própria ou comercialização. Projetos independentes não recebem esses dados. Não há transmissão para GIRAF ou provedores.
 
@@ -12,13 +12,13 @@ Sem banco central de crianças/familiares, nome, diagnóstico, foto, áudio, geo
 
 A área de responsáveis mostra resumo, permite desligar adaptação e apagar registros e preferências com confirmação. A exclusão remove a chave de histórico lógico e a substitui por estado vazio; IndexedDB e cache podem continuar contendo estruturas técnicas e catálogo genérico, sem eventos anteriores acessíveis pela aplicação. Exclusão forense do disco depende do navegador/SO. Arquivos de backup baixados devem ser apagados separadamente. Exportação é local, voluntária e contém evidências de aprendizagem; não há importação nem backup Google nesta versão.
 
-Sem proteção por senha ou perfis: pessoas que compartilham o navegador podem ler os registros. Use perfil separado quando necessário. Modo privado, limites de armazenamento ou limpar dados podem perder registros; a interface avisa quando salvar falha. Até 200 eventos recentes, sem retenção no servidor. Cache offline guarda somente arquivos genéricos de uma lista fixa.
+Sem proteção por senha ou perfis: pessoas que compartilham o navegador podem ler os registros. Use perfil separado quando necessário. Modo privado, limites de armazenamento ou limpar dados podem perder registros; a interface avisa quando salvar falha. Até 200 eventos de palavras e 200 de frases recentes, sem retenção no servidor. Cache offline guarda somente arquivos genéricos de uma lista fixa.
 
 ## Rede e voz
 
 Arquivos estáticos e catálogo exigem uma requisição inicial ao servidor. Infraestrutura pode receber IP e metadados técnicos. Comando de desenvolvimento/Docker desativa access logs; futura hospedagem exige política de logs e retenção revisada. Cabeçalhos desabilitam câmera, microfone e geolocalização e restringem conexões à própria origem.
 
-O áudio principal usa 33 MP3 genéricos gerados offline, servidos pela própria origem e cacheados com as atividades; nenhum progresso é enviado para reproduzi-los. Somente se o arquivo falhar, a síntese alternativa usa vozes que Web Speech expõe como `localService=true` em português. A sinalização é do navegador/SO; não prova um fornecedor auditado. Sem voz, aviso explícito e atividade silenciosa. Nunca selecionamos uma voz remota como fallback. Catálogo e nomes de letras são textos genéricos fixos; não há entrada livre enviada para síntese.
+O áudio principal usa 74 MP3 genéricos gerados offline, servidos pela própria origem e cacheados com as atividades; nenhum progresso é enviado para reproduzi-los. Somente se o arquivo falhar, a síntese alternativa usa vozes que Web Speech expõe como `localService=true` em português. A sinalização é do navegador/SO; não prova um fornecedor auditado. Sem voz, aviso explícito e atividade silenciosa. Nunca selecionamos uma voz remota como fallback. Catálogo e nomes de letras são textos genéricos fixos; não há entrada livre enviada para síntese.
 
 ## Próximas versões
 
@@ -41,3 +41,9 @@ Conclusões novas podem incluir `visualIds` (até três IDs como `image-v1`), in
 Os arquivos SVG são genéricos, distribuídos e cacheados na própria origem. Nenhum ID visual ou histórico é enviado ao servidor. Exclusão local continua removendo esses registros. Exportação passa a schemaVersion 4 e contém esses metadados opcionais, mantendo os eventos anteriores.
 
 Para alternar as ilustrações entre visitas, o navegador guarda somente o último ID de imagem de cada palavra com mais de uma ilustração. A escolha fica no armazenamento local, sem horário nem histórico de visitas, e não faz parte da exportação. Apagar registros e preferências reinicia a sequência.
+
+## Conclusões de frases (V0.1.13)
+
+`phraseEvents` guarda separadamente até 200 conclusões: IDs de frase/exemplo/tema do catálogo, dia local, conclusão e uso de modelo, pista e áudio solicitado antes da conclusão. Não contém identificador pessoal, novo identificador de sessão ou texto livre. Prévia completa visível conta como modelo; o áudio automático após o acerto não altera a evidência anterior. Interromper ou não concluir não gera registro.
+
+Frases aparecem em resumo separado e na cópia JSON schemaVersion 5; ainda não entram no relatório de palavras ou no planejador adaptativo. Ausência de metadados não é interpretada como ausência de apoio. Excluir registros limpa ambas as listas. Falha de armazenamento mantém a conclusão somente na memória com aviso. Pessoas no mesmo perfil podem acessar esses registros; sem identificação individual ou sincronização.

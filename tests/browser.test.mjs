@@ -778,3 +778,35 @@ test('all sixteen continuation recordings play locally without browser voices',a
   }assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
+
+test('phrase conclusions persist separately offline, track support conservatively, export and erase',async()=>{
+ const {browser,context,page,failures,network}=await setup({viewport:{width:390,height:844}});
+ try{
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+  const snapshot=()=>page.evaluate(async()=>await (await import('/storage/store.mjs')).load());
+  await page.locator('#phrase-check').click();assert.equal((await snapshot()).phraseEvents.length,0);
+  for(const key of ['0','1','2'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();
+  await page.evaluate(()=>{document.querySelector('#phrase-check').click();document.querySelector('#phrase-check').click();});await page.waitForFunction(()=>document.querySelector('#phrase-feedback').textContent.includes('Registro salvo'));
+  let state=await snapshot();assert.equal(state.phraseEvents.length,1);assert.equal(state.events.length,0);assert.deepEqual([state.phraseEvents[0].modelUsed,state.phraseEvents[0].hintUsed,state.phraseEvents[0].audioRequested],[false,false,false]);
+  await page.locator('#on-success-audio').uncheck();await page.locator('#phrase-continuations summary').click();await page.locator('#phrase-action').selectOption('viver');await page.locator('#phrase-use-continuation').click();await page.locator('#phrase-continuations summary').click();
+  await page.locator('#phrase-hint').click();await page.locator('#phrase-listen').click();await page.locator('#phrase-stop').click();
+  for(const key of ['0','1','2','3','4'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();await page.waitForFunction(()=>document.querySelector('#phrase-feedback').textContent.includes('Registro salvo'));
+  state=await snapshot();assert.equal(state.phraseEvents.length,2);assert.equal(state.phraseEvents[1].phraseId,'frase-peixe-2');assert.deepEqual([state.phraseEvents[1].modelUsed,state.phraseEvents[1].hintUsed,state.phraseEvents[1].audioRequested],[true,true,true]);
+  await page.locator('#phrase-slots button').last().click();await page.locator('#phrase-bank button[data-token-key="4"]').click();await page.locator('#phrase-check').click();assert.equal((await snapshot()).phraseEvents.length,2);
+  await construct(page,'PEIXE');await page.locator('#adult-title').click();assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE VIVE NA ÁGUA: 1/);assert.match(await page.locator('#progress').textContent(),/PEIXE: 1/);
+  const download=page.waitForEvent('download');await page.locator('#export').click();const file=await download;const {readFile}=await import('node:fs/promises');const backup=JSON.parse(await readFile(await file.path(),'utf8'));assert.equal(backup.schemaVersion,5);assert.equal(backup.phraseEvents.length,2);assert.equal(backup.events.length,1);
+  await page.locator('#phrase-progress').screenshot({path:'test-results/registros-frases-mobile.png'});await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#adult-title').click();assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE VIVE NA ÁGUA: 1/);
+  await page.locator('#delete').click();await page.locator('#confirm-delete').click();await page.waitForFunction(()=>document.querySelector('#data-feedback').textContent.includes('apagados'));assert.equal((await snapshot()).phraseEvents.length,0);assert.equal((await snapshot()).events.length,0);assert.match(await page.locator('#phrase-progress').textContent(),/Ainda não há/);
+  assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});
+
+test('unavailable storage keeps phrase conclusions only in memory with an explicit warning',async()=>{
+ const {browser,context,page,failures,network}=await setup();
+ try{
+  await context.addInitScript(()=>Object.defineProperty(window,'indexedDB',{get(){throw new Error('unavailable');}}));await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#on-success-audio').uncheck();
+  await page.locator('#phrase-show-model').check();await page.locator('#phrase-show-model').uncheck();for(const key of ['0','1','2'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();await page.waitForFunction(()=>document.querySelector('#phrase-feedback').textContent.includes('apenas na memória'));
+  await page.locator('#adult-title').click();assert.match(await page.locator('#phrase-progress').textContent(),/O PEIXE NADA: 1/);assert.match(await page.locator('#phrase-progress').textContent(),/1 com modelo ou pista/);assert.match(await page.locator('#storage-status').textContent(),/apenas na memória/);
+  await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#adult-title').click();assert.match(await page.locator('#phrase-progress').textContent(),/Ainda não há/);assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});

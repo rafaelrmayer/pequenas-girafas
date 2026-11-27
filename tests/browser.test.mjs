@@ -620,7 +620,9 @@ test('Nature and Fruits preserve accents, records and next-word cycles with all 
    await page.locator('#theme').selectOption(theme);
    for(const id of words){
     await page.locator('#word').selectOption(id);await page.locator('#listen').click();
-    await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
+    try {await page.waitForFunction(()=>{const status=document.querySelector('#word-audio-status').textContent;return status==='Leitura concluída.'||status.includes('Não foi possível');});}
+    catch(error){throw new Error('Áudio '+id+': '+await page.locator('#word-audio-status').textContent(),{cause:error});}
+    assert.equal(await page.locator('#word-audio-status').textContent(),'Leitura concluída.','Áudio '+id);
     await page.locator('#picture').screenshot({path:'test-results/'+theme+'-'+id+'.png'});
    }
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);

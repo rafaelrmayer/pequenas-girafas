@@ -72,7 +72,7 @@ O código público GIRAF-ai foi analisado em commit fixado, assim como a alterna
 - [Privacidade](PRIVACY.md), [segurança](SECURITY.md), [acessibilidade](ACCESSIBILITY.md).
 - [Diretrizes pedagógicas](PEDAGOGICAL_GUIDELINES.md) e [histórico](CHANGELOG.md).
 
-Etapas posteriores ainda estão em desenvolvimento: desenho, histórias, frases livres, relatórios avançados, restauração de backup, reconhecimento de escrita, embeddings, RAG e modelos treinados ficam fora desta entrega. A Jornada de Bia e as outras APIs não foram modificadas.
+Etapas posteriores ainda estão em desenvolvimento: desenho, biblioteca com várias histórias, frases livres, relatórios avançados, restauração de backup, reconhecimento de escrita, embeddings, RAG e modelos treinados ficam fora desta entrega. A Jornada de Bia e as outras APIs não foram modificadas.
 
 ## Ambientes separados
 
@@ -224,3 +224,11 @@ O relatório inclui palavras e frases em seções separadas, com filtros comuns 
 Abra **Sugestões para explorar frases** para ver até duas opções com explicação, usando somente registros de frases do tema atual. É possível continuar, retomar com apoios, explorar outra frase ou revisitar. As preferências em Responsáveis (personalização, forma de explorar e intervalo) são respeitadas.
 
 Abrir ou ignorar preserva os cartões; escolher uma sugestão reinicia a rodada e oferece o modelo, sem áudio automático ou registro antes de concluir. Visualizar a frase atual completa nos cartões conta como modelo. Novas frases permanecem livres, com ou sem registros. Não há avaliação de capacidade, inferência de interesses, rede neural ou chamada a provedor. Cache v22. Veja [critérios e limites](docs/adr/0012-sugestoes-frases.md).
+
+## Minha primeira história
+
+Abra **Histórias** no topo de Atividades. Escolha tema, personagem/elemento, cenário e uma frase existente; adicione até seis páginas. É possível editar, reordenar, remover, desfazer as últimas dez alterações e ler as páginas com áudio manual. Cenários são referências visuais livres, sem correção de coerência, notas ou registros de aprendizagem.
+
+**Salvar história neste navegador** mantém um rascunho por perfil. Salvar substitui a versão anterior. Alterações sem salvar ficam somente na página e podem se perder ao recarregar. A cópia JSON schemaVersion 6 inclui a última versão salva; a exclusão em Responsáveis limpa o rascunho e a edição atual. Falha ao salvar é avisada e mantém a edição apenas na memória, sem substituir a versão salva.
+
+São reutilizadas as imagens e 24 frases/áudios existentes, com oito personagens/elementos e seis cenários. Não há texto livre, desenho, geração por IA, biblioteca de múltiplas histórias ou impressão de livros nesta etapa. Cache v23 permite uso offline após atualização. Veja [decisão e limites](docs/adr/0013-primeiras-historias.md).

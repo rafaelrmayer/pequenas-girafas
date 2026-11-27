@@ -1,10 +1,10 @@
 export function setupAreas({stopAudio}){
  const panels={atividades:document.getElementById('area-atividades'),apoios:document.getElementById('configuracoes'),responsaveis:document.getElementById('responsaveis')};
- const targets={atividade:'atividades',frases:'atividades',alfabeto:'atividades',configuracoes:'apoios',responsaveis:'responsaveis'};
+ const targets={atividade:'atividades',frases:'atividades',historias:'atividades',alfabeto:'atividades',configuracoes:'apoios',responsaveis:'responsaveis'};
  const headings={atividades:'activity-title',apoios:'settings-title',responsaveis:'adult-title'};
  const scroll={atividades:0,apoios:0,responsaveis:0},lastFocus={};let current='atividades';
  function activate(target,{restore=false,focus=true}={}){
-  const area=targets[target];if(!area)return;
+  const area=targets[target];if(!area)return;if(target==='historias')document.getElementById('story-editor').open=true;
   if(current!==area){scroll[current]=window.scrollY;stopAudio();}
   for(const [id,panel] of Object.entries(panels))panel.hidden=id!==area;
   document.querySelector('.intro').hidden=area!=='atividades';current=area;

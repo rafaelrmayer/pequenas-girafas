@@ -1,5 +1,5 @@
 const NAME = 'pequenas-girafas-v1';
-const defaults = () => ({events: [], phraseEvents: [], settings: {adapt: true, reduced: false, dark: false, lowercase: false, volume: 0.7, onSuccessAudio: true, minIndependentSessions: 2, categoryInterest: 'all', exploration: 'balanced', preferredActivity: 'any', reviewAfterDays: 7}});
+const defaults = () => ({events: [], phraseEvents: [], storyDraft: null, settings: {adapt: true, reduced: false, dark: false, lowercase: false, volume: 0.7, onSuccessAudio: true, minIndependentSessions: 2, categoryInterest: 'all', exploration: 'balanced', preferredActivity: 'any', reviewAfterDays: 7}});
 let db;
 function open() {
   if (db) return Promise.resolve(db);
@@ -35,5 +35,6 @@ export async function mutate(update) {
 }
 export function record(event) { return mutate(state => ({...state, events: [...state.events, event]})); }
 export function recordPhrase(event) { return mutate(state => ({...state, phraseEvents: [...(state.phraseEvents || []), event]})); }
+export function saveStory(draft) { return mutate(state => ({...state, storyDraft:structuredClone(draft)})); }
 export function settings(patch) { return mutate(state => ({...state, settings: {...state.settings, ...patch}})); }
 export function erase() { return mutate(() => defaults()); }

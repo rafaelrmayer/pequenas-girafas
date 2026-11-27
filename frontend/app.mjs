@@ -1,3 +1,4 @@
+import {setupStories} from './stories/view.mjs';
 import {setupAreas} from './navigation/areas.mjs';
 import {phraseEntries,phraseOverview} from './phrases/records.mjs';
 import {setupPhrases} from './phrases/view.mjs';
@@ -15,7 +16,7 @@ const $ = id => document.getElementById(id);
 const sessionId = crypto.randomUUID();
 const environment = document.body.dataset.environment;
 $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
-let navigation, phraseCatalog=[], phraseView, report, catalog, fullCatalog, rules, state = {events: [], phraseEvents: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
+let storyView, navigation, phraseCatalog=[], phraseView, report, catalog, fullCatalog, rules, state = {events: [], phraseEvents: [], storyDraft: null, settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
 let hintUsed=false, audioRequested=false, roundPresentation='upper', adviceDismissed=false;
 let currentImage, roundVisualIds=[], roundStarted=false;
@@ -47,7 +48,7 @@ function summary() {
   if (!$('progress').children.length) {const li = document.createElement('li'); li.textContent = 'Ainda não há construções registradas. Explore no seu tempo.'; $('progress').append(li);}
 }
 function applySettings() {
-  phraseView?.refresh();
+  phraseView?.refresh();storyView?.refresh();
   document.body.classList.toggle('reduced', Boolean(state.settings.reduced));
   document.body.classList.toggle('dark', Boolean(state.settings.dark));
   for (const id of ['reduced','dark','lowercase','adapt']) $(id).checked = Boolean(state.settings[id]);
@@ -387,13 +388,13 @@ async function boot() {
     $('cancel-delete').addEventListener('click', () => {$('delete-confirm').hidden = true; $('delete').focus();});
     $('confirm-delete').addEventListener('click', async () => {
       if (saving) return; saving = true; stop();
-      try {await settingsQueue; state = await store.erase(); clearIllustrationRotation(); phraseView?.reset(); saving = false; storageOK = true; applySettings(); chooseTheme('fundo-do-mar'); summary(); $('data-feedback').textContent = 'Registros e preferências apagados deste navegador.'; $('delete-confirm').hidden = true; $('delete').focus();}
+      try {await settingsQueue; state = await store.erase(); clearIllustrationRotation(); phraseView?.reset();storyView?.reset(); saving = false; storageOK = true; applySettings(); chooseTheme('fundo-do-mar'); summary(); $('data-feedback').textContent = 'Registros, história e preferências apagados deste navegador.'; $('delete-confirm').hidden = true; $('delete').focus();}
       catch {$('data-feedback').textContent = 'Não foi possível apagar os registros. Tente novamente ou limpe os dados deste site nas configurações do navegador.';}
       finally {saving = false;}
     });
     $('export').addEventListener('click', () => {
       if(saving){$('data-feedback').textContent='Aguarde a conclusão do registro antes de baixar a cópia.';return;}
-      const blob = new Blob([JSON.stringify({schemaVersion:5, ...state}, null, 2)], {type:'application/json'});
+      const blob = new Blob([JSON.stringify({schemaVersion:6, ...state}, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });
@@ -403,6 +404,11 @@ async function boot() {
       catch{storageOK=false;state.phraseEvents=[...(state.phraseEvents||[]),event].slice(-200);}
       finally{saving=false;}summary();return saved;
     },settings:()=>({...state.settings,volume:state.settings.volume??0.7})});
+    storyView=setupStories({catalog:fullCatalog,entries:phraseCatalog,initialDraft:state.storyDraft,settings:()=>({...state.settings,volume:state.settings.volume??0.7}),isBusy:()=>saving,saveDraft:async draft=>{
+      saving=true;let saved=false;try{await settingsQueue;const stored=await store.saveStory(draft);state.storyDraft=stored.storyDraft;saved=true;}
+      catch{storageOK=false;}
+      finally{saving=false;}summary();return saved;
+    }});
     report=setupReport({catalog:fullCatalog,phraseEntries:phraseCatalog,stopAudio:stop,readSnapshot:async()=>{
       await settingsQueue;
       if(saving) throw new Error('Aguarde a conclusão da atividade ou da exclusão antes de gerar o relatório.');

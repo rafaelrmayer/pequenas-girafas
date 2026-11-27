@@ -328,6 +328,12 @@ async function boot() {
     $('check').addEventListener('click', check); $('hint').addEventListener('click', hint);
     $('clear').addEventListener('click', () => {if (!saving) reset();}); $('repeat').addEventListener('click', () => {if (saving) return; round++; reset(); ($('letter-bank').querySelector('button:not(:disabled)') || $('match-options').querySelector('button'))?.focus();});
     for (const input of document.querySelectorAll('input[name="mode"]')) input.addEventListener('change', () => {if (saving) {document.querySelector(`input[name="mode"][value="${mode}"]`).checked = true; return;} mode = input.value; reset();});
+    $('next-word').addEventListener('click',()=>{
+      if(saving) return;
+      const index=catalog.words.findIndex(item=>item.id===word.id);
+      chooseWord(catalog.words[(index+1)%catalog.words.length].id);
+      announce(`Próxima palavra: ${word.text}. Você pode explorar no seu tempo.`);
+    });
     $('listen').addEventListener('click', () => {if(!completed) {roundStarted=true;audioRequested=true;if(activity!=='build') usedSupport=true;}readWord();});
     $('listen-letter').addEventListener('click', () => speak(letter, $('volume').value, message => { $('letter-audio-status').textContent = message; $('audio-status').textContent = message; }, `/assets/audio/letra-${letter.toLowerCase()}.mp3`));
     $('stop-sound').addEventListener('click', () => {stop(); $('word-audio-status').textContent = 'Áudio interrompido.';});

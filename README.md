@@ -157,3 +157,5 @@ python scripts/generate_audio.py --only lua sol estrela ceu planeta
 ```
 
 A geração parcial exige manifesto anterior compatível e verifica seus hashes. O comando envia somente esses textos genéricos ao serviço, não registros de aprendizagem. O cache v13 inclui todas as palavras e mídias para uso offline após sua atualização. A publicação continua em `develop` no ambiente de testes; não promove a versão principal.
+
+O botão **Próxima palavra**, junto de Ouvir a palavra, percorre a ordem do tema escolhido e retorna à primeira após a última. Preserva a atividade escolhida, interrompe o áudio anterior e não reproduz outro automaticamente. Rodadas incompletas não geram registro de erro ou dificuldade; conclusões anteriores continuam salvas. Atualização de cache v14.

@@ -726,7 +726,7 @@ test('phrases work by keyboard offline, preserve duplicate words and never mix w
   for(const key of ['4','1','2','3','0'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Vamos explorar/);
   await page.locator('#phrase-reset').click();for(const key of ['0','1','2','3','4'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();assert.match(await page.locator('#phrase-feedback').textContent(),/Você organizou/);
   await page.locator('#lowercase').check();assert.equal(await page.locator('#phrase-slots button').first().textContent(),'a');assert.equal(await events(),before);
-  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.locator('#frases').screenshot({path:'test-results/frases-mobile.png'});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.locator('#frases').screenshot({path:'test-results/frases-mobile.png'});await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.reload();await page.locator('#experience').waitFor({state:'visible'});assert.equal(await page.locator('#phrase-slots button').count(),0);assert.equal(await events(),before);
   assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
  }finally{await browser.close();}
@@ -740,6 +740,7 @@ test('all eight fixed phrases play app audio without browser voices and honor ze
    await page.locator('#phrase-theme').selectOption(theme);
    for(const id of ids){await page.locator('#phrase-choice').selectOption(id);await page.locator('#phrase-listen').click();await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');}
   }
+  for(const key of ['0','1','2','3','4'])await page.locator(`#phrase-bank button[data-token-key="${key}"]`).click();await page.locator('#phrase-check').click();await page.waitForFunction(()=>document.querySelector('#phrase-audio-status').textContent==='Leitura concluída.');
   await page.locator('#volume').fill('0');await page.locator('#volume').dispatchEvent('change');await page.locator('#phrase-listen').click();assert.match(await page.locator('#phrase-audio-status').textContent(),/volume da leitura está em zero/);
   await page.locator('#phrase-stop').click();assert.equal(await page.locator('#phrase-audio-status').textContent(),'Leitura interrompida.');assert.deepEqual(failures,[]);
  }finally{await browser.close();}

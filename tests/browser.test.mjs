@@ -677,3 +677,33 @@ test('optional review list preserves original activities, separates dates and up
   await page.screenshot({path:'test-results/revisitas-mobile.png',fullPage:true});
  }finally{await browser.close();}
 });
+
+test('local report filters offline records, prints a checked snapshot and blocks erased data',async()=>{
+ const {browser,context,page,failures,network}=await setup({viewport:{width:390,height:844}});
+ try{
+  const dates=await page.evaluate(async()=>{
+   const store=await import('/storage/store.mjs');const {localDay}=await import('/ai/adaptive-learning/engine.mjs');
+   const old=new Date(),future=new Date();old.setDate(old.getDate()-10);future.setDate(future.getDate()+2);
+   const today=localDay();await store.mutate(state=>({...state,events:[
+    {wordId:'maca',sessionId:'private-session',activity:'build',outcome:'completed',support:'independent',day:today,hintUsed:false,audioRequested:true},
+    {wordId:'maca',activity:'match',outcome:'completed',support:'assisted',day:today,hintUsed:true},
+    {wordId:'pessego',activity:'build',outcome:'completed'},
+    {wordId:'mar',activity:'build',outcome:'completed',day:localDay(old)},
+    {wordId:'sol',activity:'build',outcome:'completed',day:localDay(future)}]}));return {today};
+  });
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#adult-title').click();
+  const records=()=>page.evaluate(async()=>JSON.stringify((await (await import('/storage/store.mjs')).load()).events));const before=await records();
+  await page.locator('#report-theme').selectOption('frutas');await page.locator('#report-period').selectOption('range');await page.locator('#report-from').fill(dates.today);await page.locator('#report-to').fill(dates.today);
+  await page.locator('#generate-report').focus();await page.keyboard.press('Enter');await page.locator('#report-preview').waitFor({state:'visible'});
+  assert.match(await page.locator('#report-preview').textContent(),/2 conclusões datadas/);assert.match(await page.locator('#report-preview').textContent(),/1 conclusões sem data/);
+  assert.equal(await page.locator('#report-preview .report-row').count(),3);assert.match(await page.locator('#report-preview').textContent(),/PÊSSEGO/);assert.doesNotMatch(await page.locator('#report-preview').textContent(),/private-session/);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.screenshot({path:'test-results/relatorio-mobile.png',fullPage:true});
+  await page.evaluate(()=>{window.print=()=>{window.printedReport=document.querySelector('#report-print-root').textContent;window.dispatchEvent(new Event('afterprint'));};});
+  await page.locator('#print-report').click();await page.waitForFunction(()=>Boolean(window.printedReport));assert.match(await page.evaluate(()=>window.printedReport),/MAÇÃ/);assert.equal(await page.locator('#report-print-root').count(),0);assert.equal(await records(),before);
+  await page.locator('#report-undated').uncheck();assert.equal(await page.locator('#print-report').isDisabled(),true);await page.locator('#generate-report').click();await page.locator('#report-preview').waitFor({state:'visible'});assert.equal(await page.locator('#report-preview .report-row').count(),2);
+  await page.evaluate(async()=>{window.printedReport=null;await (await import('/storage/store.mjs')).erase();});await page.locator('#print-report').click();await page.waitForFunction(()=>document.querySelector('#report-preview').hidden);assert.equal(await page.evaluate(()=>window.printedReport),null);assert.match(await page.locator('#report-status').textContent(),/registros mudaram/);
+  await page.locator('#generate-report').click();await page.locator('#report-preview').waitFor({state:'visible'});assert.match(await page.locator('#report-preview').textContent(),/0 conclusões datadas/);await page.locator('#clear-report').click();assert.equal(await page.locator('#report-preview').isHidden(),true);
+  assert.equal(network.filter(r=>r.method!=='GET').length,0);assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});

@@ -1,3 +1,4 @@
+import {setupReport} from './reports/view.mjs';
 import {reviewOverview} from './ai/adaptive-learning/reviews.mjs';
 import * as store from './storage/store.mjs';
 import {recommendSupport, completion, matchesWord, evidenceFor, localDay} from './ai/adaptive-learning/engine.mjs';
@@ -11,7 +12,7 @@ const $ = id => document.getElementById(id);
 const sessionId = crypto.randomUUID();
 const environment = document.body.dataset.environment;
 $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
-let catalog, fullCatalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
+let report, catalog, fullCatalog, rules, state = {events: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
 let hintUsed=false, audioRequested=false, roundPresentation='upper', adviceDismissed=false;
 let currentImage, roundVisualIds=[], roundStarted=false;
@@ -19,6 +20,7 @@ const text = value => state.settings.lowercase ? value.toLocaleLowerCase('pt-BR'
 const announce = message => {$('feedback').textContent = message;};
 function button(label, handler, className = '') { const node = document.createElement('button'); node.type = 'button'; node.textContent = label; node.className = className; node.addEventListener('click', handler); return node; }
 function summary() {
+  report?.invalidate();
   $('storage-status').textContent = storageOK ? 'Os registros ficam somente neste navegador.' : 'Armazenamento indisponível. As descobertas desta sessão ficarão apenas na memória; não foram salvas.';
   $('progress').replaceChildren();
   for (const item of fullCatalog.words) {
@@ -386,6 +388,15 @@ async function boot() {
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });
+    report=setupReport({catalog:fullCatalog,stopAudio:stop,readSnapshot:async()=>{
+      await settingsQueue;
+      if(saving) throw new Error('Aguarde a conclusão da atividade ou da exclusão antes de gerar o relatório.');
+      if(storageOK){
+        try {const saved=await store.load();if(saving)throw new Error('Aguarde a conclusão da atividade.');return {events:saved.events,persisted:true};}
+        catch(error){if(saving)throw error;}
+      }
+      return {events:structuredClone(state.events),persisted:false};
+    }});
     applySettings(); alphabet(); chooseTheme(state.settings.themeId || 'fundo-do-mar'); summary(); $('experience').hidden = false; $('boot').hidden = true;
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(() => {

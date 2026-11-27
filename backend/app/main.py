@@ -19,7 +19,7 @@ ENVIRONMENT = os.environ.get('APP_ENV', 'local')
 if ENVIRONMENT not in {'local', 'principal', 'testes'}:
     raise RuntimeError('APP_ENV deve ser local, principal ou testes')
 mock = MockGiraf()
-app = FastAPI(title="Pequenas Girafas", version="0.1.9", docs_url=None, redoc_url=None)
+app = FastAPI(title="Pequenas Girafas", version="0.1.10", docs_url=None, redoc_url=None)
 
 @app.middleware("http")
 async def headers(request, call_next):
@@ -34,7 +34,7 @@ async def headers(request, call_next):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "0.1.9", "mode": "mock", "personal_data": "device_only"}
+    return {"status": "ok", "version": "0.1.10", "mode": "mock", "personal_data": "device_only"}
 
 @app.get("/api/v1/catalog")
 def catalog():

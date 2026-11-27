@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10 — 2026-11-27
+
+- Prévia local de relatório por tema e período, com apoio, pistas, áudio e campos desconhecidos separados por atividade.
+- Impressão/PDF pelo navegador, validação dos registros antes de imprimir e exclusão de prévias desatualizadas.
+- Sem envio de históricos, identificação individual ou notas. Cache offline v17.
+
 ## 0.1.9 — 2026-11-27
 
 - Lista opcional de revisitas por tema, com explicação de intervalo e datas desconhecidas/futuras.

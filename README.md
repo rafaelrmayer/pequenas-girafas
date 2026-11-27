@@ -172,7 +172,7 @@ As 12 ilustrações são SVGs originais e os 12 áudios são MP3 locais pt-BR, c
 
 O grafo local contém relações como FOLHA → faz parte de → ÁRVORE e FLOR → pode ser encontrada em → JARDIM. Categorias Plantas e Frutas podem ser explicitamente escolhidas nas preferências; a seleção não bloqueia outras palavras. As sugestões permanecem no tema atual. Não há modelo treinado, inferência automática de interesses ou validação pedagógica das classificações de complexidade.
 
-O botão Próxima palavra percorre cada tema e retorna à primeira após a última. Os registros dos temas anteriores permanecem no dispositivo e na exportação. Cache v15 inclui os novos recursos para uso offline após atualização. Cadastro de palavras e relatórios personalizados ainda não foram implementados.
+O botão Próxima palavra percorre cada tema e retorna à primeira após a última. Os registros dos temas anteriores permanecem no dispositivo e na exportação. Cache v15 inclui os novos recursos para uso offline após atualização. Cadastro de palavras permanece para uma etapa futura.
 
 Geração parcial dos novos áudios (apenas para manutenção, não para executar o aplicativo):
 
@@ -187,4 +187,8 @@ A área de responsáveis inclui **Revisitas neste tema**, com até cinco opçõe
 
 Revisitar mantém a atividade registrada: uma conclusão de associação não vira evidência de construção porque outra atividade foi marcada como preferida. Registros com datas futuras não geram indicação por intervalo; registros sem data são preservados e não recebem data inventada. Uma nova conclusão atualiza somente a palavra/atividade realizada. Clicar em Revisitar, ignorar, trocar de palavra ou ajustar o intervalo não cria uma conclusão.
 
-O intervalo de 3 a 30 dias (padrão 7) é uma preferência de organização, não prazo, avaliação pedagógica ou indicador de esquecimento. Com personalização desligada não é produzida lista personalizada; palavras e atividades continuam disponíveis. O módulo roda no dispositivo, inclusive offline após atualização do cache v16. Não há modelo treinado, novas categorias de dados, relatório ou mudança do banco local. Veja [regras de revisita](docs/ADAPTIVE_RULES.md).
+O intervalo de 3 a 30 dias (padrão 7) é uma preferência de organização, não prazo, avaliação pedagógica ou indicador de esquecimento. Com personalização desligada não é produzida lista personalizada; palavras e atividades continuam disponíveis. O módulo roda no dispositivo, inclusive offline após atualização do cache v16. Não há modelo treinado, novas categorias de dados ou mudança do banco local. Veja [regras de revisita](docs/ADAPTIVE_RULES.md).
+
+## Relatório local de exploração
+
+Na área de responsáveis, filtre tema e período, gere e confira a prévia e use Imprimir / salvar PDF. O documento separa atividades, apoio e informações desconhecidas; registros sem data têm seção própria. Não gera notas nem comprova aprendizagem. Funciona no dispositivo, inclusive offline após atualizar o cache v17. PDFs salvos não são apagados ao excluir registros no aplicativo. Veja [funcionamento e limites](docs/LOCAL_REPORT.md).

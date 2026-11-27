@@ -61,9 +61,10 @@ test('keyboard and hint are sufficient; settings, accent and mobile layout', asy
     await inArea(page,'atividades',()=>page.locator('#check').focus()); await page.keyboard.press('Enter');
     await page.locator('#repeat').waitFor({state:'visible'});
     assert.match(await page.locator('#progress').textContent(),/ÁGUA: 1 construções; 1 com apoio/);
+    await go(page,'apoios');
     for (const id of ['dark', 'reduced', 'lowercase']) {
       const setting = page.locator(`#${id}`);
-      await setting.press('Space');
+      await setting.focus();await setting.press('Space');
       assert.equal(await setting.isChecked(), true);
     }
     await page.waitForFunction(()=>document.body.classList.contains('dark')&&document.body.classList.contains('reduced'));
@@ -422,16 +423,16 @@ test('mobile illustrations stay with the letters and rotate between visits', asy
     assert.equal(await page.locator('#slots [data-slot="0"]').textContent(),'P');
     assert.equal(await currentImage(), 'image-v1');
 
-    await word.selectOption('polvo');
+    await go(page,'atividades');await word.selectOption('polvo');
     assert.equal(await currentImage(), 'image-v1');
-    await word.selectOption('mar');
+    await go(page,'atividades');await word.selectOption('mar');
     assert.equal(await currentImage(), 'image-v1');
-    await word.selectOption('polvo');
+    await go(page,'atividades');await word.selectOption('polvo');
     assert.equal(await currentImage(), 'image-v2');
     await selectImage(page, 'image-v1');
-    await word.selectOption('peixe');
+    await go(page,'atividades');await word.selectOption('peixe');
     assert.equal(await currentImage(), 'image-v2');
-    await word.selectOption('polvo');
+    await go(page,'atividades');await word.selectOption('polvo');
     assert.equal(await currentImage(), 'image-v2');
     assert.match(await page.locator('#progress').textContent(), /Ainda não há/);
 
@@ -441,7 +442,7 @@ test('mobile illustrations stay with the letters and rotate between visits', asy
     await page.waitForFunction(() => document.querySelector('#data-feedback').textContent.includes('apagados'));
     assert.equal(await word.inputValue(), 'peixe');
     assert.equal(await currentImage(), 'image-v1');
-    await word.selectOption('polvo');
+    await go(page,'atividades');await word.selectOption('polvo');
     assert.equal(await currentImage(), 'image-v1');
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}

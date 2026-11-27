@@ -12,7 +12,7 @@ Ampliar evidências por habilidade/contexto, temas e revisão pedagógica; relat
 
 ## V0.3 — Frases e expressão
 
-Primeira etapa disponível em V0.1.11: oito frases fixas em quatro temas, cartões de palavras e narração local. Sem persistência ou avaliação de expressão livre. Continuações locais por ações/relações e complementos disponíveis em V0.1.12, com 24 combinações preparadas. Registros específicos de conclusões de frases e resumo local disponíveis em V0.1.13, separados das palavras. Próximas etapas: relatório de frases, integração das relações ao planejador e expressão mais aberta, com revisão pedagógica.
+Primeira etapa disponível em V0.1.11: oito frases fixas em quatro temas, cartões de palavras e narração local. Sem persistência ou avaliação de expressão livre. Continuações locais por ações/relações e complementos disponíveis em V0.1.12, com 24 combinações preparadas. Registros específicos de conclusões de frases e resumo local disponíveis em V0.1.13, separados das palavras. Relatório de frases disponível em V0.1.14 e sugestões locais explicáveis em V0.1.15. Próximas etapas: ampliar expressão e criatividade, com revisão pedagógica e validação dos módulos atuais.
 
 ## V0.4 — Histórias e criatividade
 

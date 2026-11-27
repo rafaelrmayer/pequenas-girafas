@@ -218,3 +218,9 @@ São mantidos até 200 registros de frases, separados dos até 200 de palavras. 
 A barra inferior abre **Atividades**, **Apoios** e **Responsáveis**, uma área por vez. A montagem atual e os formulários são preservados ao trocar; voltar a Atividades restaura a posição. Links do topo levam às palavras, frases e alfabeto. Apoios reúne volume e apresentação; Responsáveis reúne preferências pedagógicas, registros, relatório, cópia e exclusão. Não há senha ou controle de acesso individual.
 
 O relatório inclui palavras e frases em seções separadas, com filtros comuns de tema/período e seção própria para registros sem data. Não soma atividades distintas como desempenho. A impressão relê ambas as listas e bloqueia prévias desatualizadas. Cache v21; sem novos dados armazenados ou envio de histórico.
+
+## Sugestões de frases
+
+Abra **Sugestões para explorar frases** para ver até duas opções com explicação, usando somente registros de frases do tema atual. É possível continuar, retomar com apoios, explorar outra frase ou revisitar. As preferências em Responsáveis (personalização, forma de explorar e intervalo) são respeitadas.
+
+Abrir ou ignorar preserva os cartões; escolher uma sugestão reinicia a rodada e oferece o modelo, sem áudio automático ou registro antes de concluir. Visualizar a frase atual completa nos cartões conta como modelo. Novas frases permanecem livres, com ou sem registros. Não há avaliação de capacidade, inferência de interesses, rede neural ou chamada a provedor. Cache v22. Veja [critérios e limites](docs/adr/0012-sugestoes-frases.md).

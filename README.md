@@ -211,4 +211,10 @@ São 24 combinações preparadas (8 originais e 16 continuações), com áudio c
 
 A área de responsáveis mostra conclusões por frase e continuação, com uso de modelo/pista, áudio solicitado antes da conclusão e campos não informados. Ver a prévia completa também conta como modelo. Não há notas, comparação ou avaliação de capacidade. Apenas uma conclusão por rodada é salva; recomeçar permite nova exploração.
 
-São mantidos até 200 registros de frases, separados dos até 200 de palavras. Interromper, errar ou trocar sem concluir não cria registro. A cópia local schemaVersion 5 inclui as duas listas; Apagar registros e preferências limpa ambas. Os registros de frases ainda não entram no relatório de palavras. Em falha do armazenamento ficam apenas na memória, com aviso. Cache v20. Veja [decisão e campos](docs/adr/0010-registros-frases.md).
+São mantidos até 200 registros de frases, separados dos até 200 de palavras. Interromper, errar ou trocar sem concluir não cria registro. A cópia local schemaVersion 5 inclui as duas listas; Apagar registros e preferências limpa ambas. O relatório agora inclui frases e palavras em seções separadas. Em falha do armazenamento ficam apenas na memória, com aviso. Cache v20. Veja [decisão e campos](docs/adr/0010-registros-frases.md).
+
+## Navegação inferior e relatório de frases
+
+A barra inferior abre **Atividades**, **Apoios** e **Responsáveis**, uma área por vez. A montagem atual e os formulários são preservados ao trocar; voltar a Atividades restaura a posição. Links do topo levam às palavras, frases e alfabeto. Apoios reúne volume e apresentação; Responsáveis reúne preferências pedagógicas, registros, relatório, cópia e exclusão. Não há senha ou controle de acesso individual.
+
+O relatório inclui palavras e frases em seções separadas, com filtros comuns de tema/período e seção própria para registros sem data. Não soma atividades distintas como desempenho. A impressão relê ambas as listas e bloqueia prévias desatualizadas. Cache v21; sem novos dados armazenados ou envio de histórico.

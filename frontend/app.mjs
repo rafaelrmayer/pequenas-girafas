@@ -1,3 +1,4 @@
+import {setupAreas} from './navigation/areas.mjs';
 import {phraseEntries,phraseOverview} from './phrases/records.mjs';
 import {setupPhrases} from './phrases/view.mjs';
 import {setupReport} from './reports/view.mjs';
@@ -14,7 +15,7 @@ const $ = id => document.getElementById(id);
 const sessionId = crypto.randomUUID();
 const environment = document.body.dataset.environment;
 $('environment').textContent = `${environment === 'testes' ? 'AMBIENTE DE TESTES · Mudanças em avaliação' : environment === 'principal' ? 'VERSÃO PRINCIPAL' : 'AMBIENTE LOCAL'} · V0.1 experimental`;
-let phraseCatalog=[], phraseView, report, catalog, fullCatalog, rules, state = {events: [], phraseEvents: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
+let navigation, phraseCatalog=[], phraseView, report, catalog, fullCatalog, rules, state = {events: [], phraseEvents: [], settings: {}}, word, bank = [], selected = [], mode = 'model', usedSupport = true, completed = false, saving = false, storageOK = true, letter = 'P';
 let activity='build', round=0, locked=[], activeSlot=null, matchChoice=null, showAnswer=false, drag;
 let hintUsed=false, audioRequested=false, roundPresentation='upper', adviceDismissed=false;
 let currentImage, roundVisualIds=[], roundStarted=false;
@@ -140,7 +141,7 @@ function acceptSuggestion(suggestion) {
   if(saving) return;
   if(typeof suggestion.lowercase==='boolean') changeSettings({lowercase:suggestion.lowercase});
   activity=suggestion.activity;document.querySelector(`input[name="activity"][value="${activity}"]`).checked=true;
-  chooseWord(suggestion.wordId,{mode:suggestion.mode,imageId:suggestion.imageId});$('task-title').focus();
+  navigation?.activity();chooseWord(suggestion.wordId,{mode:suggestion.mode,imageId:suggestion.imageId});$('task-title').focus();
 }
 function renderReviews() {
   if(!word) return;
@@ -402,16 +403,16 @@ async function boot() {
       catch{storageOK=false;state.phraseEvents=[...(state.phraseEvents||[]),event].slice(-200);}
       finally{saving=false;}summary();return saved;
     },settings:()=>({...state.settings,volume:state.settings.volume??0.7})});
-    report=setupReport({catalog:fullCatalog,stopAudio:stop,readSnapshot:async()=>{
+    report=setupReport({catalog:fullCatalog,phraseEntries:phraseCatalog,stopAudio:stop,readSnapshot:async()=>{
       await settingsQueue;
       if(saving) throw new Error('Aguarde a conclusão da atividade ou da exclusão antes de gerar o relatório.');
       if(storageOK){
-        try {const saved=await store.load();if(saving)throw new Error('Aguarde a conclusão da atividade.');return {events:saved.events,persisted:true};}
+        try {const saved=await store.load();if(saving)throw new Error('Aguarde a conclusão da atividade.');return {events:saved.events,phraseEvents:saved.phraseEvents,persisted:true};}
         catch(error){if(saving)throw error;}
       }
-      return {events:structuredClone(state.events),persisted:false};
+      return {events:structuredClone(state.events),phraseEvents:structuredClone(state.phraseEvents||[]),persisted:false};
     }});
-    applySettings(); alphabet(); chooseTheme(state.settings.themeId || 'fundo-do-mar'); summary(); $('experience').hidden = false; $('boot').hidden = true;
+    applySettings(); alphabet(); chooseTheme(state.settings.themeId || 'fundo-do-mar'); summary(); $('experience').hidden = false; $('boot').hidden = true; navigation=setupAreas({stopAudio:stop});
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(() => {
         const ready = () => {$('offline-status').textContent = 'Atividades essenciais disponíveis offline neste navegador. Os áudios do catálogo estão incluídos.';};

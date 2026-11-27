@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.11 — 2026-11-27
+
+- Construção de oito frases de exemplo em quatro temas, com cartões por toque ou teclado, modelo, pistas e correção livre.
+- Narração completa com oito MP3 locais; preferências de volume, minúsculas e áudio ao conferir preservadas.
+- Exploração sem persistência, separada dos registros e relatórios de palavras. Cache v18.
+
 ## 0.1.10 — 2026-11-27
 
 - Prévia local de relatório por tema e período, com apoio, pistas, áudio e campos desconhecidos separados por atividade.

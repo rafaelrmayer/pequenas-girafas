@@ -1,0 +1,10 @@
+[
+ {"id":"frase-peixe","themeId":"fundo-do-mar","text":"O PEIXE NADA","wordId":"peixe"},
+ {"id":"frase-polvo","themeId":"fundo-do-mar","text":"O POLVO VIVE NO MAR","wordId":"polvo"},
+ {"id":"frase-lua","themeId":"astronomia","text":"A LUA ESTÁ NO CÉU","wordId":"lua"},
+ {"id":"frase-sol","themeId":"astronomia","text":"O SOL BRILHA","wordId":"sol"},
+ {"id":"frase-flor","themeId":"natureza","text":"A FLOR ESTÁ NO JARDIM","wordId":"flor"},
+ {"id":"frase-arvore","themeId":"natureza","text":"A ÁRVORE TEM FOLHAS","wordId":"arvore"},
+ {"id":"frase-maca","themeId":"frutas","text":"A MAÇÃ É UMA FRUTA","wordId":"maca"},
+ {"id":"frase-pera","themeId":"frutas","text":"A PERA É UMA FRUTA","wordId":"pera"}
+]

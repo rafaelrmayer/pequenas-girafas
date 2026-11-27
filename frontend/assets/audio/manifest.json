@@ -305,6 +305,54 @@
       "text": "pêssego",
       "file": "pessego.mp3",
       "sha256": "d0a1a6e155b3a0fe7d9c692f9dba44e8864a35fa1fedaa083b6657fe6bf10b2a"
+    },
+    {
+      "id": "frase-peixe",
+      "text": "o peixe nada.",
+      "file": "frase-peixe.mp3",
+      "sha256": "e4c7074f835dd0631ad3582965b21c39629523e58b31cbd8802fb479349e7837"
+    },
+    {
+      "id": "frase-polvo",
+      "text": "o polvo vive no mar.",
+      "file": "frase-polvo.mp3",
+      "sha256": "e0c95d7f9b64ac79c984ddb2351d6ff66f7d8bacd230e4629f3b2644be4bd09c"
+    },
+    {
+      "id": "frase-lua",
+      "text": "a lua está no céu.",
+      "file": "frase-lua.mp3",
+      "sha256": "03fd5f870419d2de06152a3c55a9515ef48acbb8dab8eeb9b370c05134c2172c"
+    },
+    {
+      "id": "frase-sol",
+      "text": "o sol brilha.",
+      "file": "frase-sol.mp3",
+      "sha256": "e4131c38b03e20ca52f04abb556da4e1efa78b282db7e5624bf59dc4075b272e"
+    },
+    {
+      "id": "frase-flor",
+      "text": "a flor está no jardim.",
+      "file": "frase-flor.mp3",
+      "sha256": "2adba95d3f126737f220cc2241ae381f68dad35229871546826d75f748052e13"
+    },
+    {
+      "id": "frase-arvore",
+      "text": "a árvore tem folhas.",
+      "file": "frase-arvore.mp3",
+      "sha256": "d931389838fc1f41f3a354488ddc8e16d8bee55c52f868425940b16c0b211cfe"
+    },
+    {
+      "id": "frase-maca",
+      "text": "a maçã é uma fruta.",
+      "file": "frase-maca.mp3",
+      "sha256": "0310f1f4b3c160df6d7a965ce976ed6051715b329ee0ab42f083e2dba9c6d4ee"
+    },
+    {
+      "id": "frase-pera",
+      "text": "a pera é uma fruta.",
+      "file": "frase-pera.mp3",
+      "sha256": "5abcadbc05d59c3eadf841664317612ac2666c67fadf9a0b3821f04302a11d47"
     }
   ]
 }

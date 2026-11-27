@@ -11,8 +11,9 @@ from urllib.request import getproxies
 
 WORDS = {'peixe': 'peixe', 'mar': 'mar', 'agua': 'água', 'polvo': 'polvo', 'concha': 'concha', 'praia': 'praia', 'caranguejo': 'caranguejo', 'lua': 'lua', 'sol': 'sol', 'estrela': 'estrela', 'ceu': 'céu', 'planeta': 'planeta', 'flor': 'flor', 'grama': 'grama', 'folha': 'folha', 'arvore': 'árvore', 'semente': 'semente', 'jardim': 'jardim', 'maca': 'maçã', 'pera': 'pera', 'laranja': 'laranja', 'abacaxi': 'abacaxi', 'manga': 'manga', 'pessego': 'pêssego'}
 LETTERS = dict(zip('abcdefghijklmnopqrstuvwxyz', ['á','bê','cê','dê','é','éfe','gê','agá','i','jóta','cá','éle','ême','êne','ó','pê','quê','érre','ésse','tê','u','vê','dáblio','xis','ípsilon','zê']))
-CATALOG = {**WORDS, **{'letra-'+key:value for key,value in LETTERS.items()}}
 ROOT = Path(__file__).resolve().parents[1]
+PHRASES = {item['id']:item['text'].lower()+'.' for item in json.loads((ROOT/'frontend/phrases/catalog.json').read_text())}
+CATALOG = {**WORDS, **{'letra-'+key:value for key,value in LETTERS.items()}, **PHRASES}
 VOICES = ('pt-BR-FranciscaNeural','pt-BR-AntonioNeural','pt-BR-ThalitaMultilingualNeural')
 
 async def generate(output, synthesize, *, voice, version, rate='-15%', only=None):

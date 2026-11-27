@@ -179,3 +179,12 @@ Geração parcial dos novos áudios (apenas para manutenção, não para executa
 ```bash
 python scripts/generate_audio.py --only flor grama folha arvore semente jardim maca pera laranja abacaxi manga pessego
 ```
+
+
+## Revisitas explicáveis — V0.1.9
+
+A área de responsáveis inclui **Revisitas neste tema**, com até cinco opções opcionais, ordenadas pelo último registro datado. A lista separa intervalo atingido, registro recente, ausência de data e datas a conferir. Usa somente conclusões da mesma palavra e atividade, dentro do tema escolhido.
+
+Revisitar mantém a atividade registrada: uma conclusão de associação não vira evidência de construção porque outra atividade foi marcada como preferida. Registros com datas futuras não geram indicação por intervalo; registros sem data são preservados e não recebem data inventada. Uma nova conclusão atualiza somente a palavra/atividade realizada. Clicar em Revisitar, ignorar, trocar de palavra ou ajustar o intervalo não cria uma conclusão.
+
+O intervalo de 3 a 30 dias (padrão 7) é uma preferência de organização, não prazo, avaliação pedagógica ou indicador de esquecimento. Com personalização desligada não é produzida lista personalizada; palavras e atividades continuam disponíveis. O módulo roda no dispositivo, inclusive offline após atualização do cache v16. Não há modelo treinado, novas categorias de dados, relatório ou mudança do banco local. Veja [regras de revisita](docs/ADAPTIVE_RULES.md).

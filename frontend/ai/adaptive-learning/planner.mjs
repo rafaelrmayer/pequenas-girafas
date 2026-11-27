@@ -1,11 +1,13 @@
+import {reviewOverview} from './reviews.mjs';
 import {nextPresentation,presentationsFor} from '../../modules/presentations.mjs';
-import {dayIndex,evidenceFor} from './engine.mjs';
+import {evidenceFor} from './engine.mjs';
 import {relatedWords} from '../semantic-expansion/graph.mjs';
 const labels={build:'Montar a palavra',missing:'Completar uma letra',match:'Associar imagem e palavra'};
 export function recommendActivities({catalog,events,wordId,activity='build',settings={},rules={},today,sessionId,imageId}) {
   if(settings.adapt===false) return [];
   const current=catalog.words.find(word=>word.id===wordId);
   if(!current) return [];
+  if(current.themeId) catalog={...catalog,words:catalog.words.filter(word=>word.themeId===current.themeId)};
   const facts=evidenceFor(events,wordId,activity);
   const next=[];
   function add(action,id,type,label,reason,extra={}) {
@@ -14,19 +16,16 @@ export function recommendActivities({catalog,events,wordId,activity='build',sett
     next.push({id:`${action}:${id}:${type}`,action,wordId:id,activity:type,label,reason,...extra});
   }
   const preferred=labels[settings.preferredActivity]?settings.preferredActivity:null;
-  const interval=Number(settings.reviewAfterDays || rules.reviewAfterDays || 7);
-  const reviewDays=Number.isInteger(interval) && interval>=3 && interval<=30?interval:7;
-  const now=dayIndex(today);
-  const reviews=catalog.words.flatMap(word=>Object.keys(labels).map(type=>({word,type,facts:evidenceFor(events,word.id,type)})))
-    .filter(item=>item.facts.lastDay && now!==null && now-dayIndex(item.facts.lastDay)>=reviewDays)
-    .sort((a,b)=>a.facts.lastDay.localeCompare(b.facts.lastDay) || a.word.complexity-b.word.complexity);
-  if(reviews.length && settings.exploration!=='new') {
-    const item=reviews[0];
-    add('review',item.word.id,preferred || item.type,`Revisitar ${item.word.text}`,`Há um registro de ${labels[item.type]} em ${item.facts.lastDay}. O intervalo escolhido é ${reviewDays} dias; revisitar não significa que houve esquecimento.`,{mode:'model'});
+  const overview=reviewOverview({catalog,events,today,settings,rules});
+  if(overview.available.length && settings.exploration!=='new') {
+    const item=overview.available[0];
+    add('review',item.wordId,item.activity,`Revisitar ${item.text}`,`O último registro datado de ${labels[item.activity]} é de ${item.lastDay}. O intervalo escolhido é ${overview.interval} dias; revisitar não significa que houve esquecimento. A atividade registrada é preservada.`,{mode:'model'});
   }
   if(settings.exploration==='review' && !next.length) {
-    const old=catalog.words.find(word=>word.id!==wordId && events.some(e=>e.wordId===word.id && e.outcome==='completed'));
-    if(old) add('review',old.id,preferred || activity,`Revisitar ${old.text}`,'Você escolheu revisar palavras já exploradas. Registros sem data não permitem calcular um intervalo.',{mode:'model'});
+    const item=overview.entries.find(entry=>entry.wordId!==wordId && ['recent','undated'].includes(entry.status));
+    if(item) add('review',item.wordId,item.activity,`Revisitar ${item.text}`,item.status==='undated'
+      ?`Você escolheu revisitar ${labels[item.activity]}, que já tem registros. Registros sem data não permitem calcular um intervalo.`
+      :`Você escolheu revisitar ${labels[item.activity]}, com último registro datado em ${item.lastDay}. O intervalo de ${overview.interval} dias ainda não foi atingido; revisitar continua sendo uma escolha livre.`,{mode:'model'});
   }
   const related=relatedWords(catalog,wordId,events,{...settings,today});
   const candidate=related[0];

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9 — 2026-11-27
+
+- Lista opcional de revisitas por tema, com explicação de intervalo e datas desconhecidas/futuras.
+- Preserva atividade de origem nas revisitas; preferências não fabricam evidências de outras atividades.
+- Atualiza a lista somente com novas conclusões; personalização desligada não gera fila. Cache v16.
+
 ## 0.1.8 — 2026-11-27
 
 - Temas Natureza e Frutas com seis palavras, imagens originais e áudios locais cada.

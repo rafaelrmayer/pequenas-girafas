@@ -640,3 +640,40 @@ test('Nature and Fruits preserve accents, records and next-word cycles with all 
   assert.equal(network.filter(request=>request.method!=='GET').length,0);assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
+
+
+test('optional review list preserves original activities, separates dates and updates only after completion',async()=>{
+ const {browser,context,page,failures,network}=await setup({viewport:{width:390,height:844}});
+ try{
+  await page.evaluate(async()=>{
+   const store=await import('/storage/store.mjs');const {localDay}=await import('/ai/adaptive-learning/engine.mjs');
+   const old=new Date(),future=new Date();old.setDate(old.getDate()-10);future.setDate(future.getDate()+3);
+   await store.mutate(state=>({...state,settings:{...state.settings,preferredActivity:'build',reviewAfterDays:7},events:[
+    {wordId:'mar',sessionId:'old',activity:'match',outcome:'completed',support:'assisted',day:localDay(old)},
+    {wordId:'concha',sessionId:'legacy',activity:'build',outcome:'completed',support:'independent'},
+    {wordId:'polvo',sessionId:'future',activity:'missing',outcome:'completed',support:'independent',day:localDay(future)}]}));
+  });
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));await context.setOffline(true);
+  await page.reload();await page.locator('#experience').waitFor({state:'visible'});await page.locator('#adult-title').click();
+  assert.match(await page.locator('#review-status').textContent(),/Opções com intervalo atingido: 1/);
+  assert.match(await page.locator('#review-status').textContent(),/Sem data para calcular intervalo: 1/);assert.match(await page.locator('#review-status').textContent(),/Com data a conferir: 1/);
+  assert.equal(await page.locator('#review-list button').count(),1);
+  assert.equal(await page.locator('#review-list button').getAttribute('data-activity'),'match');
+  await page.locator('#theme').selectOption('astronomia');assert.equal(await page.locator('#review-list button').count(),0);
+  assert.match(await page.locator('#review-status').textContent(),/falta de registro não é dificuldade/);
+  await page.locator('#theme').selectOption('fundo-do-mar');
+  await page.locator('#adapt').uncheck();assert.equal(await page.locator('#review-list button').count(),0);
+  assert.equal(await page.locator('#word option').count(),7);
+  await page.locator('#adapt').check();await page.locator('#review-list button').click();
+  assert.equal(await page.locator('#word').inputValue(),'mar');
+  assert.equal(await page.locator('input[name="activity"][value="match"]').isChecked(),true);
+  const before=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events.length;});assert.equal(before,3);
+  await page.locator('#match-options button').filter({hasText:'MAR'}).click();await page.locator('#check').click();
+  await page.locator('#repeat').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.querySelectorAll('#review-list button').length===0);
+  assert.match(await page.locator('#review-status').textContent(),/Atividades com registro datado mais recente: 1/);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  assert.equal(network.filter(request=>request.method!=='GET').length,0);assert.deepEqual(failures,[]);
+  await page.screenshot({path:'test-results/revisitas-mobile.png',fullPage:true});
+ }finally{await browser.close();}
+});

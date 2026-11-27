@@ -11,7 +11,7 @@ def test_catalog_graph_and_resources_are_consistent():
     assert response.status_code == 200
     data = response.json()
     ids = {w['id'] for w in data['words']}
-    assert len(ids) == 12 and 'peixe' in ids
+    assert len(ids) == 24 and 'peixe' in ids
     graph_ids=ids | {node['id'] for node in data['concepts']}
     assert all(not node['playable'] for node in data['concepts'])
     for edge in data['relations']:

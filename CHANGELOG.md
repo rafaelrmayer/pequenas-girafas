@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8 — 2026-11-27
+
+- Temas Natureza e Frutas com seis palavras, imagens originais e áudios locais cada.
+- Grafia com acentos e cedilha preservada nas atividades; categorias Plantas e Frutas nas preferências.
+- Preserva temas e registros existentes. Cache offline v15.
+
 ## 0.1.7 — 2026-11-27
 
 - Tema Astronomia com cinco palavras, imagens originais e áudios locais.

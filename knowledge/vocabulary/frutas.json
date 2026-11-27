@@ -1,0 +1,213 @@
+{
+  "version": 1,
+  "language": "pt-BR",
+  "theme": {
+    "id": "frutas",
+    "label": "Frutas"
+  },
+  "words": [
+    {
+      "id": "maca",
+      "text": "MAÇÃ",
+      "alt": "uma maçã",
+      "category": "fruta",
+      "complexity": 2,
+      "image": "/assets/maca.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/maca.svg",
+            "label": "Ilustração original",
+            "alt": "uma maçã"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "pera",
+      "text": "PERA",
+      "alt": "uma pera",
+      "category": "fruta",
+      "complexity": 1,
+      "image": "/assets/pera.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/pera.svg",
+            "label": "Ilustração original",
+            "alt": "uma pera"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "laranja",
+      "text": "LARANJA",
+      "alt": "uma laranja",
+      "category": "fruta",
+      "complexity": 3,
+      "image": "/assets/laranja.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/laranja.svg",
+            "label": "Ilustração original",
+            "alt": "uma laranja"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "abacaxi",
+      "text": "ABACAXI",
+      "alt": "um abacaxi",
+      "category": "fruta",
+      "complexity": 3,
+      "image": "/assets/abacaxi.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/abacaxi.svg",
+            "label": "Ilustração original",
+            "alt": "um abacaxi"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "manga",
+      "text": "MANGA",
+      "alt": "uma manga, a fruta",
+      "category": "fruta",
+      "complexity": 2,
+      "image": "/assets/manga.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/manga.svg",
+            "label": "Ilustração original",
+            "alt": "uma manga, a fruta"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "pessego",
+      "text": "PÊSSEGO",
+      "alt": "um pêssego",
+      "category": "fruta",
+      "complexity": 3,
+      "image": "/assets/pessego.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/pessego.svg",
+            "label": "Ilustração original",
+            "alt": "um pêssego"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    }
+  ],
+  "relations": [
+    {
+      "from": "maca",
+      "to": "pera",
+      "label": "compartilha tema com"
+    },
+    {
+      "from": "laranja",
+      "to": "abacaxi",
+      "label": "compartilha tema com"
+    },
+    {
+      "from": "manga",
+      "to": "pessego",
+      "label": "compartilha tema com"
+    },
+    {
+      "from": "pera",
+      "to": "laranja",
+      "label": "compartilha tema com"
+    },
+    {
+      "from": "abacaxi",
+      "to": "manga",
+      "label": "compartilha tema com"
+    },
+    {
+      "from": "pessego",
+      "to": "frutas",
+      "label": "pertence ao tema"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "frutas",
+      "label": "FRUTAS",
+      "kind": "theme",
+      "playable": false,
+      "reviewed": false
+    }
+  ]
+}

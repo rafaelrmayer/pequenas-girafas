@@ -89,7 +89,7 @@ python -m pip install -r requirements-audio.txt
 python scripts/generate_audio.py
 ```
 
-Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 38 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
+Esse comando precisa de internet e envia ao serviço Microsoft Edge **somente os 50 textos genéricos fixos do catálogo**. Não aceita texto livre ou histórico da criança. Não roda em inicialização, deploy ou CI de testes. Oferece também as vozes pt-BR Antonio e Thalita por `--voice`. A voz é validada contra o catálogo online antes de gerar. Os arquivos só são substituídos depois da geração completa; falha de rede preserva o catálogo anterior.
 
 `frontend/assets/audio/manifest.json` registra provedor, versão, voz, taxa, transcrições e hashes de cada MP3. `scripts/generate_audio_espeak.py` preserva a alternativa antiga, de qualidade mais robótica; não é o padrão. Edge TTS usa um serviço online do Edge, não a API contratada do Azure Speech, e sua disponibilidade pode variar. Biblioteca e serviço têm condições próprias; ver [licenças](THIRD_PARTY_LICENSES.md).
 
@@ -159,3 +159,23 @@ python scripts/generate_audio.py --only lua sol estrela ceu planeta
 A geração parcial exige manifesto anterior compatível e verifica seus hashes. O comando envia somente esses textos genéricos ao serviço, não registros de aprendizagem. O cache v13 inclui todas as palavras e mídias para uso offline após sua atualização. A publicação continua em `develop` no ambiente de testes; não promove a versão principal.
 
 O botão **Próxima palavra**, junto de Ouvir a palavra, percorre a ordem do tema escolhido e retorna à primeira após a última. Preserva a atividade escolhida, interrompe o áudio anterior e não reproduz outro automaticamente. Rodadas incompletas não geram registro de erro ou dificuldade; conclusões anteriores continuam salvas. Atualização de cache v14.
+
+
+## Natureza e Frutas — V0.1.8
+
+Dois temas adicionais usam as três atividades existentes:
+
+- **Natureza:** FLOR, GRAMA, FOLHA, ÁRVORE, SEMENTE e JARDIM.
+- **Frutas:** MAÇÃ, PERA, LARANJA, ABACAXI, MANGA e PÊSSEGO.
+
+As 12 ilustrações são SVGs originais e os 12 áudios são MP3 locais pt-BR, com a mesma voz e taxa do catálogo anterior. As 38 gravações anteriores foram preservadas. Os quatro temas somam 24 palavras e 26 nomes de letras, totalizando 50 gravações. A grafia preserva acentos e cedilha; PERA segue a grafia sem acento. MANGA é representada como fruta.
+
+O grafo local contém relações como FOLHA → faz parte de → ÁRVORE e FLOR → pode ser encontrada em → JARDIM. Categorias Plantas e Frutas podem ser explicitamente escolhidas nas preferências; a seleção não bloqueia outras palavras. As sugestões permanecem no tema atual. Não há modelo treinado, inferência automática de interesses ou validação pedagógica das classificações de complexidade.
+
+O botão Próxima palavra percorre cada tema e retorna à primeira após a última. Os registros dos temas anteriores permanecem no dispositivo e na exportação. Cache v15 inclui os novos recursos para uso offline após atualização. Cadastro de palavras e relatórios personalizados ainda não foram implementados.
+
+Geração parcial dos novos áudios (apenas para manutenção, não para executar o aplicativo):
+
+```bash
+python scripts/generate_audio.py --only flor grama folha arvore semente jardim maca pera laranja abacaxi manga pessego
+```

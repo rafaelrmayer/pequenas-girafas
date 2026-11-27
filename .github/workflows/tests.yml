@@ -37,6 +37,14 @@ jobs:
       - run: pip install -r requirements.txt
       - run: npm ci
       - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Preparar saída de áudio virtual para testes
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pulseaudio
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=girafas_ci
+          pactl set-default-sink girafas_ci
+          pactl info
       - name: Iniciar aplicação e verificar navegador
         run: |
           python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --no-access-log > /tmp/girafas-server.log 2>&1 &

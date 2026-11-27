@@ -233,6 +233,78 @@
       "text": "planeta",
       "file": "planeta.mp3",
       "sha256": "f536c677fbb6c85a11fd6a494068e5850ced0937ea9d67e177e90d33d9abe365"
+    },
+    {
+      "id": "flor",
+      "text": "flor",
+      "file": "flor.mp3",
+      "sha256": "94228227b8c9febb77fff60d4ddfb9b279957447353d258f46caea3dfe6d749f"
+    },
+    {
+      "id": "grama",
+      "text": "grama",
+      "file": "grama.mp3",
+      "sha256": "54f3cd83080d8aa0966c16064794048b86a2a3647c0a25050feaafa13d16d5ce"
+    },
+    {
+      "id": "folha",
+      "text": "folha",
+      "file": "folha.mp3",
+      "sha256": "bc32c87d5f95faa1493ec10a91f7094003a60f6803a4e79bcf55e432b9b74bd3"
+    },
+    {
+      "id": "arvore",
+      "text": "árvore",
+      "file": "arvore.mp3",
+      "sha256": "9414baf4bc72f2dfb6cd86836075d3562bf93c18389db8115e76129e55927acc"
+    },
+    {
+      "id": "semente",
+      "text": "semente",
+      "file": "semente.mp3",
+      "sha256": "2225def8f35cce0f5ccd0f10322e9ae27d508fb09d84cf5bcf420d82161bc292"
+    },
+    {
+      "id": "jardim",
+      "text": "jardim",
+      "file": "jardim.mp3",
+      "sha256": "e96280e228b9f4d062acd38e137a99b3ac21c6fcb68cc01c53c35913531507ba"
+    },
+    {
+      "id": "maca",
+      "text": "maçã",
+      "file": "maca.mp3",
+      "sha256": "8a84fa72abe4dbf6a1f373adf9c8c706e9de8e50fc96a4a5432408aaf664c19b"
+    },
+    {
+      "id": "pera",
+      "text": "pera",
+      "file": "pera.mp3",
+      "sha256": "bb07619248cf1eb54c5a565c45e81f0a75c46eb34ec4d7d132f14640778d11df"
+    },
+    {
+      "id": "laranja",
+      "text": "laranja",
+      "file": "laranja.mp3",
+      "sha256": "312125618234aa43f90422e1a06b5e360fd079350cb0c4d76be832cb168cd3d8"
+    },
+    {
+      "id": "abacaxi",
+      "text": "abacaxi",
+      "file": "abacaxi.mp3",
+      "sha256": "75e1c4d53996b4056d024d2cfe2a48bb5b0c48e1660c9dc63d803f2104710dbc"
+    },
+    {
+      "id": "manga",
+      "text": "manga",
+      "file": "manga.mp3",
+      "sha256": "e45dd759e3e124c4d00d5f570ed8871e8c9d10f0c8932176249265ccdec8ed08"
+    },
+    {
+      "id": "pessego",
+      "text": "pêssego",
+      "file": "pessego.mp3",
+      "sha256": "d0a1a6e155b3a0fe7d9c692f9dba44e8864a35fa1fedaa083b6657fe6bf10b2a"
     }
   ]
 }

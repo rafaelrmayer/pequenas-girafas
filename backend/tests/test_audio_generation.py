@@ -16,7 +16,7 @@ def test_generator_accepts_only_fixed_generic_catalog_and_records_provenance(tmp
         sent.append(text)
         path.write_bytes(b'ID3'+text.encode()*300)
     result=asyncio.run(generator.generate(tmp_path/'audio',provider,voice=generator.VOICES[0],version='test'))
-    assert len(sent)==38 and sent==list(generator.CATALOG.values())
+    assert len(sent)==50 and sent==list(generator.CATALOG.values())
     assert result['personalData'] is False
     assert result['voice']=='pt-BR-FranciscaNeural'
     assert all((tmp_path/'audio'/record['file']).is_file() for record in result['entries'])
@@ -37,7 +37,7 @@ def test_shipped_audio_matches_edge_manifest():
     manifest=json.loads((output/'manifest.json').read_text())
     assert manifest['provider']=='edge-tts'
     assert manifest['packageVersion']=='7.3.1'
-    assert len(manifest['entries'])==38
+    assert len(manifest['entries'])==50
     assert {entry['id']:entry['text'] for entry in manifest['entries']}==generator.CATALOG
     for entry in manifest['entries']:
         assert hashlib.sha256((output/entry['file']).read_bytes()).hexdigest()==entry['sha256']
@@ -52,6 +52,6 @@ def test_partial_generation_preserves_unchanged_recordings(tmp_path):
     async def replacement(text,path):
         sent.append(text);path.write_bytes(b'ID3'+text.encode()*400)
     result=asyncio.run(generator.generate(output,replacement,voice=generator.VOICES[0],version='test',only=['lua']))
-    assert sent==['lua'] and len(result['entries'])==38
+    assert sent==['lua'] and len(result['entries'])==50
     assert (output/'peixe.mp3').read_bytes()==before
     assert next(e for e in original['entries'] if e['id']=='peixe')==next(e for e in result['entries'] if e['id']=='peixe')

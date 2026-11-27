@@ -398,7 +398,7 @@ async function boot() {
       setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });
     phraseCatalog=phraseEntries(loaded[2],loaded[3]);
-    phraseView=setupPhrases({catalog:fullCatalog,phrases:loaded[2],continuations:loaded[3],isBusy:()=>saving,recordCompletion:async event=>{
+    phraseView=setupPhrases({catalog:fullCatalog,phrases:loaded[2],continuations:loaded[3],events:()=>state.phraseEvents||[],isBusy:()=>saving,recordCompletion:async event=>{
       saving=true;let saved=false;try{await settingsQueue;const stored=await store.recordPhrase(event);state.phraseEvents=stored.phraseEvents;saved=true;}
       catch{storageOK=false;state.phraseEvents=[...(state.phraseEvents||[]),event].slice(-200);}
       finally{saving=false;}summary();return saved;

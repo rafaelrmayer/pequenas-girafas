@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.15 — 2026-11-27
+
+- Sugestões opcionais e explicáveis de frases, baseadas em registros locais e preferências explícitas, dentro do tema atual.
+- Ignorar preserva a rodada; escolher reinicia com modelo, sem criar registro ou iniciar áudio.
+- Revisitas conservadoras com datas desconhecidas/futuras; exposição da frase completa conta como modelo. Cache v22.
+
 ## 0.1.14 — 2026-11-27
 
 - Menu inferior fixo com Atividades, Apoios e Responsáveis em áreas separadas, preservando montagens.

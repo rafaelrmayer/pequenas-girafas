@@ -41,3 +41,5 @@ A V0.1.8 acrescenta 12 SVGs originais de Natureza e Frutas sob a licença do có
 A V0.1.11 acrescenta oito gravações de frases genéricas com a mesma voz Francisca pt-BR, taxa -15% e edge-tts 7.3.1. Catálogo total: 58 gravações, com hashes e textos no manifesto. As 50 anteriores foram preservadas. Sem texto de usuários enviado ao serviço. Condições do serviço/voz permanecem separadas da licença do código.
 
 A V0.1.12 acrescenta 16 narrações genéricas de continuações de frases (74 gravações ao todo), com a mesma origem, voz, taxa e versão do gerador. Os 58 áudios anteriores foram preservados. Textos e hashes constam do manifesto. Condições do serviço/voz permanecem separadas da licença do código.
+
+A V0.1.17 acrescenta 25 áudios genéricos de palavras/cartões, com a mesma voz Francisca pt-BR, taxa -15% e edge-tts 7.3.1. São 99 gravações, preservando as 74 anteriores. Textos e hashes constam do manifesto. As composições das crianças não são enviadas ao serviço; condições do serviço/voz permanecem separadas da licença do código. Desenhos criados pelos usuários não são recursos genéricos distribuídos com o projeto.

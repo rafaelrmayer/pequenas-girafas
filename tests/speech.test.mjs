@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {speak, stop, localPortugueseVoices} from '../frontend/accessibility/speech.mjs';
+import {speak, speakSequence, stop, localPortugueseVoices} from '../frontend/accessibility/speech.mjs';
 
 test('local Portuguese voice selection excludes remote services and prefers pt-BR', () => {
   const utterances = [];
@@ -86,4 +86,12 @@ test('finished recordings release media resources before another word plays',()=
   audio.onerror();assert.equal(status,'Leitura concluída.');
  }
  stop();delete globalThis.Audio;
+});
+
+test('card narration plays in order, completes once, and global stop prevents later words',()=>{
+ const players=[];let status='';
+ globalThis.Audio=class{constructor(src){this.src=src;players.push(this);}play(){this.onplaying();return Promise.resolve();}pause(){}removeAttribute(){}load(){}};
+ const items=[{text:'EU',source:'/assets/audio/card-45-55.mp3'},{text:'VEJO',source:'/assets/audio/card-56-45-4a-4f.mp3'},{text:'LUA',source:'/assets/audio/lua.mp3'}];
+ speakSequence(items,.7,s=>status=s);assert.equal(players.length,1);players[0].onended();assert.equal(players.length,2);assert.equal(players[1].src,items[1].source);stop();players[1].onended();assert.equal(players.length,2);assert.notEqual(status,'Leitura concluída.');
+ speakSequence(items,.7,s=>status=s);for(let i=2;i<5;i++)players[i].onended();assert.equal(players.length,5);assert.equal(status,'Leitura concluída.');stop();delete globalThis.Audio;
 });

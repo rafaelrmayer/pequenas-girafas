@@ -449,6 +449,156 @@
       "text": "a pera tem sementes.",
       "file": "frase-pera-2.mp3",
       "sha256": "296f5bcd9ad0e81e8afec19c92992bf047e74595cbf62e2dc11cf2247adcb442"
+    },
+    {
+      "id": "card-4f",
+      "text": "o",
+      "file": "card-4f.mp3",
+      "sha256": "6c3ad50182b3e2b518df433aee468748d42cd89a605fa224e321218ec66e09b6"
+    },
+    {
+      "id": "card-4e-41-44-41",
+      "text": "nada",
+      "file": "card-4e-41-44-41.mp3",
+      "sha256": "4cebede6bb510e4da5d07079e3537a946a02f1f3aafa2e9decf47fba1f72ece5"
+    },
+    {
+      "id": "card-56-49-56-45",
+      "text": "vive",
+      "file": "card-56-49-56-45.mp3",
+      "sha256": "10834df5c0c022a168bda450bccd0e025a02adcd19ae379ec2902a3a6a935bf2"
+    },
+    {
+      "id": "card-4e-4f",
+      "text": "no",
+      "file": "card-4e-4f.mp3",
+      "sha256": "318a1e0fd4116c5c4aef195b11b289e74ae246b19dfeb78eff9ba90de3217578"
+    },
+    {
+      "id": "card-41",
+      "text": "a",
+      "file": "card-41.mp3",
+      "sha256": "b03dc2d706f1b1c06083bfd3c4910b7dd0dfd98fccb4e635f2e473e90ac3f6b8"
+    },
+    {
+      "id": "card-45-53-54-c1",
+      "text": "está",
+      "file": "card-45-53-54-c1.mp3",
+      "sha256": "251673e9857de86b8388f117e14e58a7bb25e18c3a805ee8c6ef99ed6437cd80"
+    },
+    {
+      "id": "card-42-52-49-4c-48-41",
+      "text": "brilha",
+      "file": "card-42-52-49-4c-48-41.mp3",
+      "sha256": "31e6463db436d38f2ae25ae56328c4a363bbbe533298a629d62686d8af59d68d"
+    },
+    {
+      "id": "card-54-45-4d",
+      "text": "tem",
+      "file": "card-54-45-4d.mp3",
+      "sha256": "3d76f5a3613e3eb24c16d93a7c0294c173ecb768ebe20627ddca2a5333d9defc"
+    },
+    {
+      "id": "card-46-4f-4c-48-41-53",
+      "text": "folhas",
+      "file": "card-46-4f-4c-48-41-53.mp3",
+      "sha256": "a6b20a5a285175770cc70926ec141b2da9c17a5f14b6687c457c57032fd3b7aa"
+    },
+    {
+      "id": "card-c9",
+      "text": "é",
+      "file": "card-c9.mp3",
+      "sha256": "c7af4e8558fd8f2668334bb5cd49d11e5753400abd7adc7920624bd7659f2568"
+    },
+    {
+      "id": "card-55-4d-41",
+      "text": "uma",
+      "file": "card-55-4d-41.mp3",
+      "sha256": "1d26395380a5e4b9edd343f6b6aa6edba1497d8b16f1c84ad49e0502f9730e03"
+    },
+    {
+      "id": "card-46-52-55-54-41",
+      "text": "fruta",
+      "file": "card-46-52-55-54-41.mp3",
+      "sha256": "fdfe9f2ac0781145497bc347b5bcc4781488671341791240e4f36950c2066be1"
+    },
+    {
+      "id": "card-4e-41",
+      "text": "na",
+      "file": "card-4e-41.mp3",
+      "sha256": "5704f27b57e016de8b13fe72235d6ae0baca4e57cb1bd5054ed898bdfe06cd2f"
+    },
+    {
+      "id": "card-53-4f-42-52-45",
+      "text": "sobre",
+      "file": "card-53-4f-42-52-45.mp3",
+      "sha256": "2cd917731380e5ac028bf4b16f714ee6c0d6fc08d0bec045a577591e4b0bdb29"
+    },
+    {
+      "id": "card-49-4c-55-4d-49-4e-41",
+      "text": "ilumina",
+      "file": "card-49-4c-55-4d-49-4e-41.mp3",
+      "sha256": "79e1aebb71a02d731d085cb9a2ab7e9638f974b2a4901213ce756e1952e75368"
+    },
+    {
+      "id": "card-50-45-52-54-4f",
+      "text": "perto",
+      "file": "card-50-45-52-54-4f.mp3",
+      "sha256": "fa3849da692db2138e47dfca512b6ea3a590a12f22808bcbbc588f665e762a07"
+    },
+    {
+      "id": "card-44-41",
+      "text": "da",
+      "file": "card-44-41.mp3",
+      "sha256": "ef3f01c4739199dbfe075994336bc3e8f4defba2733b2cf44204aa319c49fff5"
+    },
+    {
+      "id": "card-43-52-45-53-43-45",
+      "text": "cresce",
+      "file": "card-43-52-45-53-43-45.mp3",
+      "sha256": "c762049b22c6997b4243a9e74985d2555aff8defc7992b72a67fcc544451d337"
+    },
+    {
+      "id": "card-46-4c-4f-52-45-53",
+      "text": "flores",
+      "file": "card-46-4c-4f-52-45-53.mp3",
+      "sha256": "44931838ac1070b826929924427d7ab57d2bc287beba8c1da18f8ab69d0e2c23"
+    },
+    {
+      "id": "card-55-4d",
+      "text": "um",
+      "file": "card-55-4d.mp3",
+      "sha256": "c3cadf30021b726ddba32a317d7491e4300e5ebff4a93f5f2bfccc414b56dcbd"
+    },
+    {
+      "id": "card-41-4c-49-4d-45-4e-54-4f",
+      "text": "alimento",
+      "file": "card-41-4c-49-4d-45-4e-54-4f.mp3",
+      "sha256": "ecef92e96d5beefdc9384112a68d277755272d8b003f3b4d483f3da76e4ccb1d"
+    },
+    {
+      "id": "card-53-45-4d-45-4e-54-45-53",
+      "text": "sementes",
+      "file": "card-53-45-4d-45-4e-54-45-53.mp3",
+      "sha256": "c57b9f12d2efaebc2f250c81555789756068b6204dac8ff14b028a9c17776435"
+    },
+    {
+      "id": "card-45",
+      "text": "e",
+      "file": "card-45.mp3",
+      "sha256": "d2a8b9bf5abd4cd2b222c7d1344070bb766797853bd0ced96c95b95056998679"
+    },
+    {
+      "id": "card-45-55",
+      "text": "eu",
+      "file": "card-45-55.mp3",
+      "sha256": "6ed94e4ad095b1320815ce609a079637a027fa1f69030eb373e327752a4012c6"
+    },
+    {
+      "id": "card-56-45-4a-4f",
+      "text": "vejo",
+      "file": "card-56-45-4a-4f.mp3",
+      "sha256": "b77af569f556d167833899a1c4146d1df5a56aa88621240f4846a2c994b91d12"
     }
   ]
 }

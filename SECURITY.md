@@ -13,3 +13,5 @@ Dados locais não são criptografados; quem usa o perfil de navegador pode ler/e
 GIRAF Python requer JWT secreto forte. Validar expiração obrigatória, issuer/audience, algoritmo permitido, emissão segura e rotação; manter token no servidor, nunca no frontend. Adotar limite global de custos e concorrência, timeouts, limite total de corpo/resposta, origem exata, logs sem payload, mensagens sanitizadas e revisão de retenção/licença dos provedores. Limite por IP do upstream não é teto de gastos. Somente conteúdo genérico validado, nunca histórico ou texto pessoal.
 
 Relate falhas de forma privada ao mantenedor no GitHub; não publique segredos ou dados pessoais em issues. Ainda não há canal de suporte público dedicado ou produção publicada.
+
+Desde V0.1.17, img-src permite data: para exibir PNGs criados no editor local. O modelo valida prefixo PNG, tamanho, assinatura e dimensões 600×400; URLs externas e SVGs de usuário não são aceitos. script-src, connect-src e media-src continuam restritos à própria origem. Não há importação/upload de desenhos nem execução de conteúdo do rascunho como HTML.

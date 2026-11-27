@@ -32,7 +32,7 @@ export function speak(text, volume, report, source) {
   const id = sequence;
   const level = Math.max(0,Math.min(1,Number(volume) || 0));
   if (!level) {report('O volume da leitura está em zero. Aumente-o em Apoios e preferências.'); return;}
-  if (source && /^\/assets\/audio\/(?:peixe|mar|agua|polvo|concha|praia|caranguejo|lua|sol|estrela|ceu|planeta|flor|grama|folha|arvore|semente|jardim|maca|pera|laranja|abacaxi|manga|pessego|letra-[a-z]|frase-(?:peixe|polvo|lua|sol|flor|arvore|maca|pera)(?:-[12])?)\.mp3$/.test(source) && globalThis.Audio) {
+  if (source && /^\/assets\/audio\/(?:peixe|mar|agua|polvo|concha|praia|caranguejo|lua|sol|estrela|ceu|planeta|flor|grama|folha|arvore|semente|jardim|maca|pera|laranja|abacaxi|manga|pessego|letra-[a-z]|card-[0-9a-f]{2,4}(?:-[0-9a-f]{2,4}){0,19}|frase-(?:peixe|polvo|lua|sol|flor|arvore|maca|pera)(?:-[12])?)\.mp3$/.test(source) && globalThis.Audio) {
     const audio = new Audio(source); player = audio; audio.volume = level;
     let failed = false;
     const fallback = () => {
@@ -59,4 +59,16 @@ export function speak(text, volume, report, source) {
   };
   engine.addEventListener('voiceschanged', ready);
   timer = setTimeout(ready, 1200);
+}
+
+export function speakSequence(items,volume,report){
+ const queue=items.slice(0,12);if(!queue.length){stop();report('Escolha palavras para ouvir a frase.');return;}
+ function next(index){
+  const item=queue[index],expected=sequence+1;
+  speak(item.text,volume,message=>{
+   if(expected!==sequence)return;
+   if(message==='Leitura concluída.'){if(index+1<queue.length)next(index+1);else report(message);}
+   else report(message);
+  },item.source);
+ }next(0);
 }

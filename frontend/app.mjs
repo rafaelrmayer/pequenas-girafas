@@ -340,7 +340,7 @@ function renderAlphabet() {
 }
 async function boot() {
   try {
-    const responses = await Promise.all(['/api/v1/catalog','/api/v1/rules','/phrases/catalog.json','/phrases/continuations.json'].map(url => fetch(url, {signal: AbortSignal.timeout(15000)})));
+    const responses = await Promise.all(['/api/v1/catalog','/api/v1/rules','/phrases/catalog.json','/phrases/continuations.json','/stories/tokens.json'].map(url => fetch(url, {signal: AbortSignal.timeout(15000)})));
     if (responses.some(response => !response.ok)) throw new Error('Catálogo indisponível');
     const loaded = await Promise.all(responses.map(response => response.json()));
     [fullCatalog, rules] = loaded;
@@ -394,9 +394,9 @@ async function boot() {
     });
     $('export').addEventListener('click', () => {
       if(saving){$('data-feedback').textContent='Aguarde a conclusão do registro antes de baixar a cópia.';return;}
-      const blob = new Blob([JSON.stringify({schemaVersion:6, ...state}, null, 2)], {type:'application/json'});
+      const blob = new Blob([JSON.stringify({schemaVersion:7, ...state}, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'pequenas-girafas-copia-local.json'; link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
+      setTimeout(() => URL.revokeObjectURL(url), 1000); $('data-feedback').textContent = 'Cópia solicitada. O arquivo contém registros e histórias locais; guarde-o com cuidado. A restauração será implementada em outra versão.';
     });
     phraseCatalog=phraseEntries(loaded[2],loaded[3]);
     phraseView=setupPhrases({catalog:fullCatalog,phrases:loaded[2],continuations:loaded[3],events:()=>state.phraseEvents||[],isBusy:()=>saving,recordCompletion:async event=>{
@@ -404,7 +404,7 @@ async function boot() {
       catch{storageOK=false;state.phraseEvents=[...(state.phraseEvents||[]),event].slice(-200);}
       finally{saving=false;}summary();return saved;
     },settings:()=>({...state.settings,volume:state.settings.volume??0.7})});
-    storyView=setupStories({catalog:fullCatalog,entries:phraseCatalog,initialDraft:state.storyDraft,settings:()=>({...state.settings,volume:state.settings.volume??0.7}),isBusy:()=>saving,saveDraft:async draft=>{
+    storyView=setupStories({catalog:fullCatalog,entries:phraseCatalog,tokens:loaded[4],initialDraft:state.storyDraft,settings:()=>({...state.settings,volume:state.settings.volume??0.7}),isBusy:()=>saving,saveDraft:async draft=>{
       saving=true;let saved=false;try{await settingsQueue;const stored=await store.saveStory(draft);state.storyDraft=stored.storyDraft;saved=true;}
       catch{storageOK=false;}
       finally{saving=false;}summary();return saved;

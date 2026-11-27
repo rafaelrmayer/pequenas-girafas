@@ -16,7 +16,7 @@ Primeira etapa disponível em V0.1.11: oito frases fixas em quatro temas, cartõ
 
 ## V0.4 — Histórias e criatividade
 
-Primeira etapa disponível em V0.1.16: histórias de até seis páginas com imagens/frases existentes, edição, ordem, desfazer, áudio por página e um rascunho local. Próximas etapas: desenho, expressão mais aberta, biblioteca de múltiplas histórias, livros e exportação própria. Texto livre permanecerá local; nada enviado automaticamente a provedores.
+Primeira etapa disponível em V0.1.16: histórias de até seis páginas com imagens/frases existentes, edição, ordem, desfazer, áudio por página e um rascunho local. Cartões e desenho livre disponíveis em V0.1.17, em área própria de Histórias. Próximas etapas: ampliar expressão, biblioteca de múltiplas histórias, livros e exportação própria. Texto livre permanecerá local; nada enviado automaticamente a provedores.
 
 ## V0.5 — Avaliações de modelos
 

@@ -34,6 +34,7 @@ def test_security_and_no_remote_assets():
     response = client.get('/')
     assert response.status_code == 200
     assert "connect-src 'self'" in response.headers['content-security-policy']
+    assert "img-src 'self' data:" in response.headers['content-security-policy']
     assert "frame-ancestors 'none'" in response.headers['content-security-policy']
     assert response.headers['permissions-policy'] == 'camera=(), microphone=(), geolocation=()'
     assert 'https://' not in response.text and 'http://' not in response.text

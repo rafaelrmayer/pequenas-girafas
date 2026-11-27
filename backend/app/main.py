@@ -19,13 +19,13 @@ ENVIRONMENT = os.environ.get('APP_ENV', 'local')
 if ENVIRONMENT not in {'local', 'principal', 'testes'}:
     raise RuntimeError('APP_ENV deve ser local, principal ou testes')
 mock = MockGiraf()
-app = FastAPI(title="Pequenas Girafas", version="0.1.16", docs_url=None, redoc_url=None)
+app = FastAPI(title="Pequenas Girafas", version="0.1.17", docs_url=None, redoc_url=None)
 
 @app.middleware("http")
 async def headers(request, call_next):
     response = await call_next(request)
     response.headers.update({
-        "Content-Security-Policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "Content-Security-Policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
         "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer",
         "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
         "Cache-Control": "no-store",
@@ -34,7 +34,7 @@ async def headers(request, call_next):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "0.1.16", "mode": "mock", "personal_data": "device_only"}
+    return {"status": "ok", "version": "0.1.17", "mode": "mock", "personal_data": "device_only"}
 
 @app.get("/api/v1/catalog")
 def catalog():

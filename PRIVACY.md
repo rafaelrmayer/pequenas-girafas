@@ -57,3 +57,11 @@ Um rascunho de até seis páginas pode ser salvo explicitamente em storyDraft, n
 A edição e até dez estados de desfazer ficam apenas na memória. Salvar substitui a versão anterior. A cópia JSON schemaVersion 6 inclui a última versão salva, não as alterações pendentes ou tentativas de salvar que falharam. Não há restauração de cópias nesta etapa. Apagar registros, história e preferências limpa o rascunho salvo e a edição atual. Cópias baixadas precisam ser apagadas separadamente.
 
 Histórias não geram eventos de palavras/frases, não entram nos relatórios de aprendizagem nem no planejador. Imagens e narrações são arquivos genéricos existentes; nenhum histórico ou escolha de página é enviado a provedores. Quem compartilha este perfil pode abrir o rascunho. Em falha de armazenamento, a interface avisa e conserva a edição apenas na memória da página.
+
+## Cartões e desenhos (V0.1.17)
+
+O rascunho formato 2 aceita IDs de cartões de um vocabulário fixo (até 12 por página) e uma imagem PNG opcional de desenho, com tamanho fixo 600×400 e limite de 1.400.000 caracteres no data URL. Rascunhos formato 1 continuam aceitos. A cópia JSON passa a schemaVersion 7. Desenhos podem conter informações pessoais e são conteúdo privado, acessível a quem compartilha este perfil.
+
+Somente a imagem final é salva: não persistimos coordenadas de traços, pressão, tempos, velocidade ou ações de ferramentas. A edição e até dez passos de desfazer ficam em memória. Não há análise de desenho, inferência de emoções/capacidade, treino global ou envio a serviços de IA. Imagens das histórias não entram no cache de arquivos genéricos nem nos relatórios de aprendizagem.
+
+A frase criada é narrada com áudios fixos do aplicativo, sem enviar o texto a um sintetizador remoto. Desenhos e cartões só entram na página ao Adicionar/Atualizar, e no rascunho ao Salvar. Exclusão limpa rascunho, páginas em memória, imagens do leitor, canvas e desfazer. Cópias baixadas precisam ser apagadas separadamente.

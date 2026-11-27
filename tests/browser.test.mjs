@@ -510,3 +510,52 @@ test('new illustrations decode offline and work with association and missing-let
     assert.deepEqual(failures,[]);
   } finally {await browser.close();}
 });
+
+test('astronomy is freely selected, keeps both themes records and works offline with accents and local audio',async()=>{
+ const {browser,context,page,failures,network}=await setup();
+ try{
+  await construct(page,'PEIXE');
+  await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('PEIXE:'));
+  await page.locator('#theme').selectOption('astronomia');
+  assert.equal(await page.locator('#activity-title').textContent(),'Astronomia');
+  assert.equal(await page.locator('#word option').count(),5);
+  assert.equal(await page.locator('#word').inputValue(),'lua');
+  await page.waitForFunction(()=>Boolean(navigator.serviceWorker.controller));
+  await page.waitForFunction(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).settings.themeId==='astronomia';});
+  await context.setOffline(true);await page.reload();await page.locator('#experience').waitFor({state:'visible'});
+  assert.equal(await page.locator('#theme').inputValue(),'astronomia');
+  await construct(page,'LUA');
+  await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('LUA:'));
+  assert.match(await page.locator('#progress').textContent(),/PEIXE:/);
+  await page.locator('#word').selectOption('ceu');
+  await page.locator('input[name="activity"][value="missing"]').check();
+  await page.getByRole('button',{name:'Adicionar É',exact:true}).click();await page.locator('#check').click();
+  await page.locator('#repeat').waitFor({state:'visible'});
+  assert.match(await page.locator('#feedback').textContent(),/CÉU/);
+  await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('CÉU:'));
+  await page.locator('#word').selectOption('planeta');await page.locator('input[name="activity"][value="match"]').check();
+  await page.locator('#match-options button').filter({hasText:'PLANETA'}).click();await page.locator('#check').click();
+  await page.locator('#repeat').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('PLANETA:'));
+  assert.equal(await page.evaluate(async()=>{
+   const ctx=new (window.AudioContext||window.webkitAudioContext)();
+   try{for(const id of ['lua','sol','estrela','ceu','planeta']){
+    const image=await fetch('/assets/'+id+'.svg');if(!image.ok)return false;
+    const response=await fetch('/assets/audio/'+id+'.mp3');if(!response.ok)return false;
+    const decoded=await ctx.decodeAudioData(await response.arrayBuffer());if(decoded.duration<=0)return false;
+   }return true;}finally{await ctx.close();}
+  }),true);
+  await page.screenshot({path:'test-results/astronomia-desktop.png',fullPage:true});
+  await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
+  for(const id of ['lua','sol','estrela','ceu','planeta']){
+    await page.locator('#word').selectOption(id);await page.locator('#listen').click();
+    await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
+    await page.locator('#picture').screenshot({path:'test-results/astronomia-'+id+'.png'});
+  }
+  await page.locator('#theme').selectOption('fundo-do-mar');
+  assert.equal(await page.locator('#word option').count(),7);
+  assert.match(await page.locator('#progress').textContent(),/LUA:/);
+  assert.equal(network.filter(request=>request.method!=='GET').length,0);
+  assert.deepEqual(failures,[]);
+ }finally{await browser.close();}
+});

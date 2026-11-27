@@ -49,6 +49,12 @@ test('bundled audio plays without any browser voices, honors volume and stops', 
   assert.equal(players[0].volume,.6);
   stop(); assert.equal(players[0].paused,true);
   players[0].onended(); assert.match(status,/áudio do aplicativo/);
+  for(const id of ['lua','sol','estrela','ceu','planeta']) {
+    speak(id,.6,s=>status=s,'/assets/audio/'+id+'.mp3');
+    assert.equal(players.at(-1).src,'/assets/audio/'+id+'.mp3');
+    assert.match(status,/áudio do aplicativo/);
+  }
+  stop();
   delete globalThis.Audio;
 });
 

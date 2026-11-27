@@ -203,6 +203,36 @@
       "text": "zê",
       "file": "letra-z.mp3",
       "sha256": "5f8a43367633ab683a63e776c912053e88f3ba5009b09c2945a070ab01de3c44"
+    },
+    {
+      "id": "lua",
+      "text": "lua",
+      "file": "lua.mp3",
+      "sha256": "d863e10fa487420ca0aa7394a3657627afa018e27abe43748e3c1977339d266f"
+    },
+    {
+      "id": "sol",
+      "text": "sol",
+      "file": "sol.mp3",
+      "sha256": "dfa85882ececef82c95673838584e99ceefa941fdeb3bfe640c0874722303fa8"
+    },
+    {
+      "id": "estrela",
+      "text": "estrela",
+      "file": "estrela.mp3",
+      "sha256": "08d98a3888b90708d44db88e73331abf9d30e55a7616885b9c2050d9c011755f"
+    },
+    {
+      "id": "ceu",
+      "text": "céu",
+      "file": "ceu.mp3",
+      "sha256": "6e05ee619f8cc8e18c3d994ec489f8cfe8d6eb7b55a11ca9ebfc5b85635b02db"
+    },
+    {
+      "id": "planeta",
+      "text": "planeta",
+      "file": "planeta.mp3",
+      "sha256": "f536c677fbb6c85a11fd6a494068e5850ced0937ea9d67e177e90d33d9abe365"
     }
   ]
 }

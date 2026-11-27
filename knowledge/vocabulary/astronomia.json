@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "language": "pt-BR",
+  "theme": {
+    "id": "astronomia",
+    "label": "Astronomia"
+  },
+  "words": [
+    {
+      "id": "lua",
+      "text": "LUA",
+      "alt": "a Lua",
+      "category": "astro",
+      "complexity": 1,
+      "image": "/assets/lua.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/lua.svg",
+            "label": "Ilustração original",
+            "alt": "a Lua em uma representação ilustrada"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "sol",
+      "text": "SOL",
+      "alt": "o Sol",
+      "category": "astro",
+      "complexity": 1,
+      "image": "/assets/sol.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/sol.svg",
+            "label": "Ilustração original",
+            "alt": "o Sol em uma representação ilustrada"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "estrela",
+      "text": "ESTRELA",
+      "alt": "uma estrela",
+      "category": "astro",
+      "complexity": 3,
+      "image": "/assets/estrela.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/estrela.svg",
+            "label": "Ilustração original",
+            "alt": "uma estrela em uma representação ilustrada"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "ceu",
+      "text": "CÉU",
+      "alt": "o céu",
+      "category": "ambiente",
+      "complexity": 2,
+      "image": "/assets/ceu.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/ceu.svg",
+            "label": "Ilustração original",
+            "alt": "o céu em uma representação ilustrada"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    },
+    {
+      "id": "planeta",
+      "text": "PLANETA",
+      "alt": "um planeta",
+      "category": "astro",
+      "complexity": 3,
+      "image": "/assets/planeta.svg",
+      "skills": [
+        "associar-imagem-palavra",
+        "completar-letra",
+        "ordenar-letras"
+      ],
+      "pedagogy": {
+        "reviewed": false,
+        "optionalPrerequisites": [],
+        "presentations": [
+          {
+            "id": "image-v1",
+            "kind": "illustration",
+            "asset": "/assets/planeta.svg",
+            "label": "Ilustração original",
+            "alt": "um planeta em uma representação ilustrada"
+          }
+        ],
+        "note": "Complexidade editorial provisória; sem pré-requisitos obrigatórios."
+      }
+    }
+  ],
+  "relations": [
+    {
+      "from": "sol",
+      "to": "estrela",
+      "label": "é uma"
+    },
+    {
+      "from": "lua",
+      "to": "ceu",
+      "label": "pode ser vista no"
+    },
+    {
+      "from": "sol",
+      "to": "ceu",
+      "label": "pode ser visto no"
+    },
+    {
+      "from": "estrela",
+      "to": "ceu",
+      "label": "relacionada ao"
+    },
+    {
+      "from": "planeta",
+      "to": "estrela",
+      "label": "relacionado a"
+    },
+    {
+      "from": "planeta",
+      "to": "astronomia",
+      "label": "pertence ao tema"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "astronomia",
+      "label": "ASTRONOMIA",
+      "kind": "theme",
+      "playable": false,
+      "reviewed": false
+    }
+  ]
+}

@@ -8,13 +8,18 @@ from backend.app.integrations.giraf import MockGiraf
 
 ROOT = Path(__file__).resolve().parents[2]
 FRONTEND = ROOT / "frontend"
-CATALOG = json.loads((ROOT / "knowledge/vocabulary/fundo-do-mar.json").read_text())
+THEMES = [json.loads((ROOT / f"knowledge/vocabulary/{name}.json").read_text()) for name in ('fundo-do-mar','astronomia')]
+CATALOG = {'version': 4, 'language': 'pt-BR', 'theme': THEMES[0]['theme'],
+           'themes': [entry['theme'] for entry in THEMES],
+           'words': [{**word, 'themeId': entry['theme']['id']} for entry in THEMES for word in entry['words']],
+           'relations': [edge for entry in THEMES for edge in entry['relations']],
+           'concepts': [concept for entry in THEMES for concept in entry.get('concepts', [])]}
 RULES = json.loads((ROOT / "knowledge/pedagogical-rules/v0.1.json").read_text())
 ENVIRONMENT = os.environ.get('APP_ENV', 'local')
 if ENVIRONMENT not in {'local', 'principal', 'testes'}:
     raise RuntimeError('APP_ENV deve ser local, principal ou testes')
 mock = MockGiraf()
-app = FastAPI(title="Pequenas Girafas", version="0.1.6", docs_url=None, redoc_url=None)
+app = FastAPI(title="Pequenas Girafas", version="0.1.7", docs_url=None, redoc_url=None)
 
 @app.middleware("http")
 async def headers(request, call_next):
@@ -29,7 +34,7 @@ async def headers(request, call_next):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "0.1.6", "mode": "mock", "personal_data": "device_only"}
+    return {"status": "ok", "version": "0.1.7", "mode": "mock", "personal_data": "device_only"}
 
 @app.get("/api/v1/catalog")
 def catalog():

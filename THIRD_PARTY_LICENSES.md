@@ -33,3 +33,5 @@ O catálogo atual substitui os áudios eSpeak por gravações geradas com `edge-
 O manifesto ao lado dos MP3 contém transcrições genéricas e hashes. A geração usa o serviço online uma vez por catálogo; o aplicativo distribuído toca somente os arquivos locais. O script eSpeak foi mantido como alternativa histórica, mas os MP3 atuais não foram produzidos por ele.
 
 As seis variações SVG de PEIXE, POLVO e ÁGUA da versão 0.1.6 foram desenhadas para este projeto com formas vetoriais originais. Não são fotos, pictogramas de bibliotecas externas nem assets GIRAF/ARASAAC. As imagens originais foram preservadas. Revisão pedagógica continua pendente. Os SVGs originais estão cobertos pela licença do código próprio em LICENSE.
+
+A V0.1.7 acrescenta cinco SVGs originais de Astronomia sob a licença do código próprio e cinco MP3 gerados com a mesma voz e ferramenta Edge TTS. O catálogo passa a 38 gravações; os 33 arquivos anteriores permanecem inalterados. Os direitos e condições do serviço de voz continuam separados da licença do software.

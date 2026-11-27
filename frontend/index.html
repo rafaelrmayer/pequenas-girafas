@@ -9,7 +9,7 @@
 <fieldset class="activity-picker"><legend>Como você quer explorar?</legend><label><input type="radio" name="activity" value="build" checked> Montar a palavra</label><label><input type="radio" name="activity" value="missing"> Completar uma letra</label><label><input type="radio" name="activity" value="match"> Associar imagem e palavra</label></fieldset><div class="activity-grid"><div class="picture-card">
   <img id="picture" src="/assets/peixe.svg" alt="Um peixe" width="300" height="300">
   <p id="word-model" class="word-model">PEIXE</p>
-  <div class="picture-audio"><button id="listen" class="soft">Ouvir a palavra</button><button id="stop-sound" class="text-button">Parar áudio</button></div>
+  <div class="picture-audio"><button id="listen" class="soft">Ouvir a palavra</button><button id="next-word" class="soft" type="button">Próxima palavra</button><button id="stop-sound" class="text-button">Parar áudio</button></div>
   <p id="word-audio-status" class="small" role="status" aria-live="polite"></p>
 </div>
 <div class="build-card"><h3 id="task-title" tabindex="-1">Vamos juntar as letras?</h3><p id="task-instructions">Toque nas letras para montar a palavra.</p><div id="letter-play"><div id="slots" class="slots" role="group" aria-label="Letras escolhidas"></div><div id="letter-bank" class="letter-bank" role="group" aria-label="Letras disponíveis"></div></div><div id="match-options" class="match-options" role="group" aria-label="Palavras para associar" hidden></div>

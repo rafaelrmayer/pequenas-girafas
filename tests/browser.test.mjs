@@ -559,3 +559,32 @@ test('astronomy is freely selected, keeps both themes records and works offline 
   assert.deepEqual(failures,[]);
  }finally{await browser.close();}
 });
+
+
+test('next word cycles within the selected theme by click and keyboard without recording skipped rounds',async()=>{
+ const {browser,page,failures}=await setup({viewport:{width:390,height:844}});
+ try{
+  await page.locator('#theme').selectOption('astronomia');
+  await page.getByRole('button',{name:'Adicionar L',exact:true}).click();
+  await page.getByRole('button',{name:'Próxima palavra',exact:true}).click();
+  assert.equal(await page.locator('#word').inputValue(),'sol');
+  assert.match(await page.locator('#feedback').textContent(),/Próxima palavra: SOL/);
+  assert.match(await page.locator('#progress').textContent(),/Ainda não há/);
+  await page.keyboard.press('Enter');assert.equal(await page.locator('#word').inputValue(),'estrela');
+  await page.locator('input[name="activity"][value="match"]').check();
+  await page.locator('#word').selectOption('planeta');await page.locator('#next-word').click();
+  assert.equal(await page.locator('#word').inputValue(),'lua');
+  assert.equal(await page.locator('input[name="activity"][value="match"]').isChecked(),true);
+  await page.locator('#match-options button').filter({hasText:'LUA'}).click();await page.locator('#check').click();
+  await page.locator('#repeat').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.querySelector('#progress').textContent.includes('LUA:'));
+  await page.locator('#next-word').click();assert.equal(await page.locator('#word').inputValue(),'sol');
+  assert.match(await page.locator('#progress').textContent(),/Associar imagem e palavra: 1/);
+  assert.ok(!(await page.locator('#progress').textContent()).includes('SOL:'));
+  const events=await page.evaluate(async()=>{const store=await import('/storage/store.mjs');return (await store.load()).events;});
+  assert.equal(events.length,1);assert.equal(events[0].wordId,'lua');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  assert.deepEqual(failures,[]);
+  await page.screenshot({path:'test-results/proxima-palavra-mobile.png',fullPage:true});
+ }finally{await browser.close();}
+});

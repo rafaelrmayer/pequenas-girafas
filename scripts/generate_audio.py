@@ -14,7 +14,8 @@ LETTERS = dict(zip('abcdefghijklmnopqrstuvwxyz', ['á','bê','cê','dê','é','�
 ROOT = Path(__file__).resolve().parents[1]
 PHRASES = {item['id']:item['text'].lower()+'.' for item in json.loads((ROOT/'frontend/phrases/catalog.json').read_text())}
 CONTINUATIONS = {choice['audioId']:choice['text'].lower()+'.' for group in json.loads((ROOT/'frontend/phrases/continuations.json').read_text()) for action in group['actions'] for choice in action['complements']}
-CATALOG = {**WORDS, **{'letra-'+key:value for key,value in LETTERS.items()}, **PHRASES, **CONTINUATIONS}
+CARDS = {item['audioId']:item['text'].lower() for item in json.loads((ROOT/'frontend/stories/tokens.json').read_text()) if item['audioId'].startswith('card-')}
+CATALOG = {**WORDS, **{'letra-'+key:value for key,value in LETTERS.items()}, **PHRASES, **CONTINUATIONS, **CARDS}
 VOICES = ('pt-BR-FranciscaNeural','pt-BR-AntonioNeural','pt-BR-ThalitaMultilingualNeural')
 
 async def generate(output, synthesize, *, voice, version, rate='-15%', only=None):

@@ -227,8 +227,16 @@ Abrir ou ignorar preserva os cartões; escolher uma sugestão reinicia a rodada 
 
 ## Minha primeira história
 
-Abra **Histórias** no topo de Atividades. Escolha tema, personagem/elemento, cenário e uma frase existente; adicione até seis páginas. É possível editar, reordenar, remover, desfazer as últimas dez alterações e ler as páginas com áudio manual. Cenários são referências visuais livres, sem correção de coerência, notas ou registros de aprendizagem.
+Abra **Histórias** no menu inferior. Escolha tema, personagem/elemento, cenário e uma frase existente; adicione até seis páginas. É possível editar, reordenar, remover, desfazer as últimas dez alterações e ler as páginas com áudio manual. Cenários são referências visuais livres, sem correção de coerência, notas ou registros de aprendizagem.
 
 **Salvar história neste navegador** mantém um rascunho por perfil. Salvar substitui a versão anterior. Alterações sem salvar ficam somente na página e podem se perder ao recarregar. A cópia JSON schemaVersion 6 inclui a última versão salva; a exclusão em Responsáveis limpa o rascunho e a edição atual. Falha ao salvar é avisada e mantém a edição apenas na memória, sem substituir a versão salva.
 
-São reutilizadas as imagens e 24 frases/áudios existentes, com oito personagens/elementos e seis cenários. Não há texto livre, desenho, geração por IA, biblioteca de múltiplas histórias ou impressão de livros nesta etapa. Cache v23 permite uso offline após atualização. Veja [decisão e limites](docs/adr/0013-primeiras-historias.md).
+São reutilizadas as imagens e 24 frases/áudios existentes, com oito personagens/elementos e seis cenários. Há cartões de palavras e desenho livre desde V0.1.17. Digitação livre, geração por IA, biblioteca de múltiplas histórias e impressão de livros ficam para etapas posteriores. Cache v23 permite uso offline após atualização. Veja [decisão e limites](docs/adr/0013-primeiras-historias.md).
+
+## Histórias: cartões e desenho
+
+Histórias agora tem uma área própria no menu inferior. Cada página pode usar uma frase pronta ou até 12 cartões de palavras, repetidos e organizados livremente, sem conferir certo/errado. O banco contém 49 palavras fixas, com filtros de tema, ações/ligações e todas as palavras. Combinações novas são lidas palavra por palavra; se coincidirem com uma frase já gravada, usam seu áudio completo. São 25 novas gravações genéricas, 99 no total, sem envio da frase criada a provedores.
+
+Para ilustrar, escolha figuras ou desenhe com mouse, toque, caneta ou teclado. Há cores, espessuras, borracha, desfazer traço e limpeza reversível. Setas movem o ponto; Enter/Espaço abaixa ou levanta o pincel; Esc levanta e Tab sai. Não há reconhecimento ou avaliação do desenho.
+
+**Adicionar/Atualizar página** inclui a frase e a imagem na história; **Salvar história neste navegador** salva o rascunho. Desenhos são PNGs locais de 600×400; trajetórias, pressão e horários não são gravados. Rascunhos antigos continuam abrindo, novos usam formato 2; cópia JSON schemaVersion 7 inclui palavras, frases e desenhos das páginas salvas. Exclusão limpa também imagens, canvas e desfazer. Cache v24. Veja [decisão e limites](docs/adr/0014-historias-cartoes-desenho.md).

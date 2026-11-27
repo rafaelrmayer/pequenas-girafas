@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.17 — 2026-11-27
+
+- Histórias ganha área própria no menu inferior, preservando a edição ao navegar.
+- Frases com até 12 cartões e leitura local por palavras ou gravação completa quando disponível.
+- Desenho livre por mouse, toque, caneta e teclado, com borracha, cores e desfazer.
+- PNGs locais em rascunhos formato 2, compatíveis com formato 1; cópia schemaVersion 7. Cache v24 e 99 áudios.
+
 ## 0.1.16 — 2026-11-27
 
 - Histórias simples com até seis páginas, personagens/elementos, cenários e frases existentes.

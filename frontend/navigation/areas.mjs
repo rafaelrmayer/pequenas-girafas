@@ -1,8 +1,8 @@
 export function setupAreas({stopAudio}){
- const panels={atividades:document.getElementById('area-atividades'),apoios:document.getElementById('configuracoes'),responsaveis:document.getElementById('responsaveis')};
- const targets={atividade:'atividades',frases:'atividades',historias:'atividades',alfabeto:'atividades',configuracoes:'apoios',responsaveis:'responsaveis'};
- const headings={atividades:'activity-title',apoios:'settings-title',responsaveis:'adult-title'};
- const scroll={atividades:0,apoios:0,responsaveis:0},lastFocus={};let current='atividades';
+ const panels={atividades:document.getElementById('area-atividades'),historias:document.getElementById('historias'),apoios:document.getElementById('configuracoes'),responsaveis:document.getElementById('responsaveis')};
+ const targets={atividade:'atividades',frases:'atividades',historias:'historias',alfabeto:'atividades',configuracoes:'apoios',responsaveis:'responsaveis'};
+ const headings={atividades:'activity-title',historias:'stories-title',apoios:'settings-title',responsaveis:'adult-title'};
+ const scroll={atividades:0,historias:0,apoios:0,responsaveis:0},lastFocus={};let current='atividades';
  function activate(target,{restore=false,focus=true}={}){
   const area=targets[target];if(!area)return;if(target==='historias')document.getElementById('story-editor').open=true;
   if(current!==area){scroll[current]=window.scrollY;stopAudio();}
@@ -19,7 +19,7 @@ export function setupAreas({stopAudio}){
   const link=event.target.closest('a[href^="#"]');if(!link||event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
   const target=link.getAttribute('href').slice(1);if(!targets[target])return;event.preventDefault();
   if(location.hash!=='#'+target)history.pushState(null,'','#'+target);
-  activate(target,{restore:link.dataset.area==='atividades'});
+  activate(target,{restore:['atividades','historias'].includes(link.dataset.area)});
  });
  const fromLocation=()=>activate(location.hash.slice(1)||'atividade');
  window.addEventListener('popstate',fromLocation);window.addEventListener('hashchange',fromLocation);

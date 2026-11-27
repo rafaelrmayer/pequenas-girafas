@@ -1,3 +1,4 @@
+import {reviewOverview} from './ai/adaptive-learning/reviews.mjs';
 import * as store from './storage/store.mjs';
 import {recommendSupport, completion, matchesWord, evidenceFor, localDay} from './ai/adaptive-learning/engine.mjs';
 import {recommendActivities} from './ai/adaptive-learning/planner.mjs';
@@ -127,8 +128,35 @@ function changeVisual(id) {
   renderAdvice();
   announce(roundStarted?'Imagem alterada. Sua rodada e as letras foram preservadas; a troca será identificada no registro.':'Imagem escolhida. Explore quando quiser.');
 }
+function acceptSuggestion(suggestion) {
+  if(saving) return;
+  if(typeof suggestion.lowercase==='boolean') changeSettings({lowercase:suggestion.lowercase});
+  activity=suggestion.activity;document.querySelector(`input[name="activity"][value="${activity}"]`).checked=true;
+  chooseWord(suggestion.wordId,{mode:suggestion.mode,imageId:suggestion.imageId});$('task-title').focus();
+}
+function renderReviews() {
+  if(!word) return;
+  const overview=reviewOverview({catalog,events:state.events,today:localDay(),settings:state.settings,rules});
+  $('review-list').replaceChildren();
+  const updateStatus=message=>{if($('review-status').textContent!==message)$('review-status').textContent=message;};
+  if(!overview.enabled){updateStatus('Personalização desligada. Não há lista personalizada de revisitas; todas as palavras continuam disponíveis.');return;}
+  const unknown=overview.entries.filter(item=>item.status==='undated').length;
+  const checkDates=overview.entries.filter(item=>['check_clock','check_date'].includes(item.status)).length;
+  const recent=overview.entries.filter(item=>item.status==='recent').length;
+  let message=`Tema ${catalog.theme.label}. Intervalo escolhido: ${overview.interval} dias. Opções com intervalo atingido: ${overview.available.length}. Atividades com registro datado mais recente: ${recent}. Sem data para calcular intervalo: ${unknown}. Com data a conferir: ${checkDates}. Apenas atividades com conclusões registradas entram nesta lista. Todas as escolhas são opcionais.`;
+  if(!overview.entries.length)message+=' Ainda não há conclusões registradas neste tema; falta de registro não é dificuldade.';
+  if(checkDates)message+=' Há datas que não podem ser comparadas com hoje. Confira a data do dispositivo; não foram usadas para indicar revisita.';
+  updateStatus(message);
+  for(const item of overview.available.slice(0,5)) {
+    const row=document.createElement('li');
+    const label=document.createElement('p');label.textContent=`${item.text} — ${ACTIVITIES[item.activity]}. Último registro datado: ${item.lastDay}; ${item.daysSince} dias desde essa data. ${item.independent} conclusões sem pistas e ${item.assisted} com apoio.${item.undated?` Outros ${item.undated} registros não têm data válida.`:''}`;
+    const visit=button(`Revisitar ${item.text}: ${ACTIVITIES[item.activity]}`,()=>acceptSuggestion({wordId:item.wordId,activity:item.activity,mode:'model'}),'soft');
+    visit.dataset.wordId=item.wordId;visit.dataset.activity=item.activity;row.append(label,visit);$('review-list').append(row);
+  }
+}
 function renderEvidence() {
   if(!word) return;
+  renderReviews();
   $('evidence-word').textContent=word.text;
   $('skill-evidence').replaceChildren();
   for(const type of Object.keys(ACTIVITIES)) {
@@ -151,6 +179,7 @@ function renderEvidence() {
 }
 function renderAdvice() {
   if(!word) return;
+  renderReviews();
   $('adaptive-suggestions').replaceChildren();
   const disabled=state.settings.adapt===false;
   $('ignore-advice').hidden=disabled || adviceDismissed;
@@ -162,10 +191,7 @@ function renderAdvice() {
     const title=document.createElement('h4');title.textContent=suggestion.label;
     const why=document.createElement('p');why.textContent=suggestion.reason;
     const accept=button('Experimentar',()=>{
-      if(saving) return;
-      if(typeof suggestion.lowercase==='boolean') changeSettings({lowercase:suggestion.lowercase});
-      activity=suggestion.activity;document.querySelector(`input[name="activity"][value="${activity}"]`).checked=true;
-      chooseWord(suggestion.wordId,{mode:suggestion.mode,imageId:suggestion.imageId});$('task-title').focus();
+      acceptSuggestion(suggestion);
     },'soft');
     if(suggestion.imageId) accept.dataset.imageId=suggestion.imageId;
     accept.dataset.action=suggestion.action;accept.dataset.wordId=suggestion.wordId;accept.dataset.activity=suggestion.activity;

@@ -1,3 +1,4 @@
+import {reviewOverview} from '../frontend/ai/adaptive-learning/reviews.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -82,4 +83,46 @@ test('nature and fruit graphs offer only words from their selected theme',()=>{
    assert.ok(advice.every(suggestion=>selected.words.some(candidate=>candidate.id===suggestion.wordId)));
   }
  }
+});
+
+
+test('review preserves the observed activity even when another activity is preferred',()=>{
+ const suggestions=plan([make('mar','old',false,'match','2026-11-01')],{settings:{preferredActivity:'build'}});
+ assert.equal(suggestions[0].action,'review');assert.equal(suggestions[0].activity,'match');
+ const undated=[{wordId:'mar',sessionId:'old',support:'assisted',outcome:'completed',activity:'missing'}];
+ const manual=plan(undated,{settings:{exploration:'review',preferredActivity:'build'}});
+ assert.equal(manual[0].activity,'missing');assert.match(manual[0].reason,/sem data/);
+});
+test('review overview separates unknown, future and recent dates and never mutates records',()=>{
+ const events=[make('mar','a',true,'match','2026-11-01'),make('peixe','b',false,'build','2026-11-25'),
+  make('polvo','c',false,'missing','2026-12-01'),{wordId:'concha',sessionId:'legacy',outcome:'completed',support:'independent',activity:'match'},
+  {wordId:'praia',sessionId:'unfinished',outcome:'abandoned',activity:'build',day:'2026-11-01'}];
+ const before=JSON.stringify(events);
+ const result=reviewOverview({catalog,events,today:'2026-11-26'});
+ assert.equal(result.available.length,1);assert.equal(result.available[0].wordId,'mar');
+ assert.equal(result.available[0].assisted,1);assert.equal(result.available[0].independent,0);
+ assert.equal(result.entries.find(item=>item.wordId==='peixe').status,'recent');
+ assert.equal(result.entries.find(item=>item.wordId==='polvo').status,'check_date');
+ assert.equal(result.entries.find(item=>item.wordId==='concha').status,'undated');
+ assert.ok(!result.entries.some(item=>item.wordId==='praia'));assert.equal(JSON.stringify(events),before);
+});
+test('future-dated evidence blocks interval review for that activity without discarding older records',()=>{
+ const events=[make('mar','a',false,'match','2026-11-01'),make('mar','b',false,'match','2026-12-01')];
+ assert.equal(reviewOverview({catalog,events,today:'2026-11-26'}).available.length,0);
+ assert.ok(!plan(events).some(item=>item.action==='review'));
+});
+test('a completed revisit refreshes only its activity; interval changes never rewrite history',()=>{
+ const events=[make('mar','a',false,'match','2026-11-01'),make('mar','b',true,'build','2026-11-01'),make('mar','now',false,'match','2026-11-26')];
+ const result=reviewOverview({catalog,events,today:'2026-11-26'});
+ assert.equal(result.available.length,1);assert.equal(result.available[0].activity,'build');
+ assert.equal(result.entries.find(item=>item.activity==='match').status,'recent');
+ const item=[make('peixe','one',false,'build','2026-11-20')];
+ assert.equal(reviewOverview({catalog,events:item,today:'2026-11-26',settings:{reviewAfterDays:3}}).available.length,1);
+ assert.equal(reviewOverview({catalog,events:item,today:'2026-11-26',settings:{reviewAfterDays:7}}).available.length,0);
+});
+test('invalid clock or disabled personalization cannot generate interval reviews',()=>{
+ const events=[make('mar','a',false,'match','2026-11-01')];
+ const invalid=reviewOverview({catalog,events,today:'invalid'});assert.equal(invalid.available.length,0);assert.equal(invalid.entries[0].status,'check_clock');
+ const disabled=reviewOverview({catalog,events,today:'2026-11-26',settings:{adapt:false}});assert.equal(disabled.enabled,false);assert.deepEqual(disabled.entries,[]);
+ const fallback=reviewOverview({catalog,events,today:'2026-11-26',settings:{reviewAfterDays:1000}});assert.equal(fallback.interval,7);
 });

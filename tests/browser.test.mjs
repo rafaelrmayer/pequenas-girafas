@@ -546,7 +546,12 @@ test('astronomy is freely selected, keeps both themes records and works offline 
    }return true;}finally{await ctx.close();}
   }),true);
   await page.screenshot({path:'test-results/astronomia-desktop.png',fullPage:true});
-  for(const id of ['lua','sol','estrela','ceu','planeta']){await page.locator('#word').selectOption(id);await page.locator('#picture').screenshot({path:'test-results/astronomia-'+id+'.png'});}
+  await page.evaluate(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[],cancel:()=>{}},configurable:true}));
+  for(const id of ['lua','sol','estrela','ceu','planeta']){
+    await page.locator('#word').selectOption(id);await page.locator('#listen').click();
+    await page.waitForFunction(()=>document.querySelector('#word-audio-status').textContent==='Leitura concluída.');
+    await page.locator('#picture').screenshot({path:'test-results/astronomia-'+id+'.png'});
+  }
   await page.locator('#theme').selectOption('fundo-do-mar');
   assert.equal(await page.locator('#word option').count(),7);
   assert.match(await page.locator('#progress').textContent(),/LUA:/);
